@@ -87,16 +87,20 @@ export default function(opts) {
     .filter(pluginName => isPluginRequired(targets, pluginList[pluginName]))
     .map(pluginName => {
       return includes(looseMode, pluginName)
-        ? [require(`babel-plugin-${pluginName}`), { loose }]
+        ? [require(`babel-plugin-${pluginName}`), { loose: true }]
         : require(`babel-plugin-${pluginName}`);
     });
 
+  // TODO: Support loose mode
   const modules = Object.keys(modulesMode)
     .map(moduleType => {
-      return [require(`babel-plugin-transform-es2015-modules-${moduleType}`), { loose }]
+      return [require(`babel-plugin-transform-es2015-modules-${moduleType}`)]
     });
 
   return {
-    plugins: [].concat(transformations, modules)
+    plugins: [
+      ...modules,
+      ...transformations
+    ]
   }
 }
