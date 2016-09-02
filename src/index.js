@@ -4,6 +4,7 @@
 // "proto-to-assign",
 // "es5-property-mutators",
 
+import isArray from "lodash.isarray";
 import includes from "lodash.includes";
 import pluginList from "./plugins.js";
 
@@ -12,14 +13,6 @@ export const plugins = [
   "es3-property-literals",
   "proto-to-assign",
   "es5-property-mutators",
-];
-
-// modules?
-export const modules = [
-  "transform-es2015-modules-amd",
-  "transform-es2015-modules-commonjs",
-  "transform-es2015-modules-systemjs",
-  "transform-es2015-modules-umd"
 ];
 
 export const stagePlugins = [
@@ -31,6 +24,13 @@ export const stagePlugins = [
   "transform-function-bind",
   "transform-object-rest-spread",
 ];
+
+export const MODULE_TRANSFORMATIONS = {
+  "amd": "transform-es2015-modules-amd",
+  "commonjs": "transform-es2015-modules-commonjs",
+  "systemjs": "transform-es2015-modules-systemjs",
+  "umd": "transform-es2015-modules-umd"
+};
 
 /**
  * Determine if a transformation is required
@@ -72,15 +72,34 @@ const getLooseMode = looseOpts => {
   return looseOpts;
 }
 
-// TODO: Allow specifying modules as: Boolean, String or Array of module types
-const getModules = modulesOpts => {
+/**
+ * Given modulesOpts return an Array of all required module transformations
+ * @param  {String|Array.<String>|Boolean}  modulesOpts  An argument enumerating the modules to transform
+ * @return {Array.<String>}  An array of module transformation plugin names
+ */
+export const getModuleTransformations = modulesOpts => {
   if (!modulesOpts) { return []; }
-  return modulesOpts;
+
+  if (modulesOpts === true) { return Object.values(MODULE_TRANSFORMATIONS); }
+
+  if (typeof modulesOpts === "string") {
+    return MODULE_TRANSFORMATIONS[modulesOpts]
+      ? [MODULE_TRANSFORMATIONS[modulesOpts]]
+      : [];
+  }
+
+  if (isArray(modulesOpts)) {
+    return modulesOpts
+      .map(moduleType => MODULE_TRANSFORMATIONS[moduleType])
+      .filter(Boolean);
+  }
+
+  return [];
 }
 
 export default function(opts) {
   const looseMode = getLooseMode(opts.loose);
-  const modulesMode = getModules(opts.modules);
+  const modulesMode = getModuleTransformations(opts.modules);
   const targets = getTargets(opts.targets);
 
   const transformations = Object.keys(pluginList)
@@ -91,10 +110,11 @@ export default function(opts) {
         : require(`babel-plugin-${pluginName}`);
     });
 
-  // TODO: Support loose mode
   const modules = Object.keys(modulesMode)
     .map(moduleType => {
-      return [require(`babel-plugin-transform-es2015-modules-${moduleType}`)]
+      return includes(looseMode, moduleType)
+        ? [require(`babel-plugin-transform-es2015-modules-${moduleType}`), { loose: true }]
+        : require(`babel-plugin-transform-es2015-modules-${moduleType}`);
     });
 
   return {
