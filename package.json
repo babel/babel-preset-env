@@ -54,7 +54,8 @@
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-plugin-transform-proto-to-assign": "^6.9.0",
     "babel-plugin-transform-regenerator": "^6.6.0",
-    "lodash.includes": "^4.3.0"
+    "lodash.includes": "^4.3.0",
+    "lodash.isarray": "^4.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
