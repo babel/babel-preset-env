@@ -28,6 +28,7 @@ const environments = [
   "edge",
   "firefox",
   "safari",
+  "node"
 ];
 
 const envMap = {
@@ -38,6 +39,9 @@ const envMap = {
   chrome21dev: "chrome21",
   firefox3_5: "firefox3",
   firefox3_6: "firefox3",
+  node012: "node0.12",
+  node64: "node6",
+  node65: "node6.5"
 };
 
 const getLowestImplementedVersion = ({ features }, env) => {
@@ -45,17 +49,23 @@ const getLowestImplementedVersion = ({ features }, env) => {
     .filter((test) => features.indexOf(test.name) >= 0)
     .map((test) => {
       return test.subtests ?
-        test.subtests.map((subtest) => subtest.res) :
-        test.res;
+        test.subtests.map((subtest) => ({
+          name: `${test.name}/${subtest.name}`,
+          res: subtest.res
+        })) :
+      {
+        name: test.name,
+        res: test.res
+      };
     })
   );
 
   let envTests = tests
-  .map((test, i) => {
+  .map(({ res: test, name }, i) => {
     return Object.keys(test)
     .filter((t) => t.startsWith(env))
     // TODO: make flagged/etc an options
-    .filter((test) => tests[i][test] === true || tests[i][test] === "strict")
+    .filter((test) => tests[i].res[test] === true || tests[i].res[test] === "strict")
     // normalize some keys
     .map((test) => envMap[test] || test)
     .filter((test) => !isNaN(parseInt(test.replace(env, ""))))
@@ -64,11 +74,19 @@ const getLowestImplementedVersion = ({ features }, env) => {
 
   let envFiltered = envTests.filter((t) => t);
   if (envTests.length > envFiltered.length) {
+    // envTests.forEach((test, i) => {
+    //   if (!test) {
+    //     // print unsupported features
+    //     if (env === 'node') {
+    //       console.log(`ENV(${env}): ${tests[i].name}`);
+    //     }
+    //   }
+    // });
     return null;
   }
 
   return envTests
-  .map((str) => parseInt(str.replace(env, "") || 0, 10))
+  .map((str) => Number(str.replace(env, "")))
   .reduce((a, b) => { return (a < b) ? b : a; });
 };
 
