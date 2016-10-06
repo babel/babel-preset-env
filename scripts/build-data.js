@@ -30,6 +30,16 @@ const environments = [
   "safari",
 ];
 
+const envMap = {
+  safari51: "safari5",
+  safari71_8: "safari7",
+  chrome: "chrome19",
+  chrome19dev: "chrome19",
+  chrome21dev: "chrome21",
+  firefox3_5: "firefox3",
+  firefox3_6: "firefox3",
+};
+
 const getLowestImplementedVersion = ({ features }, env) => {
   let tests = flatten(compatibilityTests
     .filter((test) => features.indexOf(test.name) >= 0)
@@ -40,20 +50,26 @@ const getLowestImplementedVersion = ({ features }, env) => {
     })
   );
 
-  const envVersions = versions.filter((version) => version.startsWith(env));
+  let envTests = tests
+  .map((test, i) => {
+    return Object.keys(test)
+    .filter((t) => t.startsWith(env))
+    // TODO: make flagged/etc an options
+    .filter((test) => tests[i][test] === true || tests[i][test] === "strict")
+    // normalize some keys
+    .map((test) => envMap[test] || test)
+    .filter((test) => !isNaN(parseInt(test.replace(env, ""))))
+    .shift();
+  });
 
-  for (let i = 0; i < envVersions.length; i++) {
-    const version = envVersions[i];
-    tests = tests.filter((test) =>
-      test[version] !== true &&
-      test[version] !== "strict"
-    );
-    if (tests.length === 0) {
-      const number = parseInt(version.replace(env, ""), 10);
-      return isFinite(number) ? number : null;
-    }
+  let envFiltered = envTests.filter((t) => t);
+  if (envTests.length > envFiltered.length) {
+    return null;
   }
-  return null;
+
+  return envTests
+  .map((str) => parseInt(str.replace(env, "") || 0, 10))
+  .reduce((a, b) => { return (a < b) ? b : a; });
 };
 
 const data = {};
