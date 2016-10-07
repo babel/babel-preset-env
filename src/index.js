@@ -5,6 +5,7 @@
 // "es5-property-mutators",
 
 import pluginList from "../data/plugins.json";
+import browserslist from "browserslist";
 
 export const plugins = [
   "es3-member-expression-literals",
@@ -62,7 +63,16 @@ export const isPluginRequired = (supportedEnvironments, plugin) => {
 };
 
 const getTargets = targetOpts => {
-  return targetOpts || {};
+  const mergedOpts = targetOpts || {};
+  const browserOpts = targetOpts['browsers'];
+  if (typeof browserOpts === 'string' || Array.isArray(browserOpts)) {
+    delete mergedOpts.browsers;
+    browserslist(browserOpts).forEach(browser => {
+      const [browserName, browserVer] = browser.split(' ');
+      if (!mergedOpts[browserName]) mergedOpts[browserName] = browserVer;
+    });
+  }
+  return mergedOpts;
 };
 
 // TODO: Allow specifying plugins as either shortened or full name
