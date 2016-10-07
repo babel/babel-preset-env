@@ -40,6 +40,10 @@ export const MODULE_TRANSFORMATIONS = {
  * @return {Boolean}  Whether or not the transformation is required
  */
 export const isPluginRequired = (supportedEnvironments, plugin) => {
+  if (supportedEnvironments.browsers) {
+    supportedEnvironments = getTargets(supportedEnvironments);
+  }
+
   const targetEnvironments = Object.keys(supportedEnvironments);
 
   if (targetEnvironments.length === 0) { return true; }
@@ -62,10 +66,14 @@ export const isPluginRequired = (supportedEnvironments, plugin) => {
   return isRequiredForEnvironments.length > 0 ? true : false;
 };
 
+const isBrowsersQueryValid = browsers => {
+  return typeof browsers === 'string' || Array.isArray(browsers);
+};
+
 const getTargets = targetOpts => {
   const mergedOpts = targetOpts || {};
   const browserOpts = targetOpts['browsers'];
-  if (typeof browserOpts === 'string' || Array.isArray(browserOpts)) {
+  if (isBrowsersQueryValid(browserOpts)) {
     delete mergedOpts.browsers;
     browserslist(browserOpts).forEach(browser => {
       const [browserName, browserVer] = browser.split(' ');
