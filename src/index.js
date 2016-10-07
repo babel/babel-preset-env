@@ -69,7 +69,7 @@ const getTargets = targetOpts => {
     delete mergedOpts.browsers;
     browserslist(browserOpts).forEach(browser => {
       const [browserName, browserVer] = browser.split(' ');
-      if (!mergedOpts[browserName]) mergedOpts[browserName] = browserVer;
+      if (!mergedOpts[browserName]) mergedOpts[browserName] = parseInt(browserVer);
     });
   }
   return mergedOpts;
