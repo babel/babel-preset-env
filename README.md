@@ -99,6 +99,24 @@ exports.A = A;
 export class A {}
 ```
 
+```js
+// using browserslist
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "chrome": 52,
+        "browsers": ["last 2 versions", "safari 7"]
+      }
+    }]
+  ]
+}
+
+// ...
+
+export class A {}
+```
+
 ### Example with `debug: true`
 
 ```js
