@@ -70,15 +70,32 @@ const isBrowsersQueryValid = browsers => {
   return typeof browsers === 'string' || Array.isArray(browsers);
 };
 
+const getLowestVersions = (browsers) => {
+  return browsers.reduce((all, browser) => {
+    const [browserName, browserVersion] = browser.split(' ');
+    const previousBrowserVersion = all[browserName];
+    all[browserName] = parseInt(browserVersion);
+    return all;
+  }, {});
+};
+
+const mergeBrowsers = (fromQuery, fromTarget) => {
+  return Object.keys(fromTarget).reduce((queryObj, targKey) => {
+    if (targKey !== 'browsers') {
+      queryObj[targKey] = fromTarget[targKey];
+    }
+    return queryObj;
+  }, fromQuery);
+};
+
 const getTargets = targetOpts => {
-  const mergedOpts = targetOpts || {};
-  const browserOpts = targetOpts['browsers'];
+  let mergedOpts;
+  const browserOpts = targetOpts.browsers;
   if (isBrowsersQueryValid(browserOpts)) {
-    delete mergedOpts.browsers;
-    browserslist(browserOpts).forEach(browser => {
-      const [browserName, browserVer] = browser.split(' ');
-      if (!mergedOpts[browserName]) mergedOpts[browserName] = parseInt(browserVer);
-    });
+    const queryBrowsers = getLowestVersions(browserslist(browserOpts));
+    mergedOpts = mergeBrowsers(queryBrowsers, targetOpts);
+  } else {
+    mergedOpts = targetOpts;
   }
   return mergedOpts;
 };
