@@ -89,15 +89,12 @@ const mergeBrowsers = (fromQuery, fromTarget) => {
 };
 
 const getTargets = targetOpts => {
-  let mergedOpts;
   const browserOpts = targetOpts.browsers;
   if (isBrowsersQueryValid(browserOpts)) {
     const queryBrowsers = getLowestVersions(browserslist(browserOpts));
-    mergedOpts = mergeBrowsers(queryBrowsers, targetOpts);
-  } else {
-    mergedOpts = targetOpts;
+    return mergeBrowsers(queryBrowsers, targetOpts);
   }
-  return mergedOpts;
+  return targetOpts;
 };
 
 // TODO: Allow specifying plugins as either shortened or full name
