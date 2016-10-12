@@ -22,8 +22,9 @@ Currently: "chrome, edge, firefox, safari, node"
 
 > Some node features are > `6.5`.
 
-*browsers* (array/string) - an query to select browsers (ex: last 2 versions, > 5%).  
-Note, browsers' results are overridden by explicit items from `targets`.
+* `browsers` (array/string) - an query to select browsers (ex: last 2 versions, > 5%).  
+
+> Note, browsers' results are overridden by explicit items from `targets`.
 
 * `loose` (boolean) - Enable "loose" transformations for any plugins in this preset that allow them (Disabled by default).
 * `modules` - Enable transformation of ES6 module syntax to another module type (Enabled by default to `"commonjs"`).
