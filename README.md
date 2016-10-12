@@ -142,4 +142,8 @@ syntax-trailing-function-commas {}
 
 ### Using `babel-plugin-transform-object-rest-spread` and targeting node.js 6.5 or higher
 
-You may get a `SyntaxError: Unexpected token ...` error if using the [object-rest-spread](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-object-rest-spread) feature and targeting node.js 6.5 or higher. This is a known issue at [#4074](https://github.com/babel/babel/issues/4074). A simple workaround would be to re-enable the following plugins: `babel-plugin-transform-es2015-destructuring`, and `babel-plugin-transform-es2015-parameters`.
+You may get a `SyntaxError: Unexpected token ...` error if using the [object-rest-spread](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-object-rest-spread) feature and targeting node.js 6.5 or higher.
+
+This is a known issue at [babel/babel#4074](https://github.com/babel/babel/issues/4074).
+
+A simple workaround would be to re-enable the following plugins: `babel-plugin-transform-es2015-destructuring` and `babel-plugin-transform-es2015-parameters`.
