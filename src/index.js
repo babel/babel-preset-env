@@ -67,12 +67,12 @@ export const isPluginRequired = (supportedEnvironments, plugin) => {
 };
 
 const isBrowsersQueryValid = browsers => {
-  return typeof browsers === 'string' || Array.isArray(browsers);
+  return typeof browsers === "string" || Array.isArray(browsers);
 };
 
 const getLowestVersions = (browsers) => {
   return browsers.reduce((all, browser) => {
-    const [browserName, browserVersion] = browser.split(' ');
+    const [browserName, browserVersion] = browser.split(" ");
     all[browserName] = parseInt(browserVersion);
     return all;
   }, {});
@@ -80,7 +80,7 @@ const getLowestVersions = (browsers) => {
 
 const mergeBrowsers = (fromQuery, fromTarget) => {
   return Object.keys(fromTarget).reduce((queryObj, targKey) => {
-    if (targKey !== 'browsers') {
+    if (targKey !== "browsers") {
       queryObj[targKey] = fromTarget[targKey];
     }
     return queryObj;
