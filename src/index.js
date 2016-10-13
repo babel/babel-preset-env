@@ -73,7 +73,6 @@ const isBrowsersQueryValid = browsers => {
 const getLowestVersions = (browsers) => {
   return browsers.reduce((all, browser) => {
     const [browserName, browserVersion] = browser.split(' ');
-    const previousBrowserVersion = all[browserName];
     all[browserName] = parseInt(browserVersion);
     return all;
   }, {});
