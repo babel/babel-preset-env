@@ -1,10 +1,10 @@
 {
   "transform-es2015-arrow-functions": {
-    "chrome": 47,
+    "chrome": 45,
     "edge": 13,
     "firefox": 45,
     "safari": 10,
-    "node": 6,
+    "node": 4,
     "ios": 10
   },
   "transform-es2015-block-scoped-functions": {
@@ -23,11 +23,11 @@
     "ios": 10
   },
   "transform-es2015-classes": {
-    "chrome": 46,
+    "chrome": 45,
     "edge": 13,
     "firefox": 45,
     "safari": 10,
-    "node": 5,
+    "node": 4,
     "ios": 10
   },
   "transform-es2015-computed-properties": {
@@ -66,21 +66,23 @@
   "transform-es2015-literals": {
     "chrome": 44,
     "edge": 12,
+    "firefox": 40,
     "safari": 9,
     "node": 4,
     "ios": 9
   },
   "transform-es2015-object-super": {
-    "chrome": 46,
+    "chrome": 41,
     "edge": 13,
     "firefox": 45,
-    "safari": 10,
-    "node": 5,
-    "ios": 10
+    "safari": 9,
+    "node": 4,
+    "ios": 9
   },
   "transform-es2015-parameters": {
     "chrome": 49,
     "edge": 14,
+    "firefox": 43,
     "safari": 10,
     "node": 6,
     "ios": 10
@@ -102,16 +104,19 @@
     "ios": 10
   },
   "transform-es2015-sticky-regex": {
-    "chrome": 49,
-    "edge": 13,
-    "firefox": 3,
-    "safari": 10,
-    "node": 6,
-    "ios": 10
+    "chrome": -1,
+    "edge": -1,
+    "firefox": -1,
+    "safari": -1,
+    "node": -1,
+    "ie": -1,
+    "android": -1,
+    "ios": -1,
+    "phantom": -1
   },
   "transform-es2015-template-literals": {
     "chrome": 41,
-    "edge": 13,
+    "edge": 12,
     "firefox": 34,
     "safari": 9,
     "node": 4,
