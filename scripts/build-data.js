@@ -12,10 +12,12 @@ const es6Data = require("compat-table/data-es6");
 es6Data.browsers.node6 = es6Data.browsers["node64"];
 const es6PlusData = require("compat-table/data-es2016plus");
 
-let invertedEqualsEnv = {};
-Object.keys(es6Data.browsers)
+const invertedEqualsEnv = Object.keys(es6Data.browsers)
   .filter((b) => es6Data.browsers[b].equals)
-  .forEach((b) => invertedEqualsEnv[es6Data.browsers[b].equals] = b);
+  .reduce((a, b) => {
+    a[es6Data.browsers[b].equals] = b;
+    return a;
+  }, {});
 
 const compatibilityTests = flattenDeep([
   es6Data,
