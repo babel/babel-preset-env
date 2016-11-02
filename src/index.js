@@ -26,7 +26,7 @@ export const isPluginRequired = (supportedEnvironments, plugin) => {
   if (targetEnvironments.length === 0) { return true; }
 
   const isRequiredForEnvironments = targetEnvironments
-    .filter(environment => {
+    .filter((environment) => {
       // Feature is not implemented in that environment
       if (!plugin[environment]) { return true; }
 
@@ -43,7 +43,7 @@ export const isPluginRequired = (supportedEnvironments, plugin) => {
   return isRequiredForEnvironments.length > 0 ? true : false;
 };
 
-const isBrowsersQueryValid = browsers => {
+const isBrowsersQueryValid = (browsers) => {
   return typeof browsers === "string" || Array.isArray(browsers);
 };
 
@@ -121,7 +121,7 @@ export default function buildPreset(context, opts = {}) {
   const debug = opts.debug;
 
   let transformations = Object.keys(pluginList)
-    .filter(pluginName => isPluginRequired(targets, pluginList[pluginName]));
+    .filter((pluginName) => isPluginRequired(targets, pluginList[pluginName]));
 
   if (debug) {
     console.log("");
@@ -130,7 +130,7 @@ export default function buildPreset(context, opts = {}) {
     console.log("Using plugins:");
     console.log("");
     console.log(`module: ${moduleType}`);
-    transformations.forEach(transform => {
+    transformations.forEach((transform) => {
       let envList = pluginList[transform];
       let filteredList = Object.keys(targets)
       .reduce((a, b) => {
@@ -141,7 +141,7 @@ export default function buildPreset(context, opts = {}) {
     });
   }
 
-  transformations = [...transformations, ...whitelist].map(pluginName => {
+  transformations = [...transformations, ...whitelist].map((pluginName) => {
     return [require(`babel-plugin-${pluginName}`), { loose }];
   });
 
