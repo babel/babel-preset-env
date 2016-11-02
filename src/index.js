@@ -64,7 +64,7 @@ const mergeBrowsers = (fromQuery, fromTarget) => {
   }, fromQuery);
 };
 
-const getTargets = targetOpts => {
+const getTargets = (targetOpts = {}) => {
   const browserOpts = targetOpts.browsers;
   if (isBrowsersQueryValid(browserOpts)) {
     const queryBrowsers = getLowestVersions(browserslist(browserOpts));
@@ -113,23 +113,7 @@ export const validateWhitelistOption = (whitelistOpt = []) => {
   return whitelistOpt;
 };
 
-export default function buildPreset(context, opts) {
-  if (!opts.targets) {
-    throw new Error(
-`
-babel-preset-env requires a "targets" option:
-{
-  "presets": [
-    ["env", {
-      "targets": {
-        "chrome": 50
-      }
-    }]
-  ]
-}
-`);
-  }
-
+export default function buildPreset(context, opts = {}) {
   const loose = validateLooseOption(opts.loose);
   const moduleType = validateModulesOption(opts.modules);
   const whitelist = validateWhitelistOption(opts.whitelist);
