@@ -132,7 +132,7 @@ export const validateWhitelistOption = (whitelistOpt = []) => {
   return whitelistOpt;
 };
 
-let alreadyLogged = false;
+let hasBeenLogged = false;
 
 export default function buildPreset(context, opts = {}) {
   const loose = validateLooseOption(opts.loose);
@@ -144,8 +144,8 @@ export default function buildPreset(context, opts = {}) {
   let transformations = Object.keys(pluginList)
     .filter((pluginName) => isPluginRequired(targets, pluginList[pluginName]));
 
-  if (debug && !alreadyLogged) {
-    alreadyLogged = true;
+  if (debug && !hasBeenLogged) {
+    hasBeenLogged = true;
 
     console.log("babel-preset-env: `DEBUG` option");
     console.log("");
