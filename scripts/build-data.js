@@ -103,6 +103,8 @@ const environments = [
   "phantom"
 ];
 
+const environmentsWithFlags = ["chrome", "edge", "node"];
+
 const envMap = {
   safari51: "safari5",
   safari71_8: "safari8",
@@ -123,7 +125,7 @@ const envMap = {
   ios51: "ios5.1",
 };
 
-const getLowestImplementedVersion = ({ features }, env) => {
+const getLowestImplementedVersion = ({ features }, env, flag) => {
   const tests = flatten(compatibilityTests
     .filter((test) => {
       return features.indexOf(test.name) >= 0 ||
@@ -149,7 +151,7 @@ const getLowestImplementedVersion = ({ features }, env) => {
   );
 
   const envTests = tests
-    .map(({ res: test, name, isBuiltIn }, i) => {
+    .map(({ res: test, isBuiltIn }) => {
       // Babel itself doesn't implement the feature correctly,
       // don't count against it
       // only doing this for built-ins atm
@@ -170,7 +172,7 @@ const getLowestImplementedVersion = ({ features }, env) => {
       return Object.keys(test)
       .filter((t) => t.startsWith(env))
       // Babel assumes strict mode
-      .filter((test) => tests[i].res[test] === true || tests[i].res[test] === "strict")
+      .filter((t) => test[t] === true || test[t] === "strict" || (flag && test[t] === "flagged"))
       // normalize some keys
       .map((test) => envMap[test] || test)
       .filter((test) => !isNaN(parseInt(test.replace(env, ""))))
@@ -208,6 +210,15 @@ const generateData = (environments, features) => {
       const version = getLowestImplementedVersion(options, env);
       if (version !== null) {
         plugin[env] = version;
+      }
+    });
+
+    environmentsWithFlags.forEach((env) => {
+      if (Array.isArray(options.features)) {
+        const version = getLowestImplementedVersion(options, env, true);
+        if (version !== null) {
+          plugin[`${env}-flag`] = version;
+        }
       }
     });
 
