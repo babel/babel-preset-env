@@ -19,6 +19,7 @@
   },
   "transform-es2015-block-scoping": {
     "chrome": 49,
+    "opera": 36,
     "firefox": 51,
     "safari": 10,
     "node": 6,
@@ -39,11 +40,11 @@
     "edge": 12,
     "firefox": 34,
     "safari": 7,
-    "node": 4,
-    "ios": 8
+    "node": 4
   },
   "check-es2015-constants": {
     "chrome": 49,
+    "opera": 36,
     "firefox": 51,
     "safari": 10,
     "node": 6,
@@ -53,18 +54,17 @@
     "chrome": 51,
     "opera": 38,
     "safari": 10,
-    "node": 6.5,
-    "ios": 10
+    "node": 6.5
   },
   "transform-es2015-for-of": {
     "chrome": 51,
     "opera": 38,
     "safari": 10,
-    "node": 6.5,
-    "ios": 10
+    "node": 6.5
   },
   "transform-es2015-function-name": {
     "chrome": 51,
+    "opera": 38,
     "safari": 10,
     "node": 6.5,
     "ios": 10
@@ -109,8 +109,7 @@
     "edge": 13,
     "firefox": 36,
     "safari": 10,
-    "node": 5,
-    "ios": 10
+    "node": 5
   },
   "transform-es2015-sticky-regex": {
     "chrome": 49,
