@@ -3,6 +3,7 @@ import builtInsList from "../data/builtIns.json";
 import browserslist from "browserslist";
 import transformPolyfillRequirePlugin from "./transformPolyfillRequirePlugin";
 import electronToChromium from "../data/electronToChromium";
+import * as fs from "fs";
 
 export const MODULE_TRANSFORMATIONS = {
   "amd": "transform-es2015-modules-amd",
@@ -50,6 +51,10 @@ const isBrowsersQueryValid = (browsers) => {
   return typeof browsers === "string" || Array.isArray(browsers);
 };
 
+const isBrowsersConfigValid = (file) => {
+  return typeof file === "string" && fs.existsSync(file) && fs.statSync(file).isFile();
+};
+
 const browserNameMap = {
   chrome: "chrome",
   edge: "edge",
@@ -71,7 +76,7 @@ const getLowestVersions = (browsers) => {
 
 const mergeBrowsers = (fromQuery, fromTarget) => {
   return Object.keys(fromTarget).reduce((queryObj, targKey) => {
-    if (targKey !== "browsers") {
+    if (targKey !== "browsers" && targKey !== "browsersConfigPath") {
       queryObj[targKey] = fromTarget[targKey];
     }
     return queryObj;
@@ -129,8 +134,9 @@ export const getTargets = (targets = {}) => {
   }
 
   const browserOpts = targetOps.browsers;
-  if (isBrowsersQueryValid(browserOpts)) {
-    const queryBrowsers = getLowestVersions(browserslist(browserOpts));
+  const browsersConfigPath = targetOps.browsersConfigPath;
+  if (isBrowsersQueryValid(browserOpts) || isBrowsersConfigValid(browsersConfigPath)) {
+    const queryBrowsers = getLowestVersions(browserslist(browserOpts, { config: browsersConfigPath }));
     return mergeBrowsers(queryBrowsers, targetOps);
   }
   return targetOps;
