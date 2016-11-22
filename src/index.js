@@ -1,10 +1,10 @@
 import pluginList from "../data/plugins.json";
 import builtInsList from "../data/builtIns.json";
 import browserslist from "browserslist";
+import pathIsAbsolute from "path-is-absolute";
 import transformPolyfillRequirePlugin from "./transformPolyfillRequirePlugin";
 import electronToChromium from "../data/electronToChromium";
 import * as fs from "fs";
-import * as path from "path";
 
 export const MODULE_TRANSFORMATIONS = {
   "amd": "transform-es2015-modules-amd",
@@ -53,7 +53,7 @@ const isBrowsersQueryValid = (browsers) => {
 };
 
 const isBrowsersConfigValid = (file) => {
-  return typeof file === "string" && fs.existsSync(file) && fs.statSync(file).isFile() && path.isAbsolute(file);
+  return typeof file === "string" && fs.existsSync(file) && fs.statSync(file).isFile() && pathIsAbsolute(file);
 };
 
 const browserNameMap = {
