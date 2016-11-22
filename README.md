@@ -97,7 +97,7 @@ If you want to compile against the current node version, you can specify `"node"
 
 ### `browsersConfigPath`: `string`
 
-Path to a [browserslist](https://github.com/ai/browserslist) config file. This option allows the preset to share its config with Autoprefixer, Stylelint, cssnext, doiuse, etc.
+Absolute path to a [browserslist](https://github.com/ai/browserslist) config file. This option allows the preset to share its config with Autoprefixer, Stylelint, cssnext, doiuse, etc.
 
 > Note, browsersConfigPath's results are overridden by explicit items from `targets`.
 

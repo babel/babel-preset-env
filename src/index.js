@@ -4,6 +4,7 @@ import browserslist from "browserslist";
 import transformPolyfillRequirePlugin from "./transformPolyfillRequirePlugin";
 import electronToChromium from "../data/electronToChromium";
 import * as fs from "fs";
+import * as path from "path";
 
 export const MODULE_TRANSFORMATIONS = {
   "amd": "transform-es2015-modules-amd",
@@ -21,7 +22,7 @@ export const MODULE_TRANSFORMATIONS = {
  * @return {Boolean}  Whether or not the transformation is required
  */
 export const isPluginRequired = (supportedEnvironments, plugin) => {
-  if (supportedEnvironments.browsers) {
+  if (supportedEnvironments.browsers || supportedEnvironments.browsersConfigPath) {
     supportedEnvironments = getTargets(supportedEnvironments);
   }
 
@@ -52,7 +53,7 @@ const isBrowsersQueryValid = (browsers) => {
 };
 
 const isBrowsersConfigValid = (file) => {
-  return typeof file === "string" && fs.existsSync(file) && fs.statSync(file).isFile();
+  return typeof file === "string" && fs.existsSync(file) && fs.statSync(file).isFile() && path.isAbsolute(file);
 };
 
 const browserNameMap = {

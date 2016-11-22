@@ -3,6 +3,7 @@
 const babelPresetEnv = require("../lib/index.js");
 const assert = require("assert");
 const electronToChromiumData = require("../data/electronToChromium");
+const path = require("path");
 
 const {
   validateModulesOption,
@@ -155,6 +156,60 @@ describe("babel-preset-env", () => {
       assert.doesNotThrow(() => {
         babelPresetEnv.isPluginRequired(targets, plugin);
       }, Error);
+    });
+
+    describe("browsersConfigPath option", () => {
+      const browserlistsPath = path.join(
+        __dirname,
+        "fixtures",
+        "browsers-config-path",
+        "browserslist"
+      );
+
+      it("returns false if plugin feature is implemented by lower than target defined in browserslist file", () => {
+        const plugin = {
+          chrome: 49,
+        };
+        const targets = {
+          browsersConfigPath: browserlistsPath
+        };
+        assert(babelPresetEnv.isPluginRequired(targets, plugin) === false);
+      });
+
+      it("returns true if plugin feature is implemented is greater than target defined in browserslist file", () => {
+        const plugin = {
+          chrome: 52,
+        };
+        const targets = {
+          browsersConfigPath: browserlistsPath
+        };
+        assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
+      });
+
+      it("returns true if target's root items overrides versions defined in browserslist file", () => {
+        const plugin = {
+          chrome: 45,
+        };
+        const targets = {
+          browsersConfigPath: browserlistsPath,
+          chrome: 44
+        };
+
+        assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
+      });
+
+
+      it("returns true if browsers option overrides versions defined in browserslist file", () => {
+        const plugin = {
+          chrome: 45,
+        };
+        const targets = {
+          browsersConfigPath: browserlistsPath,
+          browsers: "Chrome > 40"
+        };
+
+        assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
+      });
     });
   });
 
