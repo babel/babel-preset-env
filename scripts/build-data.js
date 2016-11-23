@@ -82,6 +82,13 @@ const getLowestImplementedVersion = ({ features }, env) => {
 
   let envTests = tests
   .map(({ res: test, name }, i) => {
+    // Babel itself doesn't implement the feature correctly,
+    // don't count against it
+    if (!test.babel) {
+      // console.log(name);
+      return "-1";
+    }
+
     // `equals` in compat-table
     Object.keys(test).forEach((t) => {
       test[invertedEqualsEnv[t]] = test[t];
