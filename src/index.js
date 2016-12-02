@@ -100,7 +100,7 @@ export const getTargets = (targetOpts = {}) => {
   }
 
   // Rewrite Electron versions to their Chrome equivalents
-  if (targetOpts.electron === true) {
+  if (targetOpts.electron) {
     targetOpts.chrome = electronVersionToChromeVersion(targetOpts.electron);
     delete targetOpts.electron;
   }
