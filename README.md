@@ -124,7 +124,11 @@ Ex: Node 4 supports native classes but not spread.
 
 Defaults to `false`.
 
-A way to apply `babel-preset-env` for polyfills.
+A way to apply `babel-preset-env` for polyfills (via "babel-polyfill").
+
+```
+npm install babel-polyfill --save
+```
 
 This option will apply a new plugin that replaces the statement `import "babel-polyfill"` or `require("babel-polyfill")` with individual requires for `babel-polyfill` based on environment.
 
