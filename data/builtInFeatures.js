@@ -116,5 +116,19 @@ module.exports = {
   "es6.math.sign": "Math methods / Math.sign",
   "es6.math.sinh": "Math methods / Math.sinh",
   "es6.math.tanh": "Math methods / Math.tanh",
-  "es6.math.trunc": "Math methods / Math.trunc"
+  "es6.math.trunc": "Math methods / Math.trunc",
+
+  "es6.object.get-prototype-of": "Object static methods accept primitives / Object.getPrototypeOf",
+  "es6.object.get-own-property-descriptor": "Object static methods accept primitives / Object.getOwnPropertyDescriptor",
+  "es6.object.get-own-property-names": "Object static methods accept primitives / Object.getOwnPropertyNames",
+  "es6.object.seal": "Object static methods accept primitives / Object.seal",
+  "es6.object.freeze": "Object static methods accept primitives / Object.freeze",
+  "es6.object.prevent-extensions": "Object static methods accept primitives / Object.preventExtensions",
+  "es6.object.is-sealed": "Object static methods accept primitives / Object.isSealed",
+  "es6.object.is-frozen": "Object static methods accept primitives / Object.isFrozen",
+  "es6.object.is-extensible": "Object static methods accept primitives / Object.isExtensible",
+  "es6.object.keys": "Object static methods accept primitives / Object.keys",
+
+  "es7.string.pad-start": "String padding / String.prototype.padStart",
+  "es7.string.pad-end": "String padding / String.prototype.padEnd"
 };
