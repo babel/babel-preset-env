@@ -164,7 +164,7 @@ export default function buildPreset(context, opts = {}) {
       .filter((builtInName) => isPluginRequired(targets, builtInsList[builtInName]));
   }
 
-  if (1) {
+  if (debug && !hasBeenLogged) {
     hasBeenLogged = true;
     console.log("babel-preset-env: `DEBUG` option");
     console.log("");
