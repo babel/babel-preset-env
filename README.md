@@ -140,7 +140,7 @@ In
 import "babel-polyfill";
 ```
 
-Out (Different based on environment)
+Out (different based on environment)
 
 ```js
 import "core-js/modules/es6.typed.data-view";

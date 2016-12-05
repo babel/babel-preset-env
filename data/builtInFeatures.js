@@ -1,6 +1,5 @@
 // https://github.com/zloirock/core-js
 
-/* eslint-disable quotes */
 module.exports = {
   // es2015
   // core-js/fn/map
@@ -88,9 +87,9 @@ module.exports = {
   "es6.array.find": "Array.prototype methods / Array.prototype.find",
   "es6.array.find-index": "Array.prototype methods / Array.prototype.findIndex",
   "es6.array.fill": "Array.prototype methods / Array.prototype.fill",
-  // "es6.array.keys": "Array.prototype methods / Array.prototype.keys",
-  // "es6.array.values": "Array.prototype methods / Array.prototype.values",
-  // "es6.array.entries": "Array.prototype methods / Array.prototype.entries",
+  "es6.array.iterator": "Array.prototype methods / Array.prototype.keys",
+  // "es6.array.iterator": "Array.prototype methods / Array.prototype.values",
+  // "es6.array.iterator": "Array.prototype methods / Array.prototype.entries",
 
   "es6.number.is-finite": "Number properties / Number.isFinite",
   "es6.number.is-integer": "Number properties / Number.isInteger",
