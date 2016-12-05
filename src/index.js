@@ -176,7 +176,7 @@ export default function buildPreset(context, opts = {}) {
     transformations.forEach((transform) => {
       logPlugin(transform, targets, pluginList);
     });
-    console.log("\nUsing polyfills:")
+    console.log("\nUsing polyfills:");
     if (useBuiltIns && polyfills.length) {
       polyfills.forEach((polyfill) => {
         logPlugin(polyfill, targets, builtInsList);
