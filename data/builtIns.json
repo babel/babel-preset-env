@@ -115,15 +115,14 @@
     "safari": 9,
     "ios": 9
   },
-  "es6.reflect": {
+  "es6.reflect.apply": {
     "chrome": 49,
     "opera": 36,
-    "edge": 13,
-    "firefox": 45,
+    "edge": 12,
+    "firefox": 42,
     "safari": 10,
     "ios": 10
   },
-  "es6.reflect.apply": {},
   "es6.reflect.construct": {
     "chrome": 49,
     "opera": 36,
@@ -223,77 +222,6 @@
     "ios": 10
   },
   "es6.symbol": {
-    "chrome": 49,
-    "opera": 36,
-    "edge": 13,
-    "firefox": 36,
-    "safari": 10,
-    "ios": 10
-  },
-  "es6.symbol.has-instance": {
-    "chrome": 51,
-    "opera": 38,
-    "firefox": 50,
-    "safari": 10,
-    "node": 6.5,
-    "ios": 10
-  },
-  "es6.symbol.is-concat-spreadable": {
-    "chrome": 48,
-    "opera": 35,
-    "firefox": 48,
-    "safari": 10,
-    "ios": 10
-  },
-  "es6.symbol.iterator": {},
-  "es6.symbol.match": {
-    "chrome": 50,
-    "opera": 37,
-    "firefox": 49,
-    "safari": 10,
-    "node": 6,
-    "ios": 10
-  },
-  "es6.symbol.replace": {
-    "chrome": 50,
-    "opera": 37,
-    "firefox": 49,
-    "safari": 10,
-    "node": 6,
-    "ios": 10
-  },
-  "es6.symbol.search": {
-    "chrome": 50,
-    "opera": 37,
-    "firefox": 49,
-    "safari": 10,
-    "node": 6,
-    "ios": 10
-  },
-  "es6.symbol.species": {},
-  "es6.symbol.split": {
-    "chrome": 50,
-    "opera": 37,
-    "firefox": 49,
-    "safari": 10,
-    "node": 6,
-    "ios": 10
-  },
-  "es6.symbol.to-primitive": {
-    "chrome": 47,
-    "opera": 34,
-    "firefox": 44,
-    "safari": 10,
-    "ios": 10
-  },
-  "es6.symbol.to-string-tag": {
-    "chrome": 49,
-    "opera": 36,
-    "firefox": 51,
-    "safari": 10,
-    "ios": 10
-  },
-  "es6.symbol.unscopables": {
     "chrome": 38,
     "opera": 25,
     "edge": 12,
@@ -313,7 +241,6 @@
   },
   "es6.object.is": {
     "chrome": 19,
-    "opera": 6,
     "edge": 12,
     "firefox": 22,
     "safari": 9,
@@ -494,9 +421,17 @@
     "node": 4,
     "ios": 10
   },
+  "es6.array.iterator": {
+    "chrome": 38,
+    "opera": 25,
+    "edge": 12,
+    "firefox": 28,
+    "safari": 7,
+    "node": 0.12,
+    "ios": 10
+  },
   "es6.number.is-finite": {
     "chrome": 19,
-    "opera": 6,
     "edge": 12,
     "firefox": 16,
     "safari": 9,
@@ -524,7 +459,6 @@
   },
   "es6.number.is-nan": {
     "chrome": 19,
-    "opera": 6,
     "edge": 12,
     "firefox": 15,
     "safari": 9,
@@ -712,6 +646,34 @@
     "safari": 7,
     "node": 0.12,
     "ios": 10
+  },
+  "es7.array.includes.js": {
+    "chrome": 47,
+    "opera": 34,
+    "edge": 14,
+    "firefox": 43,
+    "safari": 10,
+    "ios": 10
+  },
+  "es7.object.values": {
+    "chrome": 54,
+    "opera": 41,
+    "edge": 14,
+    "firefox": 47,
+    "node": 7
+  },
+  "es7.object.entries": {
+    "chrome": 54,
+    "opera": 41,
+    "edge": 14,
+    "firefox": 47,
+    "node": 7
+  },
+  "es7.object.get-own-property-descriptors": {
+    "chrome": 54,
+    "opera": 41,
+    "firefox": 50,
+    "node": 7
   },
   "es7.string.pad-start": {
     "firefox": 48,
