@@ -187,7 +187,14 @@
     "safari": 10,
     "ios": 10
   },
-  "es6.reflect.own-keys": {},
+  "es6.reflect.own-keys": {
+    "chrome": 49,
+    "opera": 36,
+    "edge": 12,
+    "firefox": 42,
+    "safari": 10,
+    "ios": 10
+  },
   "es6.reflect.prevent-extensions": {
     "chrome": 49,
     "opera": 36,
