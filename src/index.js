@@ -86,7 +86,7 @@ export const electronVersionToChromeVersion = (semverVer) => {
     throw new Error("Electron version must be a semver version");
   }
 
-  let result = electronVersionToChromeVersion[m[1]];
+  let result = electronToChromium[m[1]];
   if (!result) {
     throw new Error(`Electron version ${m[1]} is either too old or too new`);
   }
