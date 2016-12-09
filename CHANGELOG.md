@@ -12,13 +12,7 @@ Electron is also an environment, so [Paul went ahead](https://twitter.com/paulcb
 
 ```js
 {
-  "presets": [
-    ["env", {
-      "targets": {
-        "electron": 1.4
-      }
-    }]
-  ]
+  "presets": [ ["env", {"targets": { "electron": 1.4 }}]]
 }
 ```
 
