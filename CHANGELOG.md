@@ -4,9 +4,9 @@
 
 ### :bug: Bug Fix
 
-* Fix regenerator import (#68) (@hzoo)
+* Fix regenerator import (#68)  ([@hzoo](https://github.com/hzoo))
 
-We were outputting the wrong path for `regenerator`!
+We were outputting an invalid path for `regenerator`!
 
 ```diff
 +import "regenerator-runtime/runtime";
