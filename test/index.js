@@ -162,6 +162,7 @@ describe("babel-preset-env", () => {
       const browserslistPath = path.join(
         __dirname,
         "fixtures",
+        "preset-options",
         "browserslist-config-path",
         "browserslist"
       );
