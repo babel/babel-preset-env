@@ -6,7 +6,9 @@
 
 * Fix issue with Object.getOwnPropertySymbols ([#71](https://github.com/babel/babel-preset-env/pull/71)) ([@existentialism](https://github.com/existentialism))
 
-Was requiring the wrong module kinda of like in v1.0.1
+Was requiring the wrong module kinda of like in v1.0.1:
+
+https://github.com/zloirock/core-js#ecmascript-6-symbol
 
 ```diff
 -import "core-js/modules/es6.object.get-own-property-symbols";
