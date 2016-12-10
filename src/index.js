@@ -22,7 +22,7 @@ export const MODULE_TRANSFORMATIONS = {
  * @return {Boolean}  Whether or not the transformation is required
  */
 export const isPluginRequired = (supportedEnvironments, plugin) => {
-  if (supportedEnvironments.browsers || supportedEnvironments.browsersConfigPath) {
+  if (supportedEnvironments.browsers || supportedEnvironments.browserslistConfigPath) {
     supportedEnvironments = getTargets(supportedEnvironments);
   }
 
@@ -77,7 +77,7 @@ const getLowestVersions = (browsers) => {
 
 const mergeBrowsers = (fromQuery, fromTarget) => {
   return Object.keys(fromTarget).reduce((queryObj, targKey) => {
-    if (targKey !== "browsers" && targKey !== "browsersConfigPath") {
+    if (targKey !== "browsers" && targKey !== "browserslistConfigPath") {
       queryObj[targKey] = fromTarget[targKey];
     }
     return queryObj;
@@ -135,9 +135,9 @@ export const getTargets = (targets = {}) => {
   }
 
   const browserOpts = targetOps.browsers;
-  const browsersConfigPath = targetOps.browsersConfigPath;
-  if (isBrowsersQueryValid(browserOpts) || isBrowsersConfigValid(browsersConfigPath)) {
-    const queryBrowsers = getLowestVersions(browserslist(browserOpts, { config: browsersConfigPath }));
+  const browserslistConfigPath = targetOps.browserslistConfigPath;
+  if (isBrowsersQueryValid(browserOpts) || isBrowsersConfigValid(browserslistConfigPath)) {
+    const queryBrowsers = getLowestVersions(browserslist(browserOpts, { config: browserslistConfigPath }));
     return mergeBrowsers(queryBrowsers, targetOps);
   }
   return targetOps;

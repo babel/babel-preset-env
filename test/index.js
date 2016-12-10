@@ -158,11 +158,11 @@ describe("babel-preset-env", () => {
       }, Error);
     });
 
-    describe("browsersConfigPath option", () => {
-      const browserlistsPath = path.join(
+    describe("browserslistConfigPath option", () => {
+      const browserslistPath = path.join(
         __dirname,
         "fixtures",
-        "browsers-config-path",
+        "browserslist-config-path",
         "browserslist"
       );
 
@@ -171,7 +171,7 @@ describe("babel-preset-env", () => {
           chrome: 49,
         };
         const targets = {
-          browsersConfigPath: browserlistsPath
+          browserslistConfigPath: browserslistPath
         };
         assert(babelPresetEnv.isPluginRequired(targets, plugin) === false);
       });
@@ -181,7 +181,7 @@ describe("babel-preset-env", () => {
           chrome: 52,
         };
         const targets = {
-          browsersConfigPath: browserlistsPath
+          browserslistConfigPath: browserslistPath
         };
         assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
       });
@@ -191,7 +191,7 @@ describe("babel-preset-env", () => {
           chrome: 45,
         };
         const targets = {
-          browsersConfigPath: browserlistsPath,
+          browserslistConfigPath: browserslistPath,
           chrome: 44
         };
 
@@ -204,7 +204,7 @@ describe("babel-preset-env", () => {
           chrome: 45,
         };
         const targets = {
-          browsersConfigPath: browserlistsPath,
+          browserslistConfigPath: browserslistPath,
           browsers: "Chrome > 40"
         };
 
