@@ -4,13 +4,14 @@
 
 `npm install babel-preset-env --save-dev`
 
+`.babelrc`
+
 ```js
-// .babelrc
 {
   "presets": [
     ["env", {
       "targets": {
-        "chrome": 54
+        "browsers": ["last 2 versions", "safari >= 7"]
       }
     }]
   ]
