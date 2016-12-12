@@ -9,8 +9,6 @@ node_js:
 - '7'
 - '6'
 - '4'
-- '0.12'
-- '0.10'
 script:
   - 'if [ -n "${LINT-}" ]; then npm run lint ; fi'
   - 'if [ -z "${LINT-}" ]; then npm run ci ; fi'
