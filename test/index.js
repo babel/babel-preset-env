@@ -3,6 +3,7 @@
 const babelPresetEnv = require("../lib/index.js");
 const assert = require("assert");
 const electronToChromiumData = require("../data/electronToChromium");
+const path = require("path");
 
 const {
   validateModulesOption,
@@ -155,6 +156,61 @@ describe("babel-preset-env", () => {
       assert.doesNotThrow(() => {
         babelPresetEnv.isPluginRequired(targets, plugin);
       }, Error);
+    });
+
+    describe("browserslistConfigPath option", () => {
+      const browserslistPath = path.join(
+        __dirname,
+        "fixtures",
+        "preset-options",
+        "browserslist-config-path",
+        "browserslist"
+      );
+
+      it("returns false if plugin feature is implemented by lower than target defined in browserslist file", () => {
+        const plugin = {
+          chrome: 49,
+        };
+        const targets = {
+          browserslistConfigPath: browserslistPath
+        };
+        assert(babelPresetEnv.isPluginRequired(targets, plugin) === false);
+      });
+
+      it("returns true if plugin feature is implemented is greater than target defined in browserslist file", () => {
+        const plugin = {
+          chrome: 52,
+        };
+        const targets = {
+          browserslistConfigPath: browserslistPath
+        };
+        assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
+      });
+
+      it("returns true if target's root items overrides versions defined in browserslist file", () => {
+        const plugin = {
+          chrome: 45,
+        };
+        const targets = {
+          browserslistConfigPath: browserslistPath,
+          chrome: 44
+        };
+
+        assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
+      });
+
+
+      it("returns true if browsers option overrides versions defined in browserslist file", () => {
+        const plugin = {
+          chrome: 45,
+        };
+        const targets = {
+          browserslistConfigPath: browserslistPath,
+          browsers: "Chrome > 40"
+        };
+
+        assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
+      });
     });
   });
 

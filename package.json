@@ -45,12 +45,13 @@
     "babel-plugin-transform-es2015-unicode-regex": "^6.3.13",
     "babel-plugin-transform-exponentiation-operator": "^6.8.0",
     "babel-plugin-transform-regenerator": "^6.6.0",
-    "browserslist": "^1.4.0"
+    "browserslist": "^1.4.0",
+    "path-is-absolute": "^1.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
     "babel-eslint": "^6.1.2",
-    "babel-helper-plugin-test-runner": "^6.18.0",
+    "babel-helper-transform-fixture-test-runner": "^6.20.0",
     "babel-plugin-transform-flow-strip-types": "^6.8.0",
     "babel-preset-es2015": "^6.14.0",
     "babel-register": "^6.14.0",
