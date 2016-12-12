@@ -3,8 +3,8 @@ const path = require("path");
 
 const flatten = require("lodash/flatten");
 const flattenDeep = require("lodash/flattenDeep");
-const pluginFeatures = require("../data/pluginFeatures");
-const builtInFeatures = require("../data/builtInFeatures");
+const pluginFeatures = require("../data/plugin-features");
+const builtInFeatures = require("../data/built-in-features");
 
 const renameTests = (tests, getName) =>
   tests.map((test) => Object.assign({}, test, { name: getName(test.name) }));
@@ -172,6 +172,6 @@ fs.writeFileSync(
 );
 
 fs.writeFileSync(
-  path.join(__dirname, "../data/builtIns.json"),
+  path.join(__dirname, "../data/built-ins.json"),
   JSON.stringify(generateData(builtInFeatures), null, 2) + "\n"
 );
