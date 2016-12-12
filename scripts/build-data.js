@@ -6,15 +6,59 @@ const path = require("path");
 const flatten = require("lodash/flatten");
 const flattenDeep = require("lodash/flattenDeep");
 const mapValues = require("lodash/mapValues");
+const cloneDeep = require("lodash/cloneDeep");
 const pluginFeatures = require("../data/plugin-features");
 const builtInFeatures = require("../data/built-in-features");
 
 const renameTests = (tests, getName) =>
   tests.map((test) => Object.assign({}, test, { name: getName(test.name) }));
 
-const es6Data = require("compat-table/data-es6");
-const es6PlusData = require("compat-table/data-es2016plus");
+const es6Data = cloneDeep(require("compat-table/data-es6"));
+const es6PlusData = cloneDeep(require("compat-table/data-es2016plus"));
 const envs = require("compat-table/environments");
+
+function interpolateAllResults(rawBrowsers, tests) {
+  function interpolateResults(res) {
+    let browser, prevBrowser, result, prevResult, bid, prevBid;
+    for (bid in rawBrowsers) {
+      // For browsers that are essentially equal to other browsers,
+      // copy over the results.
+      browser = rawBrowsers[bid];
+      if (browser.equals && res[bid] === undefined) {
+        result = res[browser.equals];
+        res[bid] = browser.ignore_flagged && result === "flagged" ? false : result;
+      // For each browser, check if the previous browser has the same
+      // browser full name (e.g. Firefox) or family name (e.g. Chakra) as this one.
+      } else if (prevBrowser &&
+          (prevBrowser.full.replace(/,.+$/, "") === browser.full.replace(/,.+$/, "") ||
+          (browser.family !== undefined && prevBrowser.family === browser.family))) {
+        // For each test, check if the previous browser has a result
+        // that this browser lacks.
+        result     = res[bid];
+        prevResult = res[prevBid];
+        if (prevResult !== undefined && result === undefined) {
+          res[bid] = prevResult;
+        }
+      }
+      prevBrowser = browser;
+      prevBid = bid;
+    }
+  }
+
+  // Now print the results.
+  tests.forEach(function(t) {
+    // Calculate the result totals for tests which consist solely of subtests.
+    if ("subtests" in t) {
+      t.subtests.forEach(function(e) {
+        interpolateResults(e.res);
+      });
+    }
+    else interpolateResults(t.res);
+  });
+}
+
+interpolateAllResults(es6Data.browsers, es6Data.tests);
+interpolateAllResults(es6PlusData.browsers, es6PlusData.tests);
 
 const invertedEqualsEnv = Object.keys(envs)
   .filter((b) => envs[b].equals)
