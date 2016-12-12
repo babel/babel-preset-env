@@ -122,6 +122,13 @@ Useful if there is a bug in a native implementation, or a combination of a non-s
 
 Ex: Node 4 supports native classes but not spread.
 
+### `blacklist`: `Array<string>`
+
+Defaults to `[]`
+An array of plugins to always remove. Will be overidden by `whitelist` to be safe.
+
+Useful for blacklisting a transform like `transform-regenerator` if you don't use generators and don't want to include `regeneratorRuntime` (when using `useBuiltIns`) or for using another plugin like [fast-async](https://github.com/MatAtBread/fast-async) instead of `async-to-gen`(http://babeljs.io/docs/plugins/transform-async-generator-functions/).
+
 ### `useBuiltIns`: `boolean`
 
 Defaults to `false`.

@@ -1,4 +1,5 @@
 import pluginList from "../data/plugins.json";
+import pluginFeatures from "../data/plugin-features";
 import builtInsList from "../data/built-ins.json";
 import browserslist from "browserslist";
 import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin";
@@ -156,25 +157,26 @@ export const validateModulesOption = (modulesOpt = "commonjs") => {
   return modulesOpt;
 };
 
-export const validateWhitelistOption = (whitelistOpt = []) => {
-  if (!Array.isArray(whitelistOpt)) {
-    throw new Error(`The 'whitelist' option must be an Array<string> of plugins
-      {
-        "presets": [
-          ["env", {
-            "targets": {
-              "chrome": 50
-            },
-            "whitelist": ["transform-es2015-arrow-functions"]
-          }]
-        ]
-      }
-      was passed "${whitelistOpt}" instead
-    `);
+function validatePluginsOption(opts = [], type) {
+  if (!Array.isArray(opts)) {
+    throw new Error(`The '${type}' option must be an Array<string> of plugins`);
   }
 
-  return whitelistOpt;
-};
+  for (let opt of opts) {
+    if ([
+      ...Object.keys(pluginFeatures),
+      ...Object.values(MODULE_TRANSFORMATIONS)
+    ].indexOf(opt) === -1) {
+      throw new Error(`Invalid plugin name '${opt}' passed to '${type}' option.
+        Check data/plugin-features in babel-preset-env`);
+    }
+  }
+
+  return opts;
+}
+
+export const validateWhitelistOption = (opts) => validatePluginsOption(opts, "whitelist");
+export const validateBlacklistOption = (opts) => validatePluginsOption(opts, "blacklist");
 
 let hasBeenLogged = false;
 
@@ -193,6 +195,7 @@ export default function buildPreset(context, opts = {}) {
   const loose = validateLooseOption(opts.loose);
   const moduleType = validateModulesOption(opts.modules);
   const whitelist = validateWhitelistOption(opts.whitelist);
+  const blacklist = validateBlacklistOption(opts.blacklist);
   const targets = getTargets(opts.targets);
   const debug = opts.debug;
   const useBuiltIns = opts.useBuiltIns;
@@ -226,7 +229,10 @@ export default function buildPreset(context, opts = {}) {
     }
   }
 
-  const allTransformations = [...transformations, ...whitelist];
+  const allTransformations = transformations
+  .filter((plugin) => blacklist.indexOf(plugin) === -1)
+  .concat(whitelist);
+
   const regenerator = allTransformations.indexOf("transform-regenerator") >= 0;
   const modulePlugin = moduleType !== false && MODULE_TRANSFORMATIONS[moduleType];
   const plugins = [];
