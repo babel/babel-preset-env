@@ -276,45 +276,23 @@ transform-async-to-generator {}
 syntax-trailing-function-commas {}
 ```
 
-### Example with `include`
+### Example with `include`/`exclude`
+
+> always include arrow functions, explicitly blacklist generators
 
 ```js
-// target chrome 52 and always include arrow functions
-{
-  "presets": [
-    ["env", {
-      "targets": {
-        "chrome": 52
-      },
-      "include": ["transform-es2015-arrow-functions"]
-    }]
-  ]
-}
-
-Using plugins:
-
-transform-exponentiation-operator {}
-transform-async-to-generator {}
-syntax-trailing-function-commas {}
-transform-es2015-arrow-functions {}
-```
-
-### Example with `exclude`
-
-```js
-// explicitly blacklist generators
 {
   "presets": [
     ["env", {
       "targets": {
         "browsers": ["last 2 versions", "safari >= 7"]
       },
+      "include": ["transform-es2015-arrow-functions"],
       "exclude": ["transform-regenerator"]
     }]
   ]
 }
 ```
-
 
 ## Caveats
 
