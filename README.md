@@ -118,9 +118,9 @@ Defaults to `false`
 > `whitelist` is deprecated and will be removed in the next major in favor of this.
 
 Defaults to `[]`
-Enable a list of plugins to always include.
+An array of plugins to always include.
 
-Valid options include any of the [babel plugins](/data/plugin-features.js) or (built-ins)(/data/built-in-features.js) such as `transform-es2015-arrow-functions` or `map`, `set`, `object.assign`.
+Valid options include any of the [babel plugins](/data/plugin-features.js) or [built-ins](/data/built-in-features.js) such as `transform-es2015-arrow-functions` or `map`, `set`, `object.assign`.
 
 > For the built-ins like `es6.typed.data-view` just put `typed.data-view`.
 
@@ -132,7 +132,7 @@ Ex: Node 4 supports native classes but not spread.
 
 Defaults to `[]`
 An array of plugins to always exclude/remove.
-The possible options are the same as for the `includes` option.
+The possible options are the same as the `includes` option.
 
 Useful for "blacklisting" a transform like `transform-regenerator` if you don't use generators and don't want to include `regeneratorRuntime` (when using `useBuiltIns`) or for using another plugin like [fast-async](https://github.com/MatAtBread/fast-async) instead of `async-to-gen`(http://babeljs.io/docs/plugins/transform-async-generator-functions/).
 
