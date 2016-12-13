@@ -115,6 +115,8 @@ Defaults to `false`
 
 ### `includes`: `Array<string>`
 
+> `whitelist` is deprecated and will be removed in the next major in favor of this.
+
 Defaults to `[]`
 Enable a list of plugins to always include.
 
