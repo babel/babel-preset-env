@@ -12,6 +12,12 @@ export const MODULE_TRANSFORMATIONS = {
   "umd": "transform-es2015-modules-umd"
 };
 
+export const validIncludeExcludes = [
+  ...Object.keys(pluginFeatures),
+  ...Object.values(MODULE_TRANSFORMATIONS),
+  ...Object.keys(builtInsList).slice(4)
+];
+
 /**
  * Determine if a transformation is required
  * @param  {Object}  supportedEnvironments  An Object containing environment keys and the lowest
@@ -157,26 +163,28 @@ export const validateModulesOption = (modulesOpt = "commonjs") => {
   return modulesOpt;
 };
 
-function validatePluginsOption(opts = [], type) {
+export function validatePluginsOption(opts = [], type) {
   if (!Array.isArray(opts)) {
-    throw new Error(`The '${type}' option must be an Array<string> of plugins`);
+    throw new Error(`The '${type}' option must be an Array<string> of plugins/built-ins`);
   }
 
-  for (let opt of opts) {
-    if ([
-      ...Object.keys(pluginFeatures),
-      ...Object.values(MODULE_TRANSFORMATIONS)
-    ].indexOf(opt) === -1) {
-      throw new Error(`Invalid plugin name '${opt}' passed to '${type}' option.
-        Check data/plugin-features in babel-preset-env`);
+  let unknownOpts = [];
+  opts.forEach((opt) => {
+    if (validIncludeExcludes.indexOf(opt) === -1) {
+      unknownOpts.push(opt);
     }
+  });
+
+  if (unknownOpts.length > 0) {
+    throw new Error(`Invalid plugins/built-ins '${unknownOpts}' passed to '${type}' option.
+      Check data/[plugin-features|built-in-features].js in babel-preset-env`);
   }
 
   return opts;
 }
 
-export const validateWhitelistOption = (opts) => validatePluginsOption(opts, "whitelist");
-export const validateBlacklistOption = (opts) => validatePluginsOption(opts, "blacklist");
+const validateIncludesOption = (opts) => validatePluginsOption(opts, "includes");
+const validateExcludesOption = (opts) => validatePluginsOption(opts, "excludes");
 
 let hasBeenLogged = false;
 
@@ -194,8 +202,13 @@ const logPlugin = (plugin, targets, list) => {
 export default function buildPreset(context, opts = {}) {
   const loose = validateLooseOption(opts.loose);
   const moduleType = validateModulesOption(opts.modules);
-  const whitelist = validateWhitelistOption(opts.whitelist);
-  const blacklist = validateBlacklistOption(opts.blacklist);
+  // TODO: remove whitelist in favor of includes in next major
+  if (opts.whitelist) {
+    console.warn(`The "whitelist" option has been deprecated
+    in favor of "includes" to match the newly added "excludes" option (instead of "blacklist").`);
+  }
+  const includes = validateIncludesOption(opts.whitelist || opts.includes);
+  const excludes = validateExcludesOption(opts.excludes);
   const targets = getTargets(opts.targets);
   const debug = opts.debug;
   const useBuiltIns = opts.useBuiltIns;
@@ -230,8 +243,8 @@ export default function buildPreset(context, opts = {}) {
   }
 
   const allTransformations = transformations
-  .filter((plugin) => blacklist.indexOf(plugin) === -1)
-  .concat(whitelist);
+  .filter((plugin) => excludes.indexOf(plugin) === -1)
+  .concat(includes);
 
   const regenerator = allTransformations.indexOf("transform-regenerator") >= 0;
   const modulePlugin = moduleType !== false && MODULE_TRANSFORMATIONS[moduleType];

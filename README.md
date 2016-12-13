@@ -113,21 +113,26 @@ Can be `false` to not transform modules.
 Defaults to `false`
 `console.log` out the targets and plugins being used as well as the version specified in `/data/plugins.json`.
 
-### `whitelist`: `Array<string>`
+### `includes`: `Array<string>`
 
 Defaults to `[]`
-Enable a whitelist of plugins to always include.
+Enable a list of plugins to always include.
+
+Valid options include any of the [babel plugins](/data/plugin-features.js) or (built-ins)(/data/built-in-features.js) such as `transform-es2015-arrow-functions` or `map`, `set`, `object.assign`.
+
+> For the built-ins like `es6.typed.data-view` just put `typed.data-view`.
 
 Useful if there is a bug in a native implementation, or a combination of a non-supported feature + a supported one doesn't  work.
 
 Ex: Node 4 supports native classes but not spread.
 
-### `blacklist`: `Array<string>`
+### `excludes`: `Array<string>`
 
 Defaults to `[]`
-An array of plugins to always remove. Will be overidden by `whitelist` to be safe.
+An array of plugins to always exclude/remove.
+The possible options are the same as for the `includes` option.
 
-Useful for blacklisting a transform like `transform-regenerator` if you don't use generators and don't want to include `regeneratorRuntime` (when using `useBuiltIns`) or for using another plugin like [fast-async](https://github.com/MatAtBread/fast-async) instead of `async-to-gen`(http://babeljs.io/docs/plugins/transform-async-generator-functions/).
+Useful for "blacklisting" a transform like `transform-regenerator` if you don't use generators and don't want to include `regeneratorRuntime` (when using `useBuiltIns`) or for using another plugin like [fast-async](https://github.com/MatAtBread/fast-async) instead of `async-to-gen`(http://babeljs.io/docs/plugins/transform-async-generator-functions/).
 
 ### `useBuiltIns`: `boolean`
 
