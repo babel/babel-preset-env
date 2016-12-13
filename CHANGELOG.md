@@ -41,8 +41,8 @@ Example:
 
 ### :memo: Documentation
 
-- Fix typo [skip ci] ([#78](https://github.com/babel/babel-preset-env/pull/78)) (@rohmanhm)
-- Fix PR link in changelog. [skip ci] ([#75](https://github.com/babel/babel-preset-env/pull/75)) (@nhajidin)
+- Fix typo ([#78](https://github.com/babel/babel-preset-env/pull/78)) (@rohmanhm)
+- Fix PR link in changelog. ([#75](https://github.com/babel/babel-preset-env/pull/75)) (@nhajidin)
 
 ## v1.0.2 (2016-12-10)
 
