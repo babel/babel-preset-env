@@ -276,17 +276,17 @@ transform-async-to-generator {}
 syntax-trailing-function-commas {}
 ```
 
-### Example with `whitelist`
+### Example with `includes`
 
 ```js
-// target chrome 52 with whitelist on arrow functions
+// target chrome 52 with includes on arrow functions
 {
   "presets": [
     ["env", {
       "targets": {
         "chrome": 52
       },
-      "whitelist": ["transform-es2015-arrow-functions"]
+      "includes": ["transform-es2015-arrow-functions"]
     }]
   ]
 }
@@ -298,6 +298,23 @@ transform-async-to-generator {}
 syntax-trailing-function-commas {}
 transform-es2015-arrow-functions {}
 ```
+
+### Example with `excludes`
+
+```js
+// explicitly blacklist generators
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "browsers": ["last 2 versions", "safari >= 7"]
+      },
+      "excludes": ["transform-regenerator"]
+    }]
+  ]
+}
+```
+
 
 ## Caveats
 
