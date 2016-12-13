@@ -12,7 +12,7 @@ export const MODULE_TRANSFORMATIONS = {
   "umd": "transform-es2015-modules-umd"
 };
 
-export const validIncludeExcludes = [
+export const validIncludesAndExcludes = [
   ...Object.keys(pluginFeatures),
   ...Object.values(MODULE_TRANSFORMATIONS),
   ...Object.keys(builtInsList).slice(4) // remove the `es6.`
@@ -170,7 +170,7 @@ export function validatePluginsOption(opts = [], type) {
 
   let unknownOpts = [];
   opts.forEach((opt) => {
-    if (validIncludeExcludes.indexOf(opt) === -1) {
+    if (validIncludesAndExcludes.indexOf(opt) === -1) {
       unknownOpts.push(opt);
     }
   });
@@ -183,8 +183,8 @@ export function validatePluginsOption(opts = [], type) {
   return opts;
 }
 
-const validateIncludesOption = (opts) => validatePluginsOption(opts, "includes");
-const validateExcludesOption = (opts) => validatePluginsOption(opts, "excludes");
+const validateIncludeOption = (opts) => validatePluginsOption(opts, "include");
+const validateExcludeOption = (opts) => validatePluginsOption(opts, "exclude");
 
 let hasBeenLogged = false;
 
@@ -202,13 +202,13 @@ const logPlugin = (plugin, targets, list) => {
 export default function buildPreset(context, opts = {}) {
   const loose = validateLooseOption(opts.loose);
   const moduleType = validateModulesOption(opts.modules);
-  // TODO: remove whitelist in favor of includes in next major
+  // TODO: remove whitelist in favor of include in next major
   if (opts.whitelist) {
     console.warn(`The "whitelist" option has been deprecated
-    in favor of "includes" to match the newly added "excludes" option (instead of "blacklist").`);
+    in favor of "include" to match the newly added "exclude" option (instead of "blacklist").`);
   }
-  const includes = validateIncludesOption(opts.whitelist || opts.includes);
-  const excludes = validateExcludesOption(opts.excludes);
+  const include = validateIncludeOption(opts.whitelist || opts.include);
+  const exclude = validateExcludeOption(opts.exclude);
   const targets = getTargets(opts.targets);
   const debug = opts.debug;
   const useBuiltIns = opts.useBuiltIns;
@@ -243,8 +243,8 @@ export default function buildPreset(context, opts = {}) {
   }
 
   const allTransformations = transformations
-  .filter((plugin) => excludes.indexOf(plugin) === -1)
-  .concat(includes);
+  .filter((plugin) => exclude.indexOf(plugin) === -1)
+  .concat(include);
 
   const regenerator = allTransformations.indexOf("transform-regenerator") >= 0;
   const modulePlugin = moduleType !== false && MODULE_TRANSFORMATIONS[moduleType];

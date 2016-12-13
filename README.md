@@ -113,7 +113,7 @@ Can be `false` to not transform modules.
 Defaults to `false`
 `console.log` out the targets and plugins being used as well as the version specified in `/data/plugins.json`.
 
-### `includes`: `Array<string>`
+### `include`: `Array<string>`
 
 > `whitelist` is deprecated and will be removed in the next major in favor of this.
 
@@ -128,11 +128,11 @@ Useful if there is a bug in a native implementation, or a combination of a non-s
 
 Ex: Node 4 supports native classes but not spread.
 
-### `excludes`: `Array<string>`
+### `exclude`: `Array<string>`
 
 Defaults to `[]`
 An array of plugins to always exclude/remove.
-The possible options are the same as the `includes` option.
+The possible options are the same as the `include` option.
 
 Useful for "blacklisting" a transform like `transform-regenerator` if you don't use generators and don't want to include `regeneratorRuntime` (when using `useBuiltIns`) or for using another plugin like [fast-async](https://github.com/MatAtBread/fast-async) instead of `async-to-gen`(http://babeljs.io/docs/plugins/transform-async-generator-functions/).
 
@@ -276,17 +276,17 @@ transform-async-to-generator {}
 syntax-trailing-function-commas {}
 ```
 
-### Example with `includes`
+### Example with `include`
 
 ```js
-// target chrome 52 with includes on arrow functions
+// target chrome 52 and always include arrow functions
 {
   "presets": [
     ["env", {
       "targets": {
         "chrome": 52
       },
-      "includes": ["transform-es2015-arrow-functions"]
+      "include": ["transform-es2015-arrow-functions"]
     }]
   ]
 }
@@ -299,7 +299,7 @@ syntax-trailing-function-commas {}
 transform-es2015-arrow-functions {}
 ```
 
-### Example with `excludes`
+### Example with `exclude`
 
 ```js
 // explicitly blacklist generators
@@ -309,7 +309,7 @@ transform-es2015-arrow-functions {}
       "targets": {
         "browsers": ["last 2 versions", "safari >= 7"]
       },
-      "excludes": ["transform-regenerator"]
+      "exclude": ["transform-regenerator"]
     }]
   ]
 }

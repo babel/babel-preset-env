@@ -3,7 +3,7 @@
     ["../../../../lib", {
       "modules": false,
       "useBuiltIns": true,
-      "excludes": ["transform-regenerator"]
+      "exclude": ["transform-regenerator"]
     }]
   ]
 }

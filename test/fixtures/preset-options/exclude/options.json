@@ -3,7 +3,7 @@
     ["../../../../lib", {
       "modules": false,
       "useBuiltIns": true,
-      "excludes": [
+      "exclude": [
         "transform-async-to-generator",
         "transform-regenerator"
       ]

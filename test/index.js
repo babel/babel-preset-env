@@ -8,7 +8,7 @@ const {
   validateModulesOption,
   validateLooseOption,
   validatePluginsOption,
-  validIncludeExcludes
+  validIncludesAndExcludes
 } = babelPresetEnv;
 
 describe("babel-preset-env", () => {
@@ -224,8 +224,8 @@ describe("babel-preset-env", () => {
 
       it("should return itself if in features", function() {
         assert.deepEqual(
-          validatePluginsOption(validIncludeExcludes),
-          validIncludeExcludes
+          validatePluginsOption(validIncludesAndExcludes),
+          validIncludesAndExcludes
         );
       });
 
