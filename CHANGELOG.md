@@ -16,7 +16,8 @@ Example:
         "browsers": ["last 2 versions", "safari >= 7"]
       },
       "include": ["transform-es2015-arrow-functions"],
-      "exclude": ["transform-regenerator"]
+      "exclude": ["transform-regenerator"],
+      "useBuiltIns": true
     }]
   ]
 }
@@ -26,7 +27,7 @@ Example:
 
 `"exclude": ["transform-async-to-generator"]` doesn't use the built-in async-to-gen transform so you can use something like [fast-async](https://github.com/MatAtBread/fast-async).
 
-`"exclude": ["map"]` doesn't include the `Map` polyfill if you know you aren't using it in your code. (We will figure out a way to automatically do this [#84](https://github.com/babel/babel-preset-env/issues/84)).
+`"exclude": ["map"]` doesn't include the `Map` polyfill if you know you aren't using it in your code (w/ `useBuiltIns`). (We will figure out a way to automatically do this [#84](https://github.com/babel/babel-preset-env/issues/84)).
 
 ### :house: Internal
 
