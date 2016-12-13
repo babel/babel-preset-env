@@ -187,6 +187,7 @@ const validateIncludeOption = (opts) => validatePluginsOption(opts, "include");
 const validateExcludeOption = (opts) => validatePluginsOption(opts, "exclude");
 
 let hasBeenLogged = false;
+let hasBeenWarned = false;
 
 const logPlugin = (plugin, targets, list) => {
   const envList = list[plugin];
@@ -203,7 +204,8 @@ export default function buildPreset(context, opts = {}) {
   const loose = validateLooseOption(opts.loose);
   const moduleType = validateModulesOption(opts.modules);
   // TODO: remove whitelist in favor of include in next major
-  if (opts.whitelist) {
+  if (opts.whitelist && !hasBeenWarned) {
+    hasBeenWarned = true;
     console.warn(`The "whitelist" option has been deprecated
     in favor of "include" to match the newly added "exclude" option (instead of "blacklist").`);
   }
