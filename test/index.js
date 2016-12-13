@@ -8,7 +8,8 @@ const {
   validateModulesOption,
   validateLooseOption,
   validatePluginsOption,
-  validIncludesAndExcludes
+  validIncludesAndExcludes,
+  checkDuplicateIncludeExcludes
 } = babelPresetEnv;
 
 describe("babel-preset-env", () => {
@@ -232,6 +233,26 @@ describe("babel-preset-env", () => {
       it("should throw if not in features", function() {
         assert.throws(() => {
           validatePluginsOption(["asdf"]);
+        }, Error);
+      });
+    });
+
+    describe("checkDuplicateIncludeExcludes", function() {
+      it("should throw if duplicate names in both", function() {
+        assert.throws(() => {
+          checkDuplicateIncludeExcludes(
+            ["transform-regenerator", "map"],
+            ["transform-regenerator", "map"]
+          );
+        }, Error);
+      });
+
+      it("should not throw if no duplicate names in both", function() {
+        assert.doesNotThrow(() => {
+          checkDuplicateIncludeExcludes(
+            ["transform-regenerator"],
+            ["map"]
+          );
         }, Error);
       });
     });

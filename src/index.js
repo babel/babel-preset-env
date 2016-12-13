@@ -186,6 +186,20 @@ export function validatePluginsOption(opts = [], type) {
 const validateIncludeOption = (opts) => validatePluginsOption(opts, "include");
 const validateExcludeOption = (opts) => validatePluginsOption(opts, "exclude");
 
+export function checkDuplicateIncludeExcludes(include, exclude) {
+  let duplicates = [];
+  include.forEach((opt) => {
+    if (exclude.indexOf(opt) >= 0) {
+      duplicates.push(opt);
+    }
+  });
+
+  if (duplicates.length > 0) {
+    throw new Error(`Duplicate plugins/built-ins: '${duplicates}' found
+      in both the "include" and "exclude" options.`);
+  }
+}
+
 let hasBeenLogged = false;
 let hasBeenWarned = false;
 
@@ -211,6 +225,7 @@ export default function buildPreset(context, opts = {}) {
   }
   const include = validateIncludeOption(opts.whitelist || opts.include);
   const exclude = validateExcludeOption(opts.exclude);
+  checkDuplicateIncludeExcludes(include, exclude);
   const targets = getTargets(opts.targets);
   const debug = opts.debug;
   const useBuiltIns = opts.useBuiltIns;
