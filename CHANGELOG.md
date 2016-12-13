@@ -29,6 +29,8 @@ Example:
 
 `"exclude": ["map"]` doesn't include the `Map` polyfill if you know you aren't using it in your code (w/ `useBuiltIns`). (We will figure out a way to automatically do this [#84](https://github.com/babel/babel-preset-env/issues/84)).
 
+If you pass a wrong plugin it will error: valid options for `include/exclude` are in [/data/plugin-features.js](https://github.com/babel/babel-preset-env/blob/master/data/plugin-features.js) and [/data/built-in-features.js](https://github.com/babel/babel-preset-env/blob/master/data/built-in-features.js) (without the `es6.`)
+
 ### :house: Internal
 
 - Optimize result filtration. ([#77](https://github.com/babel/babel-preset-env/pull/77)) (@yavorsky)
