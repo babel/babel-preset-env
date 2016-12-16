@@ -2,7 +2,7 @@
   "presets": [
     ["../../../../lib", {
       "targets": {
-        "browsers": "last 1 chrome versions"
+        "chrome": 55
       },
       "include": [
         "es6.map",
