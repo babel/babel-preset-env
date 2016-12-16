@@ -1,0 +1,15 @@
+{
+  "presets": [
+    ["../../../../lib", {
+      "targets": {
+        "browsers": "last 1 chrome versions"
+      },
+      "include": [
+        "es6.map",
+        "es6.set"
+      ],
+      "modules": false,
+      "useBuiltIns": true
+    }]
+  ]
+}
