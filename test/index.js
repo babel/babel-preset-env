@@ -230,6 +230,13 @@ describe("babel-preset-env", () => {
         );
       });
 
+      it("should return array if in features", function() {
+        assert.deepEqual(
+          validatePluginsOption(["map"]),
+          ["map"]
+        );
+      });
+
       it("should throw if not in features", function() {
         assert.throws(() => {
           validatePluginsOption(["asdf"]);

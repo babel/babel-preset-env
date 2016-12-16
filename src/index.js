@@ -15,7 +15,7 @@ export const MODULE_TRANSFORMATIONS = {
 export const validIncludesAndExcludes = [
   ...Object.keys(pluginFeatures),
   ...Object.keys(MODULE_TRANSFORMATIONS).map((m) => MODULE_TRANSFORMATIONS[m]),
-  ...Object.keys(builtInsList).slice(4) // remove the `es6.`
+  ...Object.keys(builtInsList).map((builtIn) => builtIn.slice(4)) // remove the `es6.`
 ];
 
 /**
