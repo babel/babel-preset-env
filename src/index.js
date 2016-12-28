@@ -6,6 +6,7 @@ import semver from "semver";
 import path from "path";
 import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin";
 import electronToChromium from "../data/electron-to-chromium";
+import { _extends, desemverify, semverify } from "./utils";
 
 export const MODULE_TRANSFORMATIONS = {
   "amd": "transform-es2015-modules-amd",
@@ -36,20 +37,7 @@ export const validIncludesAndExcludes = [
   ...defaultInclude
 ];
 
-const _extends = Object.assign || function (target) {
-  for (let i = 1; i < arguments.length; i++) {
-    const source = arguments[i];
-    for (let key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-  return target;
-};
-
 const getVersionsFromList = (list) => {
-  // console.log(list)
   return Object.keys(list).reduce((allVersions, currentItem) => {
     const currentVersions = list[currentItem];
     for (let envName in currentVersions) {
@@ -61,7 +49,6 @@ const getVersionsFromList = (list) => {
       } else if (currentVersion.indexOf(envVersion) === -1) {
         allVersions[envName].push(envVersion);
       }
-
     }
 
     for (let env in allVersions) {
@@ -71,8 +58,6 @@ const getVersionsFromList = (list) => {
     return allVersions;
   }, {});
 };
-
-const versionsFromData = getVersionsFromList(_extends({}, pluginList, builtInsList));
 
 /**
  * Determine if a transformation is required
@@ -132,17 +117,6 @@ const mergeBrowsers = (fromQuery, fromTarget) => {
   }, fromQuery);
 };
 
-const semverify = (version) => {
-  const isInt = version % 1 === 0;
-  const stringified = version.toString();
-  const strEnd = isInt ? '.0.0' : '.0';
-  return stringified + strEnd;
-};
-
-const desemverify = (version) => {
-  return parseFloat(version);
-};
-
 export const getCurrentNodeVersion = () => {
   return desemverify(process.versions.node);
 };
@@ -151,7 +125,7 @@ const filterSatisfiedVersions = (range, versions) => {
   return versions.filter(targ => semver.satisfies(targ, range))
 };
 
-const getLowestFromSemverValue = (version, env='node') => {
+const getLowestFromSemverValue = (version, versionsList) => {
   let lowestSupported;
   if (version === '*') return null;
   
@@ -159,7 +133,7 @@ const getLowestFromSemverValue = (version, env='node') => {
     lowestSupported = parseFloat(version);
   } else if (semver.validRange(version)) {
     // TODO: Make more flexible for all envs.
-    const versions = versionsFromData[env].map(semverify); //env ? versionsFromData[node] : mergeEnvs(versionsFromData);
+    const versions = versionsList.map(semverify);
     const allSupported = filterSatisfiedVersions(version, versions);
     if (allSupported.length) {
       lowestSupported = allSupported[0];
@@ -169,13 +143,15 @@ const getLowestFromSemverValue = (version, env='node') => {
 };
 
 export const getEnginesNodeVersion = () => {
-  const cwd = process.cwd();
-  const pkgPath = path.join(cwd, "package.json");
+  const processRoot = process.cwd();
+  const pkgPath = path.join(processRoot, "package.json");
+  const listedVersions = getVersionsFromList(_extends({}, pluginList, builtInsList));
+
   try {
     const pkg = require(pkgPath);
     if (pkg.engines && pkg.engines.node) {
       const version = pkg.engines.node;
-      return getLowestFromSemverValue(version, 'node');
+      return getLowestFromSemverValue(version, listedVersions['node']);
     } else {
       console.warn(`Can't get node.js version from \`engines\` field in ${pkgPath}.`);
     }
@@ -213,7 +189,6 @@ export const getTargets = (targets = {}) => {
   } else if (targetNode === "engines") {
     targetOps.node = getEnginesNodeVersion(); 
   }
-  console.log(targetOps)
 
   // Rewrite Electron versions to their Chrome equivalents
   if (targetOps.electron) {
