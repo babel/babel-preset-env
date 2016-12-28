@@ -2,6 +2,8 @@ import pluginList from "../data/plugins.json";
 import pluginFeatures from "../data/plugin-features";
 import builtInsList from "../data/built-ins.json";
 import browserslist from "browserslist";
+import semver from "semver";
+import path from "path";
 import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin";
 import electronToChromium from "../data/electron-to-chromium";
 
@@ -18,12 +20,59 @@ const defaultInclude = [
   "web.dom.iterable"
 ];
 
+const browserNameMap = {
+  chrome: "chrome",
+  edge: "edge",
+  firefox: "firefox",
+  ie: "ie",
+  ios_saf: "ios",
+  safari: "safari"
+};
+
 export const validIncludesAndExcludes = [
   ...Object.keys(pluginFeatures),
   ...Object.keys(MODULE_TRANSFORMATIONS).map((m) => MODULE_TRANSFORMATIONS[m]),
   ...Object.keys(builtInsList),
   ...defaultInclude
 ];
+
+const _extends = Object.assign || function (target) {
+  for (let i = 1; i < arguments.length; i++) {
+    const source = arguments[i];
+    for (let key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+  return target;
+};
+
+const getVersionsFromList = (list) => {
+  // console.log(list)
+  return Object.keys(list).reduce((allVersions, currentItem) => {
+    const currentVersions = list[currentItem];
+    for (let envName in currentVersions) {
+      const currentVersion = allVersions[envName];
+      const envVersion = currentVersions[envName];
+
+      if (!currentVersion) {
+        allVersions[envName] = [envVersion];
+      } else if (currentVersion.indexOf(envVersion) === -1) {
+        allVersions[envName].push(envVersion);
+      }
+
+    }
+
+    for (let env in allVersions) {
+      allVersions[env].sort((a, b) => a - b);
+    }
+
+    return allVersions;
+  }, {});
+};
+
+const versionsFromData = getVersionsFromList(_extends({}, pluginList, builtInsList));
 
 /**
  * Determine if a transformation is required
@@ -64,15 +113,6 @@ const isBrowsersQueryValid = (browsers) => {
   return typeof browsers === "string" || Array.isArray(browsers);
 };
 
-const browserNameMap = {
-  chrome: "chrome",
-  edge: "edge",
-  firefox: "firefox",
-  ie: "ie",
-  ios_saf: "ios",
-  safari: "safari"
-};
-
 const getLowestVersions = (browsers) => {
   return browsers.reduce((all, browser) => {
     const [browserName, browserVersion] = browser.split(" ");
@@ -92,8 +132,56 @@ const mergeBrowsers = (fromQuery, fromTarget) => {
   }, fromQuery);
 };
 
+const semverify = (version) => {
+  const isInt = version % 1 === 0;
+  const stringified = version.toString();
+  const strEnd = isInt ? '.0.0' : '.0';
+  return stringified + strEnd;
+};
+
+const desemverify = (version) => {
+  return parseFloat(version);
+};
+
 export const getCurrentNodeVersion = () => {
-  return parseFloat(process.versions.node);
+  return desemverify(process.versions.node);
+};
+
+const filterSatisfiedVersions = (range, versions) => {
+  return versions.filter(targ => semver.satisfies(targ, range))
+};
+
+const getLowestFromSemverValue = (version, env='node') => {
+  let lowestSupported;
+  if (version === '*') return null;
+  
+  if (semver.valid(version)) {
+    lowestSupported = parseFloat(version);
+  } else if (semver.validRange(version)) {
+    // TODO: Make more flexible for all envs.
+    const versions = versionsFromData[env].map(semverify); //env ? versionsFromData[node] : mergeEnvs(versionsFromData);
+    const allSupported = filterSatisfiedVersions(version, versions);
+    if (allSupported.length) {
+      lowestSupported = allSupported[0];
+    }
+  }
+  return lowestSupported ? desemverify(lowestSupported) : null;
+};
+
+export const getEnginesNodeVersion = () => {
+  const cwd = process.cwd();
+  const pkgPath = path.join(cwd, "package.json");
+  try {
+    const pkg = require(pkgPath);
+    if (pkg.engines && pkg.engines.node) {
+      const version = pkg.engines.node;
+      return getLowestFromSemverValue(version, 'node');
+    } else {
+      console.warn(`Can't get node.js version from \`engines\` field in ${pkgPath}.`);
+    }
+  } catch(e) {
+    console.warn(`Can't parse ${pkgPath} while trying to get node.js version from \`engines\` field.`);
+  }
 };
 
 export const electronVersionToChromeVersion = (semverVer) => {
@@ -116,25 +204,16 @@ export const electronVersionToChromeVersion = (semverVer) => {
   return result;
 };
 
-const _extends = Object.assign || function (target) {
-  for (let i = 1; i < arguments.length; i++) {
-    const source = arguments[i];
-    for (let key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-  return target;
-};
-
 
 export const getTargets = (targets = {}) => {
   const targetOps = _extends({}, targets);
-
-  if (targetOps.node === true || targetOps.node === "current") {
+  const {node: targetNode} = targetOps;
+  if (targetNode === true || targetNode === "current") {
     targetOps.node = getCurrentNodeVersion();
+  } else if (targetNode === "engines") {
+    targetOps.node = getEnginesNodeVersion(); 
   }
+  console.log(targetOps)
 
   // Rewrite Electron versions to their Chrome equivalents
   if (targetOps.electron) {
