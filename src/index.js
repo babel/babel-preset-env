@@ -122,17 +122,18 @@ export const getCurrentNodeVersion = () => {
 };
 
 const filterSatisfiedVersions = (range, versions) => {
-  return versions.filter(targ => semver.satisfies(targ, range))
+  return versions.filter((targ) => semver.satisfies(targ, range));
 };
 
 const getLowestFromSemverValue = (version, versionsList) => {
   let lowestSupported;
-  if (version === '*') return null;
-  
+  if (version === "*") {
+    return null;
+  }
+
   if (semver.valid(version)) {
     lowestSupported = parseFloat(version);
   } else if (semver.validRange(version)) {
-    // TODO: Make more flexible for all envs.
     const versions = versionsList.map(semverify);
     const allSupported = filterSatisfiedVersions(version, versions);
     if (allSupported.length) {
@@ -151,11 +152,11 @@ export const getEnginesNodeVersion = () => {
     const pkg = require(pkgPath);
     if (pkg.engines && pkg.engines.node) {
       const version = pkg.engines.node;
-      return getLowestFromSemverValue(version, listedVersions['node']);
+      return getLowestFromSemverValue(version, listedVersions["node"]);
     } else {
       console.warn(`Can't get node.js version from \`engines\` field in ${pkgPath}.`);
     }
-  } catch(e) {
+  } catch (e) {
     console.warn(`Can't parse ${pkgPath} while trying to get node.js version from \`engines\` field.`);
   }
 };
@@ -187,7 +188,7 @@ export const getTargets = (targets = {}) => {
   if (targetNode === true || targetNode === "current") {
     targetOps.node = getCurrentNodeVersion();
   } else if (targetNode === "engines") {
-    targetOps.node = getEnginesNodeVersion(); 
+    targetOps.node = getEnginesNodeVersion();
   }
 
   // Rewrite Electron versions to their Chrome equivalents

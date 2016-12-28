@@ -17,7 +17,7 @@ export const desemverify = (version) => {
 export const semverify = (version) => {
   const isInt = version % 1 === 0;
   const stringified = version.toString();
-  const strEnd = isInt ? '.0.0' : '.0';
+  const strEnd = isInt ? ".0.0" : ".0";
   return stringified + strEnd;
 };
 
