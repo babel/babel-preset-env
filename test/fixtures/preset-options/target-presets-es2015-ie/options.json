@@ -1,0 +1,10 @@
+{
+  "presets": [
+    ["../../../../lib", {
+      "targets": {
+        "ie": 9
+      },
+      "targetPresets": ["es2015"]
+    }]
+  ]
+}
