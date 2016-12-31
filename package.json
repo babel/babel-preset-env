@@ -18,6 +18,7 @@
     "test": "npm run build && mocha ./test --compilers js:babel-register -t 5000"
   },
   "dependencies": {
+    "babel-core": "^6.21.0",
     "babel-plugin-check-es2015-constants": "^6.3.13",
     "babel-plugin-syntax-trailing-function-commas": "^6.13.0",
     "babel-plugin-transform-async-to-generator": "^6.8.0",

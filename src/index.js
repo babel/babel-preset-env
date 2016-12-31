@@ -1,3 +1,4 @@
+import {OptionManager} from "babel-core";
 import pluginList from "../data/plugins.json";
 import pluginFeatures from "../data/plugin-features";
 import builtInsList from "../data/built-ins.json";
@@ -279,7 +280,7 @@ export default function buildPreset(context, opts = {}) {
 
   const regenerator = allTransformations.indexOf("transform-regenerator") >= 0;
   const modulePlugin = moduleType !== false && MODULE_TRANSFORMATIONS[moduleType];
-  const plugins = [];
+  let plugins = [];
 
   modulePlugin &&
     plugins.push([require(`babel-plugin-${modulePlugin}`), { loose }]);
@@ -287,6 +288,17 @@ export default function buildPreset(context, opts = {}) {
   plugins.push(...allTransformations.map((pluginName) =>
     [require(`babel-plugin-${pluginName}`), { loose }]
   ));
+
+  if (opts.targetPresets) {
+    const targetPlugins = new OptionManager();
+    targetPlugins.init({presets: opts.targetPresets});
+    // restrict plugins to those that match given target presets
+    plugins = plugins.filter(([plugin]) => {
+      const normalized = OptionManager.normalisePlugin(plugin);
+      return targetPlugins.options.plugins.some(([targetPlugin]) =>
+        targetPlugin === normalized);
+    });
+  }
 
   useBuiltIns &&
     plugins.push([transformPolyfillRequirePlugin, { polyfills, regenerator }]);
