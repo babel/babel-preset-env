@@ -180,7 +180,7 @@ export const electronVersionToChromeVersion = (semverVer) => {
 };
 
 
-export const getTargets = (targets = {}, options={}) => {
+export const getTargets = (targets = {}, options = {}) => {
   const targetOps = _extends({}, targets);
   const {node: targetNode} = targetOps;
   if (targetNode === true || targetNode === "current") {
