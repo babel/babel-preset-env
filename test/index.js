@@ -25,6 +25,22 @@ describe("babel-preset-env", () => {
       }), {
         node: parseFloat(process.versions.node)
       });
+
+    });
+
+    it("should return the current node version with option 'engines'", function() {
+      assert.deepEqual(babelPresetEnv.getTargets({
+        node: "engines"
+      }), {
+        node: 0.12
+      });
+    });
+  });
+
+  describe("getLowestFromSemverValue", () => {
+    it("should return the lowest supported version from semver value", function() {
+      const lowestNodeVersion = babelPresetEnv.getLowestFromSemverValue('>=0.12', [4, 5, 6]);
+      assert.equal(lowestNodeVersion, 4);
     });
   });
 
