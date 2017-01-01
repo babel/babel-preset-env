@@ -7,6 +7,9 @@
   "license": "MIT",
   "repository": "https://github.com/babel/babel-preset-env",
   "main": "lib/index.js",
+  "engines" : { 
+    "node" : ">=0.12.0"
+  },
   "scripts": {
     "build": "rimraf lib && babel src -d lib",
     "build-data": "node ./scripts/build-data.js",
