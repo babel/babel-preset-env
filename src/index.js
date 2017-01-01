@@ -329,8 +329,8 @@ export default function buildPreset(context, opts = {}) {
   }
 
   const allTransformations = transformations
-  .filter((plugin) => exclude.plugins.indexOf(plugin) === -1)
-  .concat(include.plugins);
+    .filter((plugin) => exclude.plugins.indexOf(plugin) === -1)
+    .concat(include.plugins);
 
   const regenerator = allTransformations.indexOf("transform-regenerator") >= 0;
   const modulePlugin = moduleType !== false && MODULE_TRANSFORMATIONS[moduleType];
