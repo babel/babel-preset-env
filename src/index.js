@@ -67,9 +67,9 @@ const getVersionsFromList = (list) => {
  *                                          version the feature was implmented in as a value
  * @return {Boolean}  Whether or not the transformation is required
  */
-export const isPluginRequired = (supportedEnvironments, plugin) => {
+export const isPluginRequired = (supportedEnvironments, plugin, options) => {
   if (supportedEnvironments.browsers) {
-    supportedEnvironments = getTargets(supportedEnvironments);
+    supportedEnvironments = getTargets(supportedEnvironments, options);
   }
 
   const targetEnvironments = Object.keys(supportedEnvironments);
@@ -125,7 +125,7 @@ const filterSatisfiedVersions = (range, versions) => {
   return versions.filter((targ) => semver.satisfies(targ, range));
 };
 
-const getLowestFromSemverValue = (version, versionsList) => {
+export const getLowestFromSemverValue = (version, versionsList) => {
   let lowestSupported;
   if (version === "*") {
     return null;
@@ -143,16 +143,14 @@ const getLowestFromSemverValue = (version, versionsList) => {
   return lowestSupported ? desemverify(lowestSupported) : null;
 };
 
-export const getEnginesNodeVersion = () => {
-  const processRoot = process.cwd();
-  const pkgPath = path.join(processRoot, "package.json");
-  const listedVersions = getVersionsFromList(_extends({}, pluginList, builtInsList));
+export const getEnginesNodeVersion = (packageRoot, supportedVersions) => {
+  const pkgPath = path.join(packageRoot, "package.json");
 
   try {
     const pkg = require(pkgPath);
     if (pkg.engines && pkg.engines.node) {
       const version = pkg.engines.node;
-      return getLowestFromSemverValue(version, listedVersions["node"]);
+      return getLowestFromSemverValue(version, supportedVersions);
     } else {
       console.warn(`Can't get node.js version from \`engines\` field in ${pkgPath}.`);
     }
@@ -182,13 +180,20 @@ export const electronVersionToChromeVersion = (semverVer) => {
 };
 
 
-export const getTargets = (targets = {}) => {
+export const getTargets = (targets = {}, options={}) => {
   const targetOps = _extends({}, targets);
   const {node: targetNode} = targetOps;
   if (targetNode === true || targetNode === "current") {
     targetOps.node = getCurrentNodeVersion();
   } else if (targetNode === "engines") {
-    targetOps.node = getEnginesNodeVersion();
+    const lists = [pluginList];
+    if (options.useBuiltIns) {
+      lists.push(builtInsList);
+    }
+
+    const allSupportedVersions = getVersionsFromList(_extends({}, ...lists));
+    const supportedNodeVersions = allSupportedVersions["node"];
+    targetOps.node = getEnginesNodeVersion(process.cwd(), supportedNodeVersions);
   }
 
   // Rewrite Electron versions to their Chrome equivalents
@@ -292,17 +297,17 @@ export default function buildPreset(context, opts = {}) {
   const include = validateIncludeOption(opts.whitelist || opts.include);
   const exclude = validateExcludeOption(opts.exclude);
   checkDuplicateIncludeExcludes(include.all, exclude.all);
-  const targets = getTargets(opts.targets);
+  const targets = getTargets(opts.targets, opts);
   const debug = opts.debug;
   const useBuiltIns = opts.useBuiltIns;
 
   let transformations = Object.keys(pluginList)
-    .filter((pluginName) => isPluginRequired(targets, pluginList[pluginName]));
+    .filter((pluginName) => isPluginRequired(targets, pluginList[pluginName], opts));
 
   let polyfills;
   if (useBuiltIns) {
     polyfills = Object.keys(builtInsList)
-      .filter((builtInName) => isPluginRequired(targets, builtInsList[builtInName]))
+      .filter((builtInName) => isPluginRequired(targets, builtInsList[builtInName], opts))
       .concat(defaultInclude)
       .filter((plugin) => exclude.builtIns.indexOf(plugin) === -1)
       .concat(include.builtIns);
