@@ -10,6 +10,9 @@
   "engines" : { 
     "node" : ">=0.12.0"
   },
+  "devEngines" : { 
+    "node" : ">= 4.x"
+  },
   "scripts": {
     "build": "rimraf lib && babel src -d lib",
     "build-data": "node ./scripts/build-data.js",
