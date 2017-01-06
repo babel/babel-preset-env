@@ -1,3 +1,5 @@
+const DEFAULT_ENV = "development";
+
 export const _extends = Object.assign || function (target) {
   for (let i = 1; i < arguments.length; i++) {
     const source = arguments[i];
@@ -21,3 +23,6 @@ export const semverify = (version) => {
   return stringified + strEnd;
 };
 
+export const getEnv = (env) => {
+  return env.BABEL_ENV || env.NODE_ENV || DEFAULT_ENV;
+};

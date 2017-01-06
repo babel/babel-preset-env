@@ -6,7 +6,7 @@ import semver from "semver";
 import path from "path";
 import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin";
 import electronToChromium from "../data/electron-to-chromium";
-import { _extends, desemverify, semverify } from "./utils";
+import { _extends, desemverify, semverify, getEnv } from "./utils";
 
 export const MODULE_TRANSFORMATIONS = {
   "amd": "transform-es2015-modules-amd",
@@ -144,12 +144,14 @@ export const getLowestFromSemverValue = (version, versionsList) => {
 };
 
 export const getEnginesNodeVersion = (packageRoot, supportedVersions) => {
+  const env = getEnv(process.env);
   const pkgPath = path.join(packageRoot, "package.json");
 
   try {
     const pkg = require(pkgPath);
-    if (pkg.engines && pkg.engines.node) {
-      const version = pkg.engines.node;
+    const engines = env === "development" && pkg.devEngines || pkg.engines;
+    if (engines && engines.node) {
+      const version = engines.node;
       return getLowestFromSemverValue(version, supportedVersions);
     } else {
       console.warn(`Can't get node.js version from \`engines\` field in ${pkgPath}.`);
@@ -182,10 +184,11 @@ export const electronVersionToChromeVersion = (semverVer) => {
 
 export const getTargets = (targets = {}, options = {}) => {
   const targetOps = _extends({}, targets);
-  const {node: targetNode} = targetOps;
-  if (targetNode === true || targetNode === "current") {
+  const {node} = targetOps;
+
+  if (node === true || node === "current") {
     targetOps.node = getCurrentNodeVersion();
-  } else if (targetNode === "engines") {
+  } else if (node === "engines") {
     const lists = [pluginList];
     if (options.useBuiltIns) {
       lists.push(builtInsList);
