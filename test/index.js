@@ -28,12 +28,29 @@ describe("babel-preset-env", () => {
 
     });
 
-    it("should return the current node version with option 'engines'", function() {
+    it("should return the current node version with option 'engines' with BABEL_ENV='development'", function() {
+      const prevEnv = process.env.BABEL_ENV;
+      process.env.BABEL_ENV = "development";
+
+      assert.deepEqual(babelPresetEnv.getTargets({
+        node: "engines"
+      }), {
+        node: 4
+      });
+
+      process.env.BABEL_ENV = prevEnv;
+    });
+
+    it("should return the current node version with option 'engines' with BABEL_ENV='production'", function() {
+      const prevEnv = process.env.BABEL_ENV;
+      process.env.BABEL_ENV = "production";
+
       assert.deepEqual(babelPresetEnv.getTargets({
         node: "engines"
       }), {
         node: 0.12
       });
+      process.env.BABEL_ENV = prevEnv;
     });
   });
 
