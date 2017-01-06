@@ -55,9 +55,19 @@ describe("babel-preset-env", () => {
   });
 
   describe("getLowestFromSemverValue", () => {
-    it("should return the lowest supported version from semver value", function() {
+    it("should return the lowest supported version from semver value '>=0.12'", function() {
       const lowestNodeVersion = babelPresetEnv.getLowestFromSemverValue(">=0.12", [4, 5, 6]);
       assert.equal(lowestNodeVersion, 4);
+    });
+
+    it("should return null from semver value '*'", function() {
+      const lowestNodeVersion = babelPresetEnv.getLowestFromSemverValue("*", [4, 5, 6]);
+      assert.equal(lowestNodeVersion, null);
+    });
+
+    it("should return null if version isnt a semver value", function() {
+        const lowestNodeVersion = babelPresetEnv.getLowestFromSemverValue("💩", [4, 5, 6]);
+        assert.equal(lowestNodeVersion, null);
     });
   });
 
