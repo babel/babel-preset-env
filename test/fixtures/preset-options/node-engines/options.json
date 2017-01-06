@@ -3,7 +3,7 @@
     ["../../../../lib", {
       "targets": {
         "node": "engines",
-        "chrome": "55"
+        "chrome": 55
       }
     }]
   ]
