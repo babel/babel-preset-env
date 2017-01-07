@@ -2,8 +2,7 @@
   "presets": [
     ["../../../../lib", {
       "targets": {
-        "node": "engines",
-        "chrome": 55
+        "node": "engines"
       }
     }]
   ]

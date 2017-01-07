@@ -35,7 +35,7 @@ describe("babel-preset-env", () => {
       assert.deepEqual(babelPresetEnv.getTargets({
         node: "engines"
       }), {
-        node: 4
+        node: 6
       });
 
       process.env.BABEL_ENV = prevEnv;
