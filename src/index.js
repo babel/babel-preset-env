@@ -235,7 +235,7 @@ const filterItem = (targets, exclusions, list, item) => {
   if (isDefault) return notExcluded;
   const isRequired = isPluginRequired(targets, list[item]);
   return isRequired && notExcluded;
-}
+};
 
 export default function buildPreset(context, opts = {}) {
   const loose = validateLooseOption(opts.loose);
