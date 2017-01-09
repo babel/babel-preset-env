@@ -230,11 +230,10 @@ const logPlugin = (plugin, targets, list) => {
 
 const filterItem = (targets, exclusions, list, item) => {
   const isDefault = defaultInclude.indexOf(item) >= 0;
-  if (isDefault) return true;
-
-  const isRequired = isPluginRequired(targets, list[item]);
   const notExcluded = exclusions.indexOf(item) === -1;
 
+  if (isDefault) return notExcluded;
+  const isRequired = isPluginRequired(targets, list[item]);
   return isRequired && notExcluded;
 }
 
