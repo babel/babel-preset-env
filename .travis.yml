@@ -14,8 +14,10 @@ node_js:
 script:
   - 'if [ -n "${LINT-}" ]; then npm run lint ; fi'
   - 'if [ -z "${LINT-}" ]; then npm run ci ; fi'
+os: [linux, osx]
 matrix:
   fast_finish: true
   include:
     - node_js: "node"
+      os: linux # only lint on linux, no need to lint on os x too
       env: LINT=true
