@@ -19,9 +19,15 @@ const envs = require("compat-table/environments");
 const invertedEqualsEnv = Object.keys(envs)
   .filter((b) => envs[b].equals)
   .reduce((a, b) => {
-    a[envs[b].equals] = b;
+    if (!a[envs[b].equals]) {
+      a[envs[b].equals] = [b];
+    } else {
+      a[envs[b].equals].push(b);
+    }
     return a;
   }, {});
+
+invertedEqualsEnv.safari5 = ["ios6"];
 
 const compatibilityTests = flattenDeep([
   es6Data,
@@ -103,7 +109,12 @@ const getLowestImplementedVersion = ({ features }, env) => {
 
       // `equals` in compat-table
       Object.keys(test).forEach((t) => {
-        test[invertedEqualsEnv[t]] = test[t];
+        const invertedEnvs = invertedEqualsEnv[envMap[t] || t];
+        if (invertedEnvs) {
+          invertedEnvs.forEach((inv) => {
+            test[inv] = test[t];
+          });
+        }
       });
 
       return Object.keys(test)
@@ -149,6 +160,15 @@ const generateData = (environments, features) => {
         plugin[env] = version;
       }
     });
+
+    // // add ios
+    // if (plugin.safari) {
+    //   if (plugin.safari >= 9) {
+    //     plugin.ios = plugin.safari;
+    //   } else {
+    //     plugin.ios = 10;
+    //   }
+    // }
 
     // add opera
     if (plugin.chrome) {
