@@ -29,9 +29,9 @@ const invertedEqualsEnv = Object.keys(envs)
 
 invertedEqualsEnv.safari5 = ["ios6"];
 if (Array.isArray(invertedEqualsEnv.safari6)) {
-  invertedEqualsEnv.safari6.push("ios6");
+  invertedEqualsEnv.safari6.push("ios7");
 } else {
-  invertedEqualsEnv.safari6 = ["ios6"];
+  invertedEqualsEnv.safari6 = ["ios7"];
 }
 invertedEqualsEnv.safari8 = ["ios8"];
 
