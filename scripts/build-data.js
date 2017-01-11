@@ -12,6 +12,7 @@ const builtInFeatures = require("../data/built-in-features");
 const renameTests = (tests, getName) =>
   tests.map((test) => Object.assign({}, test, { name: getName(test.name) }));
 
+const es5Data = require("compat-table/data-es5");
 const es6Data = require("compat-table/data-es6");
 const es6PlusData = require("compat-table/data-es2016plus");
 const envs = require("compat-table/environments");
@@ -24,6 +25,7 @@ const invertedEqualsEnv = Object.keys(envs)
   }, {});
 
 const compatibilityTests = flattenDeep([
+  es5Data,
   es6Data,
   es6PlusData,
 ].map((data) =>

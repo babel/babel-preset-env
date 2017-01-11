@@ -1,5 +1,48 @@
 // https://github.com/zloirock/core-js
 
+const es5 = {
+  "es6.object.create": "Object static methods / Object.create",
+  "es6.object.define-property": "Object static methods / Object.defineProperty",
+  "es6.object.define-properties": "Object static methods / Object.defineProperties",
+  "es6.object.get-prototype-of": "Object static methods / Object.getPrototypeOf",
+  "es6.object.keys": "Object static methods / Object.keys",
+  "es6.object.seal": "Object static methods / Object.seal",
+  "es6.object.freeze": "Object static methods / Object.freeze",
+  "es6.object.prevent-extensions": "Object static methods / Object.preventExtensions",
+  "es6.object.is-sealed": "Object static methods / Object.isSealed",
+  "es6.object.is-frozen": "Object static methods / Object.isFrozen",
+  "es6.object.is-extensible": "Object static methods / Object.isExtensible",
+  "es6.object.get-own-property-descriptor": "Object static methods / Object.getOwnPropertyDescriptor",
+  "es6.object.get-own-property-names": "Object static methods / Object.getOwnPropertyNames",
+
+  "es6.array.is-array": "Array methods / Array.isArray",
+  "es6.array.index-of": "Array methods / Array.prototype.indexOf",
+  "es6.array.last-index-of": "Array methods / Array.prototype.lastIndexOf",
+  "es6.array.every": "Array methods / Array.prototype.every",
+  "es6.array.some": "Array methods / Array.prototype.some",
+  "es6.array.for-each": "Array methods / Array.prototype.forEach",
+  "es6.array.map": "Array methods / Array.prototype.map",
+  "es6.array.filter": "Array methods / Array.prototype.filter",
+  "es6.array.reduce": "Array methods / Array.prototype.reduce",
+  "es6.array.reduce-right": "Array methods / Array.prototype.reduceRight",
+  "es6.array.sort": "Array methods / Array.prototype.sort",
+
+  "es6.string.trim": "String properties and methods / String.prototype.trim",
+
+  "es6.date.to-iso-string": "Date methods / Date.prototype.toISOString",
+  "es6.date.now": "Date methods / Date.now",
+  "es6.date.to-json": "Date methods / Date.prototype.toJSON",
+
+  "es6.function.bind": "Function.prototype.bind",
+
+  "es6.parse-int": "Miscellaneous / parseInt ignores leading zeros",
+  "es6.parse-float": "Miscellaneous / parseInt ignores leading zeros",
+
+  // "es6.array.join": "",
+  // "es6.array.slice": "",
+  // "es6.regexp.to-string": "",
+};
+
 const es2015 = {
   // "es6.typed/array-buffer": "typed arrays / ",
   "es6.typed.data-view": "typed arrays / DataView",
@@ -131,4 +174,4 @@ const es2017 = {
   "es7.string.pad-end": "String padding / String.prototype.padEnd",
 };
 
-module.exports = Object.assign({}, es2015, es2016, es2017);
+module.exports = Object.assign({}, es5, es2015, es2016, es2017);
