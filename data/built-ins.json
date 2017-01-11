@@ -35,7 +35,8 @@
     "edge": 12,
     "firefox": 4,
     "safari": 6,
-    "node": 0.12
+    "node": 0.12,
+    "ios": 6
   },
   "es6.typed.int16-array": {
     "chrome": 5,
