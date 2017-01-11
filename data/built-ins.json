@@ -417,36 +417,36 @@
     "chrome": 45,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 4,
-    "ios": 7,
+    "ios": 8,
     "opera": 32
   },
   "es6.array.find-index": {
     "chrome": 45,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 4,
-    "ios": 7,
+    "ios": 8,
     "opera": 32
   },
   "es6.array.fill": {
     "chrome": 45,
     "edge": 12,
     "firefox": 31,
-    "safari": 7,
+    "safari": 8,
     "node": 4,
-    "ios": 7,
+    "ios": 8,
     "opera": 32
   },
   "es6.array.iterator": {
     "chrome": 38,
     "edge": 12,
     "firefox": 28,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.number.is-finite": {
@@ -516,36 +516,36 @@
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.asinh": {
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.atanh": {
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.cbrt": {
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.clz32": {
@@ -561,36 +561,36 @@
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.expm1": {
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.fround": {
     "chrome": 38,
     "edge": 12,
     "firefox": 26,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.hypot": {
     "chrome": 38,
     "edge": 12,
     "firefox": 27,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.imul": {
@@ -607,27 +607,27 @@
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.log10": {
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.log2": {
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.sign": {
@@ -643,27 +643,27 @@
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.tanh": {
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es6.math.trunc": {
     "chrome": 38,
     "edge": 12,
     "firefox": 25,
-    "safari": 7,
+    "safari": 8,
     "node": 0.12,
-    "ios": 7,
+    "ios": 8,
     "opera": 25
   },
   "es7.array.includes": {

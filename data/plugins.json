@@ -38,9 +38,9 @@
     "chrome": 44,
     "edge": 12,
     "firefox": 34,
-    "safari": 7,
+    "safari": 8,
     "node": 4,
-    "ios": 7,
+    "ios": 8,
     "opera": 31
   },
   "check-es2015-constants": {

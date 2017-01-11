@@ -33,6 +33,7 @@ if (Array.isArray(invertedEqualsEnv.safari6)) {
 } else {
   invertedEqualsEnv.safari6 = ["ios6"];
 }
+invertedEqualsEnv.safari8 = ["ios8"];
 
 const compatibilityTests = flattenDeep([
   es6Data,
@@ -60,7 +61,7 @@ const environments = [
 
 const envMap = {
   safari51: "safari5",
-  safari71_8: "safari7",
+  safari71_8: "safari8",
   firefox3_5: "firefox3",
   firefox3_6: "firefox3",
   node010: "node0.10",
