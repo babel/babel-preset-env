@@ -419,7 +419,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 4,
-    "ios": 8,
+    "ios": 9,
     "opera": 32
   },
   "es6.array.find-index": {
@@ -428,7 +428,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 4,
-    "ios": 8,
+    "ios": 9,
     "opera": 32
   },
   "es6.array.fill": {
@@ -437,7 +437,7 @@
     "firefox": 31,
     "safari": 8,
     "node": 4,
-    "ios": 8,
+    "ios": 9,
     "opera": 32
   },
   "es6.array.iterator": {
@@ -446,7 +446,7 @@
     "firefox": 28,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.number.is-finite": {
@@ -518,7 +518,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.asinh": {
@@ -527,7 +527,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.atanh": {
@@ -536,7 +536,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.cbrt": {
@@ -545,7 +545,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.clz32": {
@@ -563,7 +563,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.expm1": {
@@ -572,7 +572,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.fround": {
@@ -581,7 +581,7 @@
     "firefox": 26,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.hypot": {
@@ -590,7 +590,7 @@
     "firefox": 27,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.imul": {
@@ -609,7 +609,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.log10": {
@@ -618,7 +618,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.log2": {
@@ -627,7 +627,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.sign": {
@@ -645,7 +645,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.tanh": {
@@ -654,7 +654,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es6.math.trunc": {
@@ -663,7 +663,7 @@
     "firefox": 25,
     "safari": 8,
     "node": 0.12,
-    "ios": 8,
+    "ios": 9,
     "opera": 25
   },
   "es7.array.includes": {

@@ -33,7 +33,7 @@ if (Array.isArray(invertedEqualsEnv.safari6)) {
 } else {
   invertedEqualsEnv.safari6 = ["ios7"];
 }
-invertedEqualsEnv.safari8 = ["ios8"];
+invertedEqualsEnv.safari8 = ["ios9"];
 
 const compatibilityTests = flattenDeep([
   es6Data,
