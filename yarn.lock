@@ -1060,7 +1060,7 @@ commoner@^0.10.1:
     q "^1.1.2"
     recast "^0.11.17"
 
-"compat-table@github:kangax/compat-table#b0cec63ea21f3a7788a8eececcb918de903b7fc5":
+compat-table@kangax/compat-table#b0cec63ea21f3a7788a8eececcb918de903b7fc5:
   version "0.0.0"
   resolved "https://codeload.github.com/kangax/compat-table/tar.gz/b0cec63ea21f3a7788a8eececcb918de903b7fc5"
   dependencies:

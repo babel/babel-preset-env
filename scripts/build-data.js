@@ -167,15 +167,6 @@ const generateData = (environments, features) => {
       }
     });
 
-    // // add ios
-    // if (plugin.safari) {
-    //   if (plugin.safari >= 9) {
-    //     plugin.ios = plugin.safari;
-    //   } else {
-    //     plugin.ios = 10;
-    //   }
-    // }
-
     // add opera
     if (plugin.chrome) {
       if (plugin.chrome >= 28) {
