@@ -1,7 +1,7 @@
 import browserslist from "browserslist";
 import builtInsList from "../data/built-ins.json";
 import defaultInclude from "./default-includes";
-import e2c from "electron-to-chromium";
+import { electronToChromium } from "electron-to-chromium";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
@@ -103,7 +103,7 @@ export const getTargets = (targets = {}) => {
 
   // Rewrite Electron versions to their Chrome equivalents
   if (targetOps.electron) {
-    targetOps.chrome = parseInt(e2c.electronToChromium(targetOps.electron), 10);
+    targetOps.chrome = parseInt(electronToChromium(targetOps.electron), 10);
     // if (!targetOps.chrome) {
     //   throw new Error(`Electron version ${targetOps.electron} is either too old or too new`);
     // }
