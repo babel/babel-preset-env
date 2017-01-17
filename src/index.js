@@ -103,10 +103,18 @@ export const getTargets = (targets = {}) => {
 
   // Rewrite Electron versions to their Chrome equivalents
   if (targetOps.electron) {
-    targetOps.chrome = parseInt(electronToChromium(targetOps.electron), 10);
-    // if (!targetOps.chrome) {
-    //   throw new Error(`Electron version ${targetOps.electron} is either too old or too new`);
-    // }
+    const electronChromeVersion = parseInt(electronToChromium(targetOps.electron), 10);
+
+    if (!electronChromeVersion) {
+      throw new Error(`Electron version ${targetOps.electron} is either too old or too new`);
+    }
+
+    if (targetOps.chrome) {
+      targetOps.chrome = Math.min(targetOps.chrome, electronChromeVersion);
+    } else {
+      targetOps.chrome = electronChromeVersion;
+    }
+
     delete targetOps.electron;
   }
 
