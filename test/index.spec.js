@@ -38,6 +38,25 @@ describe("babel-preset-env", () => {
       });
     });
 
+
+    it("should preserve lower Chrome number if Electron version is more recent", function() {
+      assert.deepEqual(babelPresetEnv.getTargets({
+        electron: 1.4,
+        chrome: 50
+      }), {
+        chrome: 50
+      });
+    });
+
+    it("should overwrite Chrome number if Electron version is older", function() {
+      assert.deepEqual(babelPresetEnv.getTargets({
+        electron: 1.0,
+        chrome: 50
+      }), {
+        chrome: 49
+      });
+    });
+
     Object.keys(electronToChromiumData).forEach((electronVersion) => {
       it(`"should work for Electron: ${electronVersion}`, function() {
         assert.deepEqual(babelPresetEnv.getTargets({
