@@ -2,7 +2,6 @@ const chai = require("chai");
 const child = require("child_process");
 const fs = require("fs-extra");
 const helper = require("babel-helper-fixtures");
-const merge = require("lodash/merge");
 const path = require("path");
 
 const fixtureLoc = path.join(__dirname, "debug-fixtures");
@@ -89,21 +88,15 @@ describe("debug output", () => {
       opts.stdout = helper.readFile(stdoutLoc);
     }
 
-    const optionsLoc = path.join(testLoc, "config.json");
+    const optionsLoc = path.join(testLoc, "options.json");
 
     if (!fs.existsSync(optionsLoc)) {
-      throw new Error(`Debug test '${testName}' is missing a config.json`);
+      throw new Error(`Debug test '${testName}' is missing an options.json file`);
     }
-
-    const config = merge({ "debug": true }, require(optionsLoc));
 
     opts.inFiles = {
       "src/in.js": "",
-      ".babelrc": JSON.stringify({
-        "presets": [
-          ["../../lib", config],
-        ],
-      }),
+      ".babelrc": helper.readFile(optionsLoc),
     };
 
     it(testName, buildTest(opts));

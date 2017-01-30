@@ -1,7 +1,0 @@
-{
-  "useBuiltIns": true,
-  "targets": {
-    "browsers": "chrome >= 54, ie 10",
-    "node": 6
-  }
-}
