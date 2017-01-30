@@ -6,7 +6,7 @@
 npm install babel-preset-env --save-dev
 ```
 
-```js
+```json
 {
   "presets": [
     ["env", {
@@ -27,7 +27,7 @@ Check out the many options (especially `useBuiltIns` to polyfill less)!
 - [Examples](#examples)
 - [Caveats](#caveats)
 - [Other Cool Projects](#other-cool-projects)
-  
+
 ## How it Works
 
 ### Determine environment support for ECMAScript features
@@ -78,7 +78,7 @@ npm install --save-dev babel-preset-env
 
 The default behavior without options runs all transforms (behaves the same as [babel-preset-latest](https://babeljs.io/docs/plugins/preset-latest/)).
 
-```js
+```json
 {
   "presets": ["env"]
 }
@@ -117,7 +117,7 @@ Note, browsers' results are overridden by explicit items from `targets`.
 ### `loose`
 
 `boolean`, defaults to `false`.
-    
+
 Enable "loose" transformations for any plugins in this preset that allow them.
 
 ### `modules`
@@ -125,13 +125,13 @@ Enable "loose" transformations for any plugins in this preset that allow them.
 `"amd" | "umd" | "systemjs" | "commonjs" | false`, defaults to `"commonjs"`.
 
 Enable transformation of ES6 module syntax to another module type.
-    
+
 Setting this to `false` will not transform modules.
 
 ### `debug`
 
 `boolean`, defaults to `false`.
-    
+
 Outputs the targets/plugins used and the version specified in [plugin data version](https://github.com/babel/babel-preset-env/blob/master/data/plugins.json) to `console.log`.
 
 ### `include`
@@ -151,7 +151,7 @@ For example, Node 4 supports native classes but not spread. If `super` is used w
 ### `exclude`
 
 `Array<string>`, defaults to `[]`.
-    
+
 An array of plugins to always exclude/remove.
 
 The possible options are the same as the `include` option.
@@ -201,13 +201,17 @@ npm install core-js --save
 
 ## Examples
 
+### Export with various targets
+
 ```js
-// src
 export class A {}
 ```
 
-```js
-// target chrome 52
+#### Target only Chrome 52
+
+**.babelrc**
+
+```json
 {
   "presets": [
     ["env", {
@@ -217,15 +221,20 @@ export class A {}
     }]
   ]
 }
+```
 
-// ...
+**Out**
 
+```js
 class A {}
 exports.A = A;
 ```
 
-```js
-// target chrome 52 with webpack 2/rollup and loose mode
+#### Target Chrome 52 with webpack 2/rollup and loose mode
+
+**.babelrc**
+
+```json
 {
   "presets": [
     ["env", {
@@ -237,14 +246,19 @@ exports.A = A;
     }]
   ]
 }
+```
 
-// ...
+**Out**
 
+```js
 export class A {}
 ```
 
-```js
-// using browserslist
+#### Target specific browsers via browserslist
+
+**.babelrc**
+
+```json
 {
   "presets": [
     ["env", {
@@ -255,18 +269,21 @@ export class A {}
     }]
   ]
 }
+```
 
-// ...
+**Out**
 
+```js
 export var A = function A() {
   _classCallCheck(this, A);
 };
 ```
 
-### Example with `node: true` or `node: "current"`
+#### Target latest node via `node: true` or `node: "current"`
 
-```js
-// process.versions.node -> 6.9.0
+**.babelrc**
+
+```json
 {
   "presets": [
     ["env", {
@@ -276,33 +293,62 @@ export var A = function A() {
     }]
   ]
 }
+```
 
-// ...
+**Out**
 
+```js
 class A {}
 exports.A = A;
 ```
 
-### Example with `debug: true`
+### Show debug output
 
-```js
-Using targets: {
-  "node": 6.5
+**.babelrc**
+
+```json
+{
+  "presets": [
+    [ "env", {
+      "targets": {
+        "safari": 10
+      },
+      "modules": false,
+      "useBuiltIns": true,
+      "debug": true
+    }]
+  ]
 }
-
-Using plugins:
-
-module: false
-transform-exponentiation-operator {}
-transform-async-to-generator {}
-syntax-trailing-function-commas {}
 ```
 
-### Example with `include`/`exclude`
+**stdin**
+
+```sh
+Using targets:
+{
+  "safari": 10
+}
+
+Modules transform: false
+
+Using plugins:
+  transform-exponentiation-operator {}
+  transform-async-to-generator {}
+
+Using polyfills:
+  es7.object.values {}
+  es7.object.entries {}
+  es7.object.get-own-property-descriptors {}
+  web.timers {}
+  web.immediate {}
+  web.dom.iterable {}
+```
+
+### Include and exclude specific plugins/built-ins
 
 > always include arrow functions, explicitly exclude generators
 
-```js
+```json
 {
   "presets": [
     ["env", {

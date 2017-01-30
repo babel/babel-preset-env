@@ -1,13 +1,4 @@
-import "core-js/modules/es6.typed.data-view";
-import "core-js/modules/es6.typed.int8-array";
-import "core-js/modules/es6.typed.uint8-array";
 import "core-js/modules/es6.typed.uint8-clamped-array";
-import "core-js/modules/es6.typed.int16-array";
-import "core-js/modules/es6.typed.uint16-array";
-import "core-js/modules/es6.typed.int32-array";
-import "core-js/modules/es6.typed.uint32-array";
-import "core-js/modules/es6.typed.float32-array";
-import "core-js/modules/es6.typed.float64-array";
 import "core-js/modules/es6.map";
 import "core-js/modules/es6.set";
 import "core-js/modules/es6.weak-map";
@@ -74,7 +65,7 @@ import "core-js/modules/es6.math.sign";
 import "core-js/modules/es6.math.sinh";
 import "core-js/modules/es6.math.tanh";
 import "core-js/modules/es6.math.trunc";
-import "core-js/modules/es7.array.includes.js";
+import "core-js/modules/es7.array.includes";
 import "core-js/modules/es7.object.values";
 import "core-js/modules/es7.object.entries";
 import "core-js/modules/es7.object.get-own-property-descriptors";
@@ -84,5 +75,3 @@ import "core-js/modules/web.timers";
 import "core-js/modules/web.immediate";
 import "core-js/modules/web.dom.iterable";
 import "regenerator-runtime/runtime";
-
-Math.pow(1, 2);

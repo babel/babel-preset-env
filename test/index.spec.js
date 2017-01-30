@@ -2,14 +2,7 @@
 
 const babelPresetEnv = require("../lib/index.js");
 const assert = require("assert");
-const electronToChromiumData = require("../data/electron-to-chromium");
-
-const {
-  validateModulesOption,
-  validateLooseOption,
-  validatePluginsOption,
-  checkDuplicateIncludeExcludes
-} = babelPresetEnv;
+const { versions: electronToChromiumData } = require("electron-to-chromium");
 
 describe("babel-preset-env", () => {
   describe("getTargets", () => {
@@ -76,7 +69,7 @@ describe("babel-preset-env", () => {
       assert.deepEqual(babelPresetEnv.getTargets({
         electron: "1.0"
       }), {
-        chrome: 50
+        chrome: 49
       });
     });
 
@@ -84,7 +77,26 @@ describe("babel-preset-env", () => {
       assert.deepEqual(babelPresetEnv.getTargets({
         electron: 1.0
       }), {
+        chrome: 49
+      });
+    });
+
+
+    it("should preserve lower Chrome number if Electron version is more recent", function() {
+      assert.deepEqual(babelPresetEnv.getTargets({
+        electron: 1.4,
         chrome: 50
+      }), {
+        chrome: 50
+      });
+    });
+
+    it("should overwrite Chrome number if Electron version is older", function() {
+      assert.deepEqual(babelPresetEnv.getTargets({
+        electron: 1.0,
+        chrome: 50
+      }), {
+        chrome: 49
       });
     });
 
@@ -187,13 +199,12 @@ describe("babel-preset-env", () => {
       assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
     });
 
-    it("doesn't throw when specifiying a decimal for node", () => {
-      let targets;
+    it("doesn't throw when specifying a decimal for node", () => {
       const plugin = {
         node: 6
       };
 
-      targets = {
+      const targets = {
         "node": 6.5
       };
 
@@ -201,117 +212,43 @@ describe("babel-preset-env", () => {
         babelPresetEnv.isPluginRequired(targets, plugin);
       }, Error);
     });
-  });
 
-  describe("validateLooseOption", () => {
-    it("`undefined` option returns false", () => {
-      assert(validateLooseOption() === false);
-    });
+    it("will throw if target version is not a number", () => {
+      const plugin = {
+        "node": 6,
+      };
 
-    it("`false` option returns false", () => {
-      assert(validateLooseOption(false) === false);
-    });
+      const targets = {
+        "node": "6.5",
+      };
 
-    it("`true` option returns true", () => {
-      assert(validateLooseOption(true) === true);
-    });
-
-    it("array option is invalid", () => {
       assert.throws(() => {
-        validateModulesOption([]);
+        babelPresetEnv.isPluginRequired(targets, plugin);
       }, Error);
     });
   });
 
-  describe("validateModulesOption", () => {
-    it("`undefined` option returns commonjs", () => {
-      assert(validateModulesOption() === "commonjs");
+  describe("transformIncludesAndExcludes", function() {
+    it("should return in transforms array", function() {
+      assert.deepEqual(
+        babelPresetEnv.transformIncludesAndExcludes(["transform-es2015-arrow-functions"]),
+        {
+          all: ["transform-es2015-arrow-functions"],
+          plugins: ["transform-es2015-arrow-functions"],
+          builtIns: []
+        }
+      );
     });
 
-    it("`false` option returns commonjs", () => {
-      assert(validateModulesOption(false) === false);
-    });
-
-    it("commonjs option is valid", () => {
-      assert(validateModulesOption("commonjs") === "commonjs");
-    });
-
-    it("systemjs option is valid", () => {
-      assert(validateModulesOption("systemjs") === "systemjs");
-    });
-
-    it("amd option is valid", () => {
-      assert(validateModulesOption("amd") === "amd");
-    });
-
-    it("umd option is valid", () => {
-      assert(validateModulesOption("umd") === "umd");
-    });
-
-    it("`true` option is invalid", () => {
-      assert.throws(() => {
-        validateModulesOption(true);
-      }, Error);
-    });
-
-    it("array option is invalid", () => {
-      assert.throws(() => {
-        assert(validateModulesOption([]));
-      }, Error);
-    });
-
-    describe("validatePluginsOption", function() {
-      it("should return empty arrays if undefined", function() {
-        assert.deepEqual(validatePluginsOption(), { all: [], plugins: [], builtIns: [] });
-      });
-
-      it("should return in transforms array", function() {
-        assert.deepEqual(
-          validatePluginsOption(["transform-es2015-arrow-functions"]),
-          {
-            all: ["transform-es2015-arrow-functions"],
-            plugins: ["transform-es2015-arrow-functions"],
-            builtIns: []
-          }
-        );
-      });
-
-      it("should return in built-ins array", function() {
-        assert.deepEqual(
-          validatePluginsOption(["es6.map"]),
-          {
-            all: ["es6.map"],
-            plugins: [],
-            builtIns: ["es6.map"]
-          }
-        );
-      });
-
-      it("should throw if not in features", function() {
-        assert.throws(() => {
-          validatePluginsOption(["asdf"]);
-        }, Error);
-      });
-    });
-
-    describe("checkDuplicateIncludeExcludes", function() {
-      it("should throw if duplicate names in both", function() {
-        assert.throws(() => {
-          checkDuplicateIncludeExcludes(
-            ["transform-regenerator", "map"],
-            ["transform-regenerator", "map"]
-          );
-        }, Error);
-      });
-
-      it("should not throw if no duplicate names in both", function() {
-        assert.doesNotThrow(() => {
-          checkDuplicateIncludeExcludes(
-            ["transform-regenerator"],
-            ["map"]
-          );
-        }, Error);
-      });
+    it("should return in built-ins array", function() {
+      assert.deepEqual(
+        babelPresetEnv.transformIncludesAndExcludes(["es6.map"]),
+        {
+          all: ["es6.map"],
+          plugins: [],
+          builtIns: ["es6.map"]
+        }
+      );
     });
   });
 });

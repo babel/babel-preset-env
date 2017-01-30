@@ -1,5 +1,78 @@
 # Changelog
 
+## v1.1.8 (2017-01-10)
+
+### :bug: Bug Fix
+
+- Debug: Transformations before logs. ([#128](https://github.com/babel/babel-preset-env/pull/128)) (@yavorsky)
+
+Makes sure that all transformations on `targets` (such as `exclude`/`include`) are run before logging out with the `debug` option. Fixes ([#127](https://github.com/babel/babel-preset-env/issues/127)).
+
+### :house: Internal
+
+- Remove unnecessary extension. ([#131](https://github.com/babel/babel-preset-env/pull/131)) (@roman-yakobnyuk)
+- Include yarn.lock and update CI. ([#124](https://github.com/babel/babel-preset-env/pull/124)) (@existentialism)
+
+## v1.1.7 (2017-01-09)
+ 
+Had a publishing issue in the previous release.
+
+## v1.1.6 (2017-01-06)
+
+### :bug: Bug Fix
+
+- Explicitly resolve lowest browser version. ([#121](https://github.com/babel/babel-preset-env/pull/121)) (@brokenmass)
+
+```js
+{
+  "targets": {
+    "browsers": ["ios >= 6"] // was resolving to {ios: 10} rather than {ios: 6}
+  }
+}
+```
+
+## v1.1.5 (2017-01-04)
+
+### :bug: Bug Fix
+
+- Show error if target version is not a number. ([#107](https://github.com/babel/babel-preset-env/pull/107)) (@existentialism)
+
+```js
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "chrome": "52", // will error since it's not a number,
+        "chrome": 52 // correct!
+      }
+    }]
+  ]
+}
+```
+
+- Fix targets for the `debug` option. ([#109](https://github.com/babel/babel-preset-env/pull/109)) (@yavorsky)
+
+Now it prints the transformed targets/environments rather than the browsers query.
+
+```txt
+Using targets:
+{
+  "chrome": 53,
+  "ie": 10,
+  "node": 6
+}
+
+Modules transform: false
+
+Using plugins:
+  transform-es2015-arrow-functions {"chrome":47,"node":6}
+  transform-es2015-block-scoped-functions {"chrome":41,"ie":11,"node":4}
+
+Using polyfills:
+  es6.typed.uint8-clamped-array {"chrome":5,"node":0.12}
+  es6.map {"chrome":51,"node":6.5}
+```
+
 ## v1.1.4 (2016-12-16)
 
 v1.1.2-v1.1.4

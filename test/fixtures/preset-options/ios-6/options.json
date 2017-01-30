@@ -2,7 +2,7 @@
   "presets": [
     ["../../../../lib", {
       "targets": {
-        "electron": 1.4
+        "browsers": ["ios >= 6"]
       },
       "modules": false,
       "useBuiltIns": true
