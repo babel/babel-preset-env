@@ -140,7 +140,7 @@ export const getTargets = (targets = {}, options = {}) => {
 
     const allSupportedVersions = getVersionsFromList(_extends({}, ...lists));
     const supportedNodeVersions = allSupportedVersions["node"];
-    const packageJSONRoot = options.root || process.cwd();
+    const packageJSONRoot = options.root;
     targetOps.node = getEnginesNodeVersion(packageJSONRoot, supportedNodeVersions);
   }
 
@@ -203,7 +203,7 @@ export default function buildPreset(context, opts = {}) {
   const validatedOptions = normalizeOptions(opts);
   const {debug, loose, moduleType, useBuiltIns} = validatedOptions;
 
-  const targets = getTargets(validatedOptions.targets);
+  const targets = getTargets(validatedOptions.targets, opts);
   const include = transformIncludesAndExcludes(validatedOptions.include);
   const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
 

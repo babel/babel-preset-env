@@ -1,19 +1,17 @@
 import semver from "semver";
 import path from "path";
-import invariant from "invariant";
 import { pathIsFile, getDirnameInPath, getFilenameInPath, getEnv, semverify, desemverify } from "./utils";
 
 /* Resolving path depending on what type of path was passed (directory or file).
    ../confg/ -> ../confg/package.json
    ./index.js -> ./package.json */
-const resolvePackagePath = (packagePath) => {
+const resolvePackagePath = (packagePath = "") => {
   if (pathIsFile(packagePath)) {
-    if (getFilenameInPath(packagePath) === "package.json") {
-      return packagePath;
+    if (getFilenameInPath(packagePath) !== "package.json") {
+      packagePath = getDirnameInPath(packagePath);
     }
-    packagePath = getDirnameInPath(packagePath);
   }
-  return path.join(packagePath, "package.json");
+  return path.join(process.cwd(), packagePath, "package.json");
 };
 
 /* Filter versions that satisfiyng to passed semver range.
@@ -61,11 +59,6 @@ export const getPackageJSON = (packagePath) => {
    returns engines/devEngines version or `null`.
    `null` means support all node.js versions. */
 export const getEnginesNodeVersion = (packagePath, supportedVersions) => {
-  invariant(
-    typeof packagePath === "string",
-    "Invalid Path: Path to `package.json` must be a string."
-  );
-
   const env = getEnv(process.env);
   const pkg = getPackageJSON(packagePath);
   const engines = env === "development" && pkg.devEngines || pkg.engines;
