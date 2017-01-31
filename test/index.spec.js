@@ -1,6 +1,7 @@
 "use strict";
 
 const babelPresetEnv = require("../lib/index.js");
+const configUtils = require("../lib/config-utils.js");
 const assert = require("assert");
 const { versions: electronToChromiumData } = require("electron-to-chromium");
 
@@ -49,17 +50,17 @@ describe("babel-preset-env", () => {
 
   describe("getLowestFromSemverValue", () => {
     it("should return the lowest supported version from semver value '>=0.12'", function() {
-      const lowestNodeVersion = babelPresetEnv.getLowestFromSemverValue(">=0.12", [4, 5, 6]);
+      const lowestNodeVersion = configUtils.getLowestFromSemverValue(">=0.12", [4, 5, 6]);
       assert.equal(lowestNodeVersion, 4);
     });
 
     it("should return null from semver value '*'", function() {
-      const lowestNodeVersion = babelPresetEnv.getLowestFromSemverValue("*", [4, 5, 6]);
+      const lowestNodeVersion = configUtils.getLowestFromSemverValue("*", [4, 5, 6]);
       assert.equal(lowestNodeVersion, null);
     });
 
     it("should return null if version isnt a semver value", function() {
-      const lowestNodeVersion = babelPresetEnv.getLowestFromSemverValue("💩", [4, 5, 6]);
+      const lowestNodeVersion = configUtils.getLowestFromSemverValue("💩", [4, 5, 6]);
       assert.equal(lowestNodeVersion, null);
     });
   });
