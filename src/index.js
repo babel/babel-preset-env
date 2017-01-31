@@ -1,5 +1,3 @@
-import semver from "semver";
-import path from "path";
 import browserslist from "browserslist";
 import builtInsList from "../data/built-ins.json";
 import defaultInclude from "./default-includes";
@@ -8,7 +6,8 @@ import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
 import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin";
-import { _extends, desemverify, semverify, getEnv } from "./utils";
+import { getEnginesNodeVersion } from "./config-utils";
+import { _extends, desemverify} from "./utils";
 
 /**
  * Determine if a transformation is required
@@ -106,46 +105,6 @@ export const getCurrentNodeVersion = () => {
   return desemverify(process.versions.node);
 };
 
-const filterSatisfiedVersions = (range, versions) => {
-  return versions.filter((targ) => semver.satisfies(targ, range));
-};
-
-export const getLowestFromSemverValue = (version, versionsList) => {
-  let lowestSupported;
-  if (version === "*") {
-    return null;
-  }
-
-  if (semver.valid(version)) {
-    lowestSupported = parseFloat(version);
-  } else if (semver.validRange(version)) {
-    const versions = versionsList.map(semverify);
-    const allSupported = filterSatisfiedVersions(version, versions);
-    if (allSupported.length) {
-      lowestSupported = allSupported[0];
-    }
-  }
-  return lowestSupported ? desemverify(lowestSupported) : null;
-};
-
-export const getEnginesNodeVersion = (packageRoot, supportedVersions) => {
-  const env = getEnv(process.env);
-  const pkgPath = path.join(packageRoot, "package.json");
-
-  try {
-    const pkg = require(pkgPath);
-    const engines = env === "development" && pkg.devEngines || pkg.engines;
-    if (engines && engines.node) {
-      const version = engines.node;
-      return getLowestFromSemverValue(version, supportedVersions);
-    } else {
-      console.warn(`Can't get node.js version from \`engines\` field in ${pkgPath}.`);
-    }
-  } catch (e) {
-    console.warn(`Can't parse ${pkgPath} while trying to get node.js version from \`engines\` field.`);
-  }
-};
-
 export const electronVersionToChromeVersion = (semverVer) => {
   semverVer = String(semverVer);
 
@@ -181,7 +140,8 @@ export const getTargets = (targets = {}, options = {}) => {
 
     const allSupportedVersions = getVersionsFromList(_extends({}, ...lists));
     const supportedNodeVersions = allSupportedVersions["node"];
-    targetOps.node = getEnginesNodeVersion(process.cwd(), supportedNodeVersions);
+    const packageJSONRoot = options.root || process.cwd();
+    targetOps.node = getEnginesNodeVersion(packageJSONRoot, supportedNodeVersions);
   }
 
   // Rewrite Electron versions to their Chrome equivalents
