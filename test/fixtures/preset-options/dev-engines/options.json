@@ -3,7 +3,8 @@
     ["../../../../lib", {
       "targets": {
         "node": "engines"
-      }
+      },
+      "root": "./test/fixtures/preset-options/dev-engines"
     }]
   ]
 }

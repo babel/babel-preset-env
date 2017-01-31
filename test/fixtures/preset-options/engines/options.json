@@ -1,0 +1,10 @@
+{
+  "presets": [
+    ["../../../../lib", {
+      "targets": {
+        "node": "engines"
+      },
+      "root": "./test/fixtures/preset-options/engines"
+    }]
+  ]
+}
