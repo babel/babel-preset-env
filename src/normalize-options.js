@@ -1,6 +1,6 @@
 import intersection from "lodash/intersection";
 import invariant from "invariant";
-
+import browserslist from "browserslist";
 import builtInsList from "../data/built-ins.json";
 import defaultInclude from "./default-includes";
 import moduleTransformations from "./module-transformations";
@@ -13,6 +13,11 @@ const validIncludesAndExcludes = [
   ...Object.keys(moduleTransformations).map((m) => moduleTransformations[m]),
   ...Object.keys(builtInsList),
   ...defaultInclude
+];
+
+const validBrowserslistTargets = [
+  ...browserslist.major,
+  ...Object.keys(browserslist.aliases)
 ];
 
 export const validateIncludesAndExcludes = (opts = [], type) => {
@@ -54,6 +59,19 @@ export const validateLooseOption = (looseOpt = false) => {
   return looseOpt;
 };
 
+export const objectToBrowserslist = (object, log) => {
+  return Object.keys(object).reduce((list, targetName) => {
+    if (log) {
+      console.log(validBrowserslistTargets);
+    }
+    if (validBrowserslistTargets.includes(targetName)) {
+      const targetVersion = object[targetName];
+      return list.concat(`${targetName} ${targetVersion}`);
+    }
+    return list;
+  }, []);
+};
+
 export const validateModulesOption = (modulesOpt = "commonjs") => {
   invariant(
     modulesOpt === false || Object.keys(moduleTransformations).includes(modulesOpt),
@@ -87,6 +105,7 @@ export default function normalizeOptions(opts) {
     include: validateIncludesAndExcludes(opts.whitelist || opts.include, "include"),
     loose: validateLooseOption(opts.loose),
     moduleType: validateModulesOption(opts.modules),
+    path: opts.path,
     targets: opts.targets,
     useBuiltIns: opts.useBuiltIns
   };

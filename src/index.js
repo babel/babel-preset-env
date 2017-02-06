@@ -3,7 +3,7 @@ import builtInsList from "../data/built-ins.json";
 import defaultInclude from "./default-includes";
 import { electronToChromium } from "electron-to-chromium";
 import moduleTransformations from "./module-transformations";
-import normalizeOptions from "./normalize-options.js";
+import normalizeOptions, {objectToBrowserslist} from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
 import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin";
 
@@ -15,9 +15,9 @@ import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin"
  *                                          version the feature was implemented in as a value
  * @return {Boolean}  Whether or not the transformation is required
  */
-export const isPluginRequired = (supportedEnvironments, plugin) => {
+export const isPluginRequired = (supportedEnvironments, plugin, options) => {
   if (supportedEnvironments.browsers) {
-    supportedEnvironments = getTargets(supportedEnvironments);
+    supportedEnvironments = getTargets(supportedEnvironments, options);
   }
 
   const targetEnvironments = Object.keys(supportedEnvironments);
@@ -41,10 +41,6 @@ export const isPluginRequired = (supportedEnvironments, plugin) => {
     });
 
   return isRequiredForEnvironments.length > 0 ? true : false;
-};
-
-const isBrowsersQueryValid = (browsers) => {
-  return typeof browsers === "string" || Array.isArray(browsers);
 };
 
 const browserNameMap = {
@@ -94,7 +90,7 @@ const _extends = Object.assign || function (target) {
 };
 
 
-export const getTargets = (targets = {}) => {
+export const getTargets = (targets = {}, opts = {}) => {
   const targetOps = _extends({}, targets);
 
   if (targetOps.node === true || targetOps.node === "current") {
@@ -117,12 +113,14 @@ export const getTargets = (targets = {}) => {
 
     delete targetOps.electron;
   }
+  browserslist.defaults = objectToBrowserslist(targetOps);
 
-  const browserOpts = targetOps.browsers;
-  if (isBrowsersQueryValid(browserOpts)) {
-    const queryBrowsers = getLowestVersions(browserslist(browserOpts));
-    return mergeBrowsers(queryBrowsers, targetOps);
-  }
+  const browsersQuery = targetOps.browsers;
+  const browserslistOpts = {path: opts.path};
+  const browsersValues = browserslist(browsersQuery, browserslistOpts);
+  const queryBrowsers = getLowestVersions(browsersValues);
+  return mergeBrowsers(queryBrowsers, targetOps);
+
   return targetOps;
 };
 
@@ -141,12 +139,12 @@ const logPlugin = (plugin, targets, list) => {
   console.log(logStr);
 };
 
-const filterItem = (targets, exclusions, list, item) => {
+const filterItem = (targets, exclusions, list, opts, item) => {
   const isDefault = defaultInclude.indexOf(item) >= 0;
   const notExcluded = exclusions.indexOf(item) === -1;
 
   if (isDefault) return notExcluded;
-  const isRequired = isPluginRequired(targets, list[item]);
+  const isRequired = isPluginRequired(targets, list[item], opts);
   return isRequired && notExcluded;
 };
 
@@ -159,19 +157,18 @@ export const transformIncludesAndExcludes = (opts) => ({
 export default function buildPreset(context, opts = {}) {
   const validatedOptions = normalizeOptions(opts);
   const {debug, loose, moduleType, useBuiltIns} = validatedOptions;
-
-  const targets = getTargets(validatedOptions.targets);
+  const targets = getTargets(validatedOptions.targets, validatedOptions);
   const include = transformIncludesAndExcludes(validatedOptions.include);
   const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
 
-  const filterPlugins = filterItem.bind(null, targets, exclude.plugins, pluginList);
+  const filterPlugins = filterItem.bind(null, targets, exclude.plugins, pluginList, opts);
   const transformations = Object.keys(pluginList)
     .filter(filterPlugins)
     .concat(include.plugins);
 
   let polyfills;
   if (useBuiltIns) {
-    const filterBuiltIns = filterItem.bind(null, targets, exclude.builtIns, builtInsList);
+    const filterBuiltIns = filterItem.bind(null, targets, exclude.builtIns, builtInsList, opts);
 
     polyfills = Object.keys(builtInsList)
       .concat(defaultInclude)
