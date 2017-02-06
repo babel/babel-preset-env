@@ -7,7 +7,8 @@ const {
   checkDuplicateIncludeExcludes,
   validateIncludesAndExcludes,
   validateLooseOption,
-  validateModulesOption
+  validateModulesOption,
+  objectToBrowserslist
 } = normalizeOptions;
 
 describe("normalize-options", () => {
@@ -88,14 +89,30 @@ describe("normalize-options", () => {
       }, Error);
     });
   });
+
   describe("validateIncludesAndExcludes", function() {
     it("should return empty arrays if undefined", function() {
       assert.deepEqual(validateIncludesAndExcludes(), []);
     });
+
     it("should throw if not in features", function() {
       assert.throws(() => {
         validateIncludesAndExcludes(["asdf"]);
       }, Error);
+    });
+  });
+
+  describe("objectToBrowserslist", function() {
+    it("should return browserslist's query from a plain object", function() {
+      assert.deepEqual(objectToBrowserslist({
+        chrome: 55,
+        ie: 11,
+        node: 7
+      }), ["chrome 55", "ie 11"]);
+    });
+
+    it("should return browserslist's query from an empty object", function() {
+      assert.deepEqual(objectToBrowserslist({}), []);
     });
   });
 });
