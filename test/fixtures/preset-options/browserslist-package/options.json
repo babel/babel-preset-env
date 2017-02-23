@@ -5,8 +5,7 @@
         "chrome": 55
       },
       "modules": false,
-      "debug": true,
-      "path": "test/fixtures/preset-options/browserslist-package"
+      "debug": true
     }]
   ]
 }

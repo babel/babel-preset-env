@@ -15,9 +15,9 @@ import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin"
  *                                          version the feature was implemented in as a value
  * @return {Boolean}  Whether or not the transformation is required
  */
-export const isPluginRequired = (supportedEnvironments, plugin, options) => {
+export const isPluginRequired = (supportedEnvironments, plugin, fileContext) => {
   if (supportedEnvironments.browsers) {
-    supportedEnvironments = getTargets(supportedEnvironments, options);
+    supportedEnvironments = getTargets(supportedEnvironments, fileContext);
   }
 
   const targetEnvironments = Object.keys(supportedEnvironments);
@@ -90,7 +90,7 @@ const _extends = Object.assign || function (target) {
 };
 
 
-export const getTargets = (targets = {}, opts = {}) => {
+export const getTargets = (targets = {}, fileContext = {}) => {
   const targetOps = _extends({}, targets);
 
   if (targetOps.node === true || targetOps.node === "current") {
@@ -116,7 +116,7 @@ export const getTargets = (targets = {}, opts = {}) => {
   browserslist.defaults = objectToBrowserslist(targetOps);
 
   const browsersQuery = targetOps.browsers;
-  const browserslistOpts = {path: opts.path};
+  const browserslistOpts = {path: fileContext.dirname};
   const browsersValues = browserslist(browsersQuery, browserslistOpts);
   const queryBrowsers = getLowestVersions(browsersValues);
   return mergeBrowsers(queryBrowsers, targetOps);
@@ -139,12 +139,12 @@ const logPlugin = (plugin, targets, list) => {
   console.log(logStr);
 };
 
-const filterItem = (targets, exclusions, list, opts, item) => {
+const filterItem = (targets, exclusions, list, fileContext, item) => {
   const isDefault = defaultInclude.indexOf(item) >= 0;
   const notExcluded = exclusions.indexOf(item) === -1;
 
   if (isDefault) return notExcluded;
-  const isRequired = isPluginRequired(targets, list[item], opts);
+  const isRequired = isPluginRequired(targets, list[item], fileContext);
   return isRequired && notExcluded;
 };
 
@@ -154,14 +154,14 @@ export const transformIncludesAndExcludes = (opts) => ({
   builtIns: opts.filter((opt) => opt.match(/^(es\d+|web)\./))
 });
 
-export default function buildPreset(context, opts = {}) {
+export default function buildPreset(context, opts = {}, fileContext) {
   const validatedOptions = normalizeOptions(opts);
   const {debug, loose, moduleType, useBuiltIns} = validatedOptions;
-  const targets = getTargets(validatedOptions.targets, validatedOptions);
+  const targets = getTargets(validatedOptions.targets, fileContext);
   const include = transformIncludesAndExcludes(validatedOptions.include);
   const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
 
-  const filterPlugins = filterItem.bind(null, targets, exclude.plugins, pluginList, opts);
+  const filterPlugins = filterItem.bind(null, targets, exclude.plugins, pluginList, fileContext);
   const transformations = Object.keys(pluginList)
     .filter(filterPlugins)
     .concat(include.plugins);
