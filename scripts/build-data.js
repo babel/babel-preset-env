@@ -6,15 +6,59 @@ const path = require("path");
 const flatten = require("lodash/flatten");
 const flattenDeep = require("lodash/flattenDeep");
 const mapValues = require("lodash/mapValues");
+const cloneDeep = require("lodash/cloneDeep");
 const pluginFeatures = require("../data/plugin-features");
 const builtInFeatures = require("../data/built-in-features");
 
 const renameTests = (tests, getName) =>
   tests.map((test) => Object.assign({}, test, { name: getName(test.name) }));
 
-const es6Data = require("compat-table/data-es6");
-const es6PlusData = require("compat-table/data-es2016plus");
+const es6Data = cloneDeep(require("compat-table/data-es6"));
+const es6PlusData = cloneDeep(require("compat-table/data-es2016plus"));
 const envs = require("compat-table/environments");
+
+function interpolateAllResults(rawBrowsers, tests) {
+  function interpolateResults(res) {
+    let browser, prevBrowser, result, prevResult, bid, prevBid;
+    for (bid in rawBrowsers) {
+      // For browsers that are essentially equal to other browsers,
+      // copy over the results.
+      browser = rawBrowsers[bid];
+      if (browser.equals && res[bid] === undefined) {
+        result = res[browser.equals];
+        res[bid] = browser.ignore_flagged && result === "flagged" ? false : result;
+      // For each browser, check if the previous browser has the same
+      // browser full name (e.g. Firefox) or family name (e.g. Chakra) as this one.
+      } else if (prevBrowser &&
+          (prevBrowser.full.replace(/,.+$/, "") === browser.full.replace(/,.+$/, "") ||
+          (browser.family !== undefined && prevBrowser.family === browser.family))) {
+        // For each test, check if the previous browser has a result
+        // that this browser lacks.
+        result     = res[bid];
+        prevResult = res[prevBid];
+        if (prevResult !== undefined && result === undefined) {
+          res[bid] = prevResult;
+        }
+      }
+      prevBrowser = browser;
+      prevBid = bid;
+    }
+  }
+
+  // Now print the results.
+  tests.forEach(function(t) {
+    // Calculate the result totals for tests which consist solely of subtests.
+    if ("subtests" in t) {
+      t.subtests.forEach(function(e) {
+        interpolateResults(e.res);
+      });
+    }
+    else interpolateResults(t.res);
+  });
+}
+
+interpolateAllResults(es6Data.browsers, es6Data.tests);
+interpolateAllResults(es6PlusData.browsers, es6PlusData.tests);
 
 const invertedEqualsEnv = Object.keys(envs)
   .filter((b) => envs[b].equals)
@@ -59,6 +103,8 @@ const environments = [
   "phantom"
 ];
 
+const environmentsWithFlags = ["chrome", "edge", "node"];
+
 const envMap = {
   safari51: "safari5",
   safari71_8: "safari8",
@@ -79,7 +125,7 @@ const envMap = {
   ios51: "ios5.1",
 };
 
-const getLowestImplementedVersion = ({ features }, env) => {
+const getLowestImplementedVersion = ({ features }, env, flag) => {
   const tests = flatten(compatibilityTests
     .filter((test) => {
       return features.indexOf(test.name) >= 0 ||
@@ -105,7 +151,7 @@ const getLowestImplementedVersion = ({ features }, env) => {
   );
 
   const envTests = tests
-    .map(({ res: test, name, isBuiltIn }, i) => {
+    .map(({ res: test, isBuiltIn }) => {
       // Babel itself doesn't implement the feature correctly,
       // don't count against it
       // only doing this for built-ins atm
@@ -126,7 +172,7 @@ const getLowestImplementedVersion = ({ features }, env) => {
       return Object.keys(test)
       .filter((t) => t.startsWith(env))
       // Babel assumes strict mode
-      .filter((test) => tests[i].res[test] === true || tests[i].res[test] === "strict")
+      .filter((t) => test[t] === true || test[t] === "strict" || (flag && test[t] === "flagged"))
       // normalize some keys
       .map((test) => envMap[test] || test)
       .filter((test) => !isNaN(parseInt(test.replace(env, ""))))
@@ -164,6 +210,15 @@ const generateData = (environments, features) => {
       const version = getLowestImplementedVersion(options, env);
       if (version !== null) {
         plugin[env] = version;
+      }
+    });
+
+    environmentsWithFlags.forEach((env) => {
+      if (Array.isArray(options.features)) {
+        const version = getLowestImplementedVersion(options, env, true);
+        if (version !== null) {
+          plugin[`${env}-flag`] = version;
+        }
       }
     });
 
