@@ -11,6 +11,8 @@ const validIncludesAndExcludes = [
   ...defaultInclude
 ];
 
+let hasBeenWarned = false;
+
 export const validateIncludesAndExcludes = (opts = [], type) => {
   invariant(
     Array.isArray(opts),
@@ -69,11 +71,12 @@ export const validateModulesOption = (modulesOpt = "commonjs") => {
 
 export default function normalizeOptions(opts) {
   // TODO: remove whitelist in favor of include in next major
-  if (opts.whitelist) {
+  if (opts.whitelist && !hasBeenWarned) {
     console.warn(
       `Deprecation Warning: The "whitelist" option has been deprecated in favor of "include" to
       match the newly added "exclude" option (instead of "blacklist").`
     );
+    hasBeenWarned = true;
   }
 
   invariant(
