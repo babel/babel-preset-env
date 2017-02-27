@@ -76,7 +76,7 @@ npm install --save-dev babel-preset-env
 
 Or [yarn](https://yarnpkg.com):
 ```sh
-yarn add babel-preset-env
+yarn add babel-preset-env --dev
 ```
 
 ## Usage
