@@ -168,7 +168,7 @@ export default function buildPreset(context, opts = {}, fileContext) {
 
   let polyfills;
   if (useBuiltIns) {
-    const filterBuiltIns = filterItem.bind(null, targets, exclude.builtIns, builtInsList, opts);
+    const filterBuiltIns = filterItem.bind(null, targets, exclude.builtIns, builtInsList, fileContext);
 
     polyfills = Object.keys(builtInsList)
       .concat(defaultInclude)
