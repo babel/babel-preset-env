@@ -85,6 +85,28 @@ describe("babel-preset-env", () => {
     });
   });
 
+  describe("getTargets + uglify", () => {
+    it("should work with `true`", function() {
+      assert.deepEqual(babelPresetEnv.getTargets({
+        uglify: true
+      }), {
+        uglify: true
+      });
+    });
+
+    it("should ignore `false`", function() {
+      assert.deepEqual(babelPresetEnv.getTargets({
+        uglify: false
+      }), {});
+    });
+
+    it("should ignore `null`", function() {
+      assert.deepEqual(babelPresetEnv.getTargets({
+        uglify: null
+      }), {});
+    });
+  });
+
   describe("isPluginRequired", () => {
     it("returns true if no targets are specified", () => {
       const isRequired = babelPresetEnv.isPluginRequired({}, {});
