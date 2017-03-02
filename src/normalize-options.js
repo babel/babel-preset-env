@@ -12,8 +12,6 @@ const validIncludesAndExcludes = [
   ...defaultInclude
 ];
 
-let hasBeenWarned = false;
-
 export const validateIncludesAndExcludes = (opts = [], type) => {
   invariant(
     Array.isArray(opts),
