@@ -153,7 +153,7 @@ const getBuiltInTargets = (targets) => {
     delete builtInTargets.uglify;
   }
   return builtInTargets;
-}
+};
 
 export const transformIncludesAndExcludes = (opts) => ({
   all: opts,
