@@ -195,6 +195,18 @@ describe("babel-preset-env", () => {
       assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
     });
 
+    it("returns true if uglify is specified as a target", () => {
+      const plugin = {
+        chrome: 50
+      };
+      const targets = {
+        chrome: 55,
+        uglify: true
+      };
+
+      assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
+    });
+
     it("doesn't throw when specifying a decimal for node", () => {
       const plugin = {
         node: 6
