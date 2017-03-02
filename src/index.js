@@ -157,14 +157,21 @@ export default function buildPreset(context, opts = {}) {
   const include = transformIncludesAndExcludes(validatedOptions.include);
   const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
 
+
   const filterPlugins = filterItem.bind(null, targets, exclude.plugins, pluginList);
   const transformations = Object.keys(pluginList)
     .filter(filterPlugins)
     .concat(include.plugins);
 
   let polyfills;
+  let polyfillTargets;
   if (useBuiltIns) {
-    const filterBuiltIns = filterItem.bind(null, targets, exclude.builtIns, builtInsList);
+    polyfillTargets = _extends({}, targets);
+    if (polyfillTargets.uglify) {
+      delete polyfillTargets.uglify;
+    }
+
+    const filterBuiltIns = filterItem.bind(null, polyfillTargets, exclude.builtIns, builtInsList);
 
     polyfills = Object.keys(builtInsList)
       .concat(defaultInclude)
@@ -185,7 +192,7 @@ export default function buildPreset(context, opts = {}) {
     if (useBuiltIns && polyfills.length) {
       console.log("\nUsing polyfills:");
       polyfills.forEach((polyfill) => {
-        logPlugin(polyfill, targets, builtInsList);
+        logPlugin(polyfill, polyfillTargets, builtInsList);
       });
     }
   }
