@@ -171,6 +171,7 @@
     "chrome": 52,
     "edge": 14,
     "firefox": 52,
+    "node": 7,
     "opera": 39
   },
   "transform-async-to-generator": {
