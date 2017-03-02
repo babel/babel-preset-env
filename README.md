@@ -122,6 +122,12 @@ A query to select browsers (ex: last 2 versions, > 5%) using [browserslist](http
 
 Note, browsers' results are overridden by explicit items from `targets`.
 
+### `targets.uglify`
+
+`number | true`
+
+If you are using minification with uglify then targeting later browsers would throw a syntax error. To prevent it - specify `uglify` option. It will just use all plugins and as result compile fully to ES5, but with `useBuiltIns` it will include only polyfills according to your targets.
+
 ### `loose`
 
 `boolean`, defaults to `false`.
