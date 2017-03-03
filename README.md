@@ -126,7 +126,9 @@ Note, browsers' results are overridden by explicit items from `targets`.
 
 `number | true`
 
-If you are using minification with uglify then targeting later browsers would throw a syntax error. To prevent it - specify `uglify` option. It will just use all plugins and as result compile fully to ES5, but with `useBuiltIns` it will include only polyfills according to your targets.
+If you are using UglifyJS to minify your code, then targeting later browsers will throw a syntax error.
+
+To prevent this - specify the uglify option, which will enable all plugins and, as a result, fully compile your code to ES5. Note, that useBuiltIns will work as before, and only include the polyfills that your target(s) need.
 
 ### `loose`
 
