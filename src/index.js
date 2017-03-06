@@ -5,6 +5,7 @@ import moduleTransformations from "./module-transformations";
 import normalizeOptions, { getElectronChromeVersion } from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
 import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin";
+import { execSync } from "child_process";
 
 /**
  * Determine if a transformation is required
@@ -80,6 +81,15 @@ export const getCurrentNodeVersion = () => {
   return parseFloat(process.versions.node);
 };
 
+/**
+ * Returns the locally installed Electron version
+ * @return {string}
+ */
+export const getLocalElectronVersion = () => {
+  const output = execSync("npm list electron").toString();
+  return output.split("electron@")[1].replace(/\s/g, "");
+};
+
 const _extends = Object.assign || function (target) {
   for (let i = 1; i < arguments.length; i++) {
     const source = arguments[i];
@@ -106,7 +116,10 @@ export const getTargets = (targets = {}) => {
 
   // Replace Electron target with its Chrome equivalent
   if (targetOpts.electron) {
-    const electronChromeVersion = getElectronChromeVersion(targetOpts.electron);
+    const targetVersion = targetOpts.electron === "current"
+      ? getLocalElectronVersion()
+      : targetOpts.electron;
+    const electronChromeVersion = getElectronChromeVersion(targetVersion);
 
     targetOpts.chrome = targetOpts.chrome
       ? Math.min(targetOpts.chrome, electronChromeVersion)

@@ -2,7 +2,7 @@
 
 const babelPresetEnv = require("../lib/index.js");
 const assert = require("assert");
-const { versions: electronToChromiumData } = require("electron-to-chromium");
+const electronToChromiumData = require("electron-to-chromium");
 
 describe("babel-preset-env", () => {
   describe("getTargets", () => {
@@ -57,12 +57,12 @@ describe("babel-preset-env", () => {
       });
     });
 
-    Object.keys(electronToChromiumData).forEach((electronVersion) => {
+    Object.keys(electronToChromiumData.versions).forEach((electronVersion) => {
       it(`"should work for Electron: ${electronVersion}`, function() {
         assert.deepEqual(babelPresetEnv.getTargets({
           electron: electronVersion
         }), {
-          chrome: electronToChromiumData[electronVersion]
+          chrome: electronToChromiumData.versions[electronVersion]
         });
       });
     });
@@ -81,6 +81,14 @@ describe("babel-preset-env", () => {
             electron: electronVersion,
           });
         }, Error);
+      });
+    });
+
+    it("should return the current locally installed Electron version with option 'current'", function() {
+      assert.deepEqual(babelPresetEnv.getTargets({
+        electron: "current"
+      }), {
+        chrome: parseInt(electronToChromiumData.electronToChromium("1.6.1"), 10)
       });
     });
   });
