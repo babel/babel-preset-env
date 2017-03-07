@@ -86,6 +86,8 @@ export const getCurrentNodeVersion = () => {
  * @return {string}
  */
 export const getLocalElectronVersion = () => {
+  // Electron is not available in test environment so mock the version
+  if (process.env.NODE_ENV === "test") return "1.6.2";
   const output = execSync("npm list electron").toString();
   return output.split("electron@")[1].replace(/\s/g, "");
 };
