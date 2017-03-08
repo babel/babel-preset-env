@@ -104,6 +104,7 @@ describe("babel-preset-env", () => {
       before(() => {
         const source = rootPath + "/test/mocks/electron.package.json";
         const destination = electronDir + "/package.json";
+        if (fs.existsSync(electronDir)) fs.removeSync(electronDir);
         fs.mkdirSync(electronDir);
         fs.copySync(source, destination);
       });
