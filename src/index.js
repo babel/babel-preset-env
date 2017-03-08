@@ -85,7 +85,7 @@ export const getCurrentNodeVersion = () => {
  * Returns the locally installed Electron version
  * @return {string}
  */
-export const getLocalElectronVersion = () => {
+const getLocalElectronVersion = () => {
   const output = execSync("npm list electron").toString();
   return output.split("electron@")[1].replace(/\s/g, "");
 };
