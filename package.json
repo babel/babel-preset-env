@@ -18,7 +18,7 @@
     "lint": "eslint .",
     "test": "npm run build && npm run test-only",
     "test-ci": "nyc npm run test",
-    "test-only": "NODE_ENV=test mocha ./test --compilers js:babel-register -t 10000"
+    "test-only": "mocha ./test --compilers js:babel-register -t 10000"
   },
   "dependencies": {
     "babel-plugin-check-es2015-constants": "^6.22.0",
@@ -64,7 +64,6 @@
     "chai": "^3.5.0",
     "codecov": "^1.0.1",
     "compat-table": "kangax/compat-table#c38f039b8ea7fadf347d3e300fec3611645e31e9",
-    "cross-env": "^3.2.3",
     "eslint": "^3.17.1",
     "eslint-config-babel": "^6.0.0",
     "eslint-plugin-flowtype": "^2.29.1",
