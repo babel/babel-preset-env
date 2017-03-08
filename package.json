@@ -21,6 +21,7 @@
     "test-only": "mocha ./test --compilers js:babel-register -t 10000"
   },
   "dependencies": {
+    "app-root-path": "^2.0.1",
     "babel-plugin-check-es2015-constants": "^6.22.0",
     "babel-plugin-syntax-trailing-function-commas": "^6.22.0",
     "babel-plugin-transform-async-to-generator": "^6.22.0",

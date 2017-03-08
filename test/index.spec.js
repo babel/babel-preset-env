@@ -3,6 +3,8 @@
 const babelPresetEnv = require("../lib/index.js");
 const assert = require("assert");
 const electronVersions = require("electron-to-chromium/versions");
+const fs = require("fs-extra");
+const rootPath = require("app-root-path");
 
 describe("babel-preset-env", () => {
   describe("getTargets", () => {
@@ -22,73 +24,100 @@ describe("babel-preset-env", () => {
   });
 
   describe("getTargets + electron", () => {
-    it("should work with a string", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        electron: "1.0"
-      }), {
-        chrome: 49
-      });
-    });
-
-    it("should work with a number", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        electron: 1.0
-      }), {
-        chrome: 49
-      });
-    });
-
-
-    it("should preserve lower Chrome number if Electron version is more recent", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        electron: 1.4,
-        chrome: 50
-      }), {
-        chrome: 50
-      });
-    });
-
-    it("should overwrite Chrome number if Electron version is older", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        electron: 1.0,
-        chrome: 50
-      }), {
-        chrome: 49
-      });
-    });
-
-    Object.keys(electronVersions).forEach((electronVersion) => {
-      it(`"should work for Electron: ${electronVersion}`, function() {
+    describe("specific version", () => {
+      it("should work with a string", function() {
         assert.deepEqual(babelPresetEnv.getTargets({
-          electron: electronVersion
+          electron: "1.0"
         }), {
-          chrome: electronVersions[electronVersion]
+          chrome: 49
+        });
+      });
+
+      it("should work with a number", function() {
+        assert.deepEqual(babelPresetEnv.getTargets({
+          electron: 1.0
+        }), {
+          chrome: 49
+        });
+      });
+
+
+      it("should preserve lower Chrome number if Electron version is more recent", function() {
+        assert.deepEqual(babelPresetEnv.getTargets({
+          electron: 1.4,
+          chrome: 50
+        }), {
+          chrome: 50
+        });
+      });
+
+      it("should overwrite Chrome number if Electron version is older", function() {
+        assert.deepEqual(babelPresetEnv.getTargets({
+          electron: 1.0,
+          chrome: 50
+        }), {
+          chrome: 49
+        });
+      });
+
+      Object.keys(electronVersions).forEach((electronVersion) => {
+        it(`"should work for Electron: ${electronVersion}`, function() {
+          assert.deepEqual(babelPresetEnv.getTargets({
+            electron: electronVersion
+          }), {
+            chrome: electronVersions[electronVersion]
+          });
+        });
+      });
+
+      it("should error if electron version is invalid", () => {
+        const fixtures = [
+          "0.19",
+          0.19,
+          999,
+          "999",
+        ];
+
+        fixtures.forEach((electronVersion) => {
+          assert.throws(() => {
+            babelPresetEnv.getTargets({
+              electron: electronVersion,
+            });
+          }, Error);
         });
       });
     });
 
-    it("should error if electron version is invalid", () => {
-      const fixtures = [
-        "0.19",
-        0.19,
-        999,
-        "999",
-      ];
-
-      fixtures.forEach((electronVersion) => {
+    describe("`current` + Electron not installed", () => {
+      it("should error", () => {
         assert.throws(() => {
           babelPresetEnv.getTargets({
-            electron: electronVersion,
+            electron: "current",
           });
         }, Error);
       });
     });
 
-    it("should return the current locally installed Electron version with option 'current'", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        electron: "current"
-      }), {
-        chrome: parseInt(electronVersions["1.6"], 10)
+    describe("`current`", () => {
+      const electronDir = rootPath + "/node_modules/electron";
+
+      before(() => {
+        const source = rootPath + "/test/mocks/electron.package.json";
+        const destination = electronDir + "/package.json";
+        fs.mkdirSync(electronDir);
+        fs.copySync(source, destination);
+      });
+
+      after(() => {
+        fs.remove(electronDir);
+      });
+
+      it("should return the locally installed Electron version", function() {
+        assert.deepEqual(babelPresetEnv.getTargets({
+          electron: "current"
+        }), {
+          chrome: parseInt(electronVersions["1.4"], 10)
+        });
       });
     });
   });

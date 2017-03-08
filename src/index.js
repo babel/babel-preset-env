@@ -5,7 +5,7 @@ import moduleTransformations from "./module-transformations";
 import normalizeOptions, { getElectronChromeVersion } from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
 import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin";
-import { execSync } from "child_process";
+import rootPath from "app-root-path";
 
 /**
  * Determine if a transformation is required
@@ -86,8 +86,12 @@ export const getCurrentNodeVersion = () => {
  * @return {string}
  */
 const getLocalElectronVersion = () => {
-  const output = execSync("npm list electron").toString();
-  return output.split("electron@")[1].replace(/\s/g, "");
+  try {
+    const electronPkg = require(`${rootPath.path}/node_modules/electron/package.json`);
+    return electronPkg.version;
+  } catch (e) {
+    throw new Error("A local version of Electron was not found");
+  }
 };
 
 const _extends = Object.assign || function (target) {
