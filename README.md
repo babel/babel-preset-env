@@ -122,6 +122,13 @@ A query to select browsers (ex: last 2 versions, > 5%) using [browserslist](http
 
 Note, browsers' results are overridden by explicit items from `targets`.
 
+### `targets.electron`
+
+`number | "current" | true`
+
+If you want to compile against a locally installed version of Electron, you can specify `"electron": true` or `"electron": "current"`. babel-preset-env will read the version
+from Electron's package.json. If a local version is not found, an error will be thrown.
+
 ### `targets.uglify`
 
 `number | true`
