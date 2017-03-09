@@ -120,7 +120,7 @@ export const getTargets = (targets = {}) => {
 
   // Replace Electron target with its Chrome equivalent
   if (targetOpts.electron) {
-    const targetVersion = targetOpts.electron === "current"
+    const targetVersion = targetOpts.electron === true || targetOpts.electron === "current"
       ? getLocalElectronVersion()
       : targetOpts.electron;
     const electronChromeVersion = getElectronChromeVersion(targetVersion);

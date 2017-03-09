@@ -88,17 +88,25 @@ describe("babel-preset-env", () => {
       });
     });
 
-    describe("`current` + Electron not installed", () => {
-      it("should error", () => {
+    describe("Electron NOT installed", () => {
+      it("`current` should throw an error", () => {
         assert.throws(() => {
           babelPresetEnv.getTargets({
             electron: "current",
           });
         }, Error);
       });
+
+      it("`true` should throw an error", () => {
+        assert.throws(() => {
+          babelPresetEnv.getTargets({
+            electron: true,
+          });
+        }, Error);
+      });
     });
 
-    describe("`current`", () => {
+    describe("Electron installed locally", () => {
       const electronDir = rootPath + "/node_modules/electron";
 
       before(() => {
@@ -113,9 +121,17 @@ describe("babel-preset-env", () => {
         fs.remove(electronDir);
       });
 
-      it("should return the locally installed Electron version", function() {
+      it("`current` should return the locally installed Electron version", function() {
         assert.deepEqual(babelPresetEnv.getTargets({
           electron: "current"
+        }), {
+          chrome: parseInt(electronVersions["1.4"], 10)
+        });
+      });
+
+      it("`true` should return the locally installed Electron version", function() {
+        assert.deepEqual(babelPresetEnv.getTargets({
+          electron: true
         }), {
           chrome: parseInt(electronVersions["1.4"], 10)
         });
