@@ -2,7 +2,22 @@
 
 const babelPresetEnv = require("../lib/index.js");
 const assert = require("assert");
+const envPluginsWithFeatures = require("../data/plugins");
+const latestPresetPackage = require("babel-preset-latest/package.json");
+const moduleTransformations = require("../src/module-transformations").default;
 const { versions: electronToChromiumData } = require("electron-to-chromium");
+
+const mergePluginsFromPresets = (presets) =>
+  presets.reduce((all, preset) => {
+    const presetPackage = require(preset + "/package.json");
+    const plugins = presetPackage.dependencies;
+
+    Object.keys(plugins).forEach((plugin) => {
+      const featureName = plugin.replace("babel-plugin-", "");
+      all = all.concat(featureName);
+    });
+    return all;
+}, []);
 
 describe("babel-preset-env", () => {
   describe("getTargets", () => {
@@ -257,6 +272,22 @@ describe("babel-preset-env", () => {
           builtIns: ["es6.map"]
         }
       );
+    });
+  });
+
+  describe("compare with other presets", function() {
+    it("should return same presets list as the babel-preset-latest", function() {
+
+      const envTransformations = Object.keys(moduleTransformations).map(
+        (transformation) => moduleTransformations[transformation]
+      );
+      const envPlugins = Object.keys(envPluginsWithFeatures)
+        .concat(envTransformations)
+        .sort();
+      const latestPresets = Object.keys(latestPresetPackage.dependencies);
+      const latestPlugins = mergePluginsFromPresets(latestPresets).sort();
+
+      assert.deepEqual(envPlugins, latestPlugins);
     });
   });
 });
