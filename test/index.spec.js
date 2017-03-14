@@ -3,7 +3,6 @@
 const babelPresetEnv = require("../lib/index.js");
 const assert = require("assert");
 const envPluginsWithFeatures = require("../data/plugins");
-const latestPresetPackage = require("babel-preset-latest/package.json");
 const moduleTransformations = require("../src/module-transformations").default;
 const { versions: electronToChromiumData } = require("electron-to-chromium");
 
@@ -284,7 +283,11 @@ describe("babel-preset-env", () => {
       const envPlugins = Object.keys(envPluginsWithFeatures)
         .concat(envTransformations)
         .sort();
-      const latestPresets = Object.keys(latestPresetPackage.dependencies);
+      const latestPresets = [
+        "babel-preset-es2015",
+        "babel-preset-es2016",
+        "babel-preset-es2017"
+      ];
       const latestPlugins = mergePluginsFromPresets(latestPresets).sort();
 
       assert.deepEqual(envPlugins, latestPlugins);
