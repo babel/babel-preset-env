@@ -17,7 +17,7 @@ const mergePluginsFromPresets = (presets) =>
       all = all.concat(featureName);
     });
     return all;
-}, []);
+  }, []);
 
 describe("babel-preset-env", () => {
   describe("getTargets", () => {
