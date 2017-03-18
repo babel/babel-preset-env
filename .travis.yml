@@ -10,28 +10,28 @@ node_js:
 - '7'
 - '6'
 - '4'
-- '0.12'
-- '0.10'
 env:
-  - PKG_CMD="npm"
-  - PKG_CMD="yarn"
+  global:
+    - BABEL_ENV=test
+  matrix:
+    - PKG_CMD="npm"
+    - PKG_CMD="yarn"
 before_install:
   - nvm use $TRAVIS_NODE_VERSION
   - npm set loglevel error
   - npm set progress false
-  - 'if [ $PKG_CMD = "yarn" ]; then npm i -g yarn ; fi'
+  - 'if [ $PKG_CMD = "yarn" ]; then curl -o- -L https://yarnpkg.com/install.sh | bash && PATH=$HOME/.yarn/bin:$PATH ; fi'
 install:
   - $PKG_CMD install
 script:
   - 'if [ -n "${LINT-}" ]; then $PKG_CMD run lint ; fi'
-  - 'if [ -z "${LINT-}" ]; then $PKG_CMD run ci ; fi'
+  - 'if [ -n "${DATA_CHECK-}" ]; then $PKG_CMD run build-data -- --check ; fi'
+  - 'if [ -z "${LINT-}" ] && [ -z "${DATA_CHECK-}" ]; then $PKG_CMD run test-ci ; fi'
 matrix:
   fast_finish: true
-  exclude:
-    - node_js: "0.10"
-      env: PKG_CMD="yarn"
-    - node_js: "0.12"
-      env: PKG_CMD="yarn"
   include:
     - node_js: "node"
       env: LINT=true PKG_CMD="npm"
+    - node_js: "node"
+      env: DATA_CHECK=true PKG_CMD="npm"
+after_success: 'if [ -z "${LINT-}" ] && [ -z "${DATA_CHECK-}" ]; then npm run coverage-ci ; fi'

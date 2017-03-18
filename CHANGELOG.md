@@ -1,5 +1,159 @@
 # Changelog
 
+## v1.2.2 (2017-03-14)
+
+### :bug: Bug Fix
+
+- Refactor browser data parsing to handle families ([#208](https://github.com/babel/babel-preset-env/pull/208)) (@existentialism)
+
+When parsing plugin data, we weren't properly handling browser families. This caused 
+`transform-es2015-block-scoping` and other plugins to be incorrectly added for Edge >= 12. 
+(s/o to @mgol for the the report and review!)
+
+- Add typed array methods to built-ins features. ([#198](https://github.com/babel/babel-preset-env/pull/198)) (@yavorsky)
+
+Fixes an issue where some TypedArray features were not being polyfilled properly. (s/o to @alippai for the report!)
+
+### :memo: Documentation
+
+- Fixed minor typo in readme ([#199](https://github.com/babel/babel-preset-env/pull/199)) (@bl4ckdu5t)
+- Add built-ins, better links, compat-table url, etc ([#195](https://github.com/babel/babel-preset-env/pull/195)) (@yavorsky)
+- Change CONTRIBUTING.md to use absolute paths ([#194](https://github.com/babel/babel-preset-env/pull/194)) (@aaronang)
+
+### :house: Internal
+
+- Bump plugins ([#201](https://github.com/babel/babel-preset-env/pull/201)) (@yavorsky)
+- Enable code coverage ([#200](https://github.com/babel/babel-preset-env/pull/200)) (@alxpy)
+- Increase mocha timeout to 10s ([#202](https://github.com/babel/babel-preset-env/pull/202)) (@yavorsky)
+
+## v1.2.1 (2017-03-06)
+
+### :bug: Bug Fix
+
+- Add transform-duplicate-keys mapping ([#192](https://github.com/babel/babel-preset-env/pull/192)) (@existentialism)
+
+Our plugin data was missing a mapping for the `transform-duplicate-keys` plugin which caused it to never be included. (s/o to @Timer for the report!)
+
+### :memo: Documentation
+
+- Clarify reasons for the uglify option in README.md ([#188](https://github.com/babel/babel-preset-env/pull/188)) (@mikegreiling)
+
+## v1.2.0 (2017-03-03)
+
+### :rocket: New Feature
+
+- Add uglify as a target ([#178](https://github.com/babel/babel-preset-env/pull/178)) (@yavorsky)
+
+Support for `uglify` as a target is now available! This will enable all plugins and, as a result, fully compiles your code to ES5. Note, that useBuiltIns will work as before, and only the polyfills that your other target(s) need will be included.
+
+```json
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "chrome": 55,
+        "uglify": true
+      },
+      "useBuiltIns": true,
+      "modules": false
+    }]
+  ]
+}
+```
+
+### :bug: Bug Fix
+
+- Respect older versions in invert equals map ([#180](https://github.com/babel/babel-preset-env/pull/180)) (@danez)
+
+Fixes a number of bugs that caused some incorrect and/or missing environment data when parsing `compat-table`.
+
+## v1.1.11 (2017-03-01)
+
+This release primarily upgrades `compat-table`, which adds support for async on Node 7.6!
+
+### :bug: Bug Fix
+
+- Fix hasBeenWarned condition. ([#175](https://github.com/babel/babel-preset-env/pull/175)) (@yavorsky)
+
+### :memo: Documentation
+
+- Add yarn example. ([#174](https://github.com/babel/babel-preset-env/pull/174)) (@yavorsky)
+
+### :house: Internal
+
+- Bump compat-table ([#177](https://github.com/babel/babel-preset-env/pull/177)) (@existentialism)
+- Add electron version exception test ([#176](https://github.com/babel/babel-preset-env/pull/176)) (@existentialism)
+
+## v1.1.10 (2017-02-24)
+
+### :bug: Bug Fix
+
+- Drop use of lodash/intersection from checkDuplicateIncludeExcludes ([#173](https://github.com/babel/babel-preset-env/pull/173)) (@existentialism)
+
+## v1.1.9 (2017-02-24)
+
+### :bug: Bug Fix
+
+- Add tests for debug output ([#156](https://github.com/babel/babel-preset-env/pull/156)) (@existentialism)
+
+Since we've (mostly @yavorsky) have fixed a number of bugs recently with the `debug` option output, we added the ability to assert stdout matches what we expect. Read the updated [CONTRIBUTING.md](https://github.com/babel/babel-preset-env/blob/master/CONTRIBUTING.md#testing-the-debug-option) for more info.
+
+- Fixes #143. Log correct targets. ([#155](https://github.com/babel/babel-preset-env/pull/155)) (@yavorsky)
+
+This fixes a bug in the `debug` output where incorrect target(s) were being displayed for why a particular plugin/preset was being included.
+
+Given targets:
+
+```txt
+{
+  "firefox": 52,
+  "node": 7.4 
+}
+```
+
+Before:
+
+```txt
+Using plugins:
+  transform-es2015-destructuring {"node":6.5}
+  transform-es2015-for-of {"node":6.5}
+  transform-es2015-function-name {"node":6.5}
+  transform-es2015-literals {"node":4}
+  transform-exponentiation-operator {"firefox":52}
+  syntax-trailing-function-commas {"firefox":52}
+```
+
+After:
+
+```txt
+Using plugins:
+  transform-es2015-destructuring {"firefox":52}
+  transform-es2015-for-of {"firefox":52}
+  transform-es2015-function-name {"firefox":52}
+  transform-es2015-literals {"firefox":52}
+  transform-exponentiation-operator {"node":7.4}
+  syntax-trailing-function-commas {"node":7.4}
+```
+
+### :memo: Documentation
+
+- Fix compat-table link in contributing.md (@existentialism)
+- Update README examples to fix website ([#151](https://github.com/babel/babel-preset-env/pull/)) (@existentialism)
+- Fix few typos ([#146](https://github.com/babel/babel-preset-env/pull/146)) (@existentialism)
+- Add configuration example to clarify `debug: true` ([#138](https://github.com/babel/babel-preset-env/pull/138)) (@yavorsky)
+- Fix CHANGELOG’s v1.1.8 updates typo. ([#136](https://github.com/babel/babel-preset-env/pull/136)) (@yavorsky)
+- README: Update `debug: true` example. ([#138](https://github.com/babel/babel-preset-env/pull/138)) (@yavorsky)
+
+### :house: Internal
+
+- update compat ([#169](https://github.com/babel/babel-preset-env/pull/169)) (@hzoo)
+- Use external Electron to Chromium library ([#144](https://github.com/babel/babel-preset-env/pull/144)) (@Kilian)
+- Update yarn lockfile ([#152](https://github.com/babel/babel-preset-env/pull/152)) (@existentialism)
+- Extract option normalization into independant file ([#125](https://github.com/babel/babel-preset-env/pull/125)) (@baer)
+- Update yarnfile ([#145](https://github.com/babel/babel-preset-env/pull/145)) (@baer)
+- devDeps: eslint-config-babel v5.0.0 ([#139](https://github.com/babel/babel-preset-env/pull/139)) (@kaicataldo)
+- Update compat-table, build data ([#135](https://github.com/babel/babel-preset-env/pull/135)) (@hzoo)
+ 
 ## v1.1.8 (2017-01-10)
 
 ### :bug: Bug Fix

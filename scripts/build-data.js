@@ -5,45 +5,93 @@ const path = require("path");
 
 const flatten = require("lodash/flatten");
 const flattenDeep = require("lodash/flattenDeep");
+const isEqual = require("lodash/isEqual");
 const mapValues = require("lodash/mapValues");
+const pickBy = require("lodash/pickBy");
 const pluginFeatures = require("../data/plugin-features");
 const builtInFeatures = require("../data/built-in-features");
 
 const renameTests = (tests, getName) =>
   tests.map(test => Object.assign({}, test, { name: getName(test.name) }));
 
-const es6Data = require("compat-table/data-es6");
-const es6PlusData = require("compat-table/data-es2016plus");
+// The following is adapted from compat-table:
+// https://github.com/kangax/compat-table/blob/gh-pages/build.js
+//
+// It parses and interpolates data so environments that "equal" other
+// environments (node4 and chrome45), as well as familial relationships (edge
+// and ie11) can be handled properly.
+
 const envs = require("compat-table/environments");
 
-const invertedEqualsEnv = Object.keys(envs).filter(b => envs[b].equals).reduce((
-  a,
-  b,
-) => {
-  if (!a[envs[b].equals]) {
-    a[envs[b].equals] = [b];
-  } else {
-    a[envs[b].equals].push(b);
-  }
-  return a;
-}, {});
+const byTestSuite = suite =>
+  browser => {
+    return Array.isArray(browser.test_suites)
+      ? browser.test_suites.indexOf(suite) > -1
+      : true;
+  };
 
-invertedEqualsEnv.safari5 = ["ios6"];
-if (Array.isArray(invertedEqualsEnv.safari6)) {
-  invertedEqualsEnv.safari6.push("ios7");
-} else {
-  invertedEqualsEnv.safari6 = ["ios7"];
-}
-invertedEqualsEnv.safari8 = ["ios9"];
+const es6 = require("compat-table/data-es6");
+es6.browsers = pickBy(envs, byTestSuite("es6"));
 
-const compatibilityTests = flattenDeep(
-  [es6Data, es6PlusData].map(data =>
-    data.tests.map(test => {
-      return test.subtests
-        ? [test, renameTests(test.subtests, name => test.name + " / " + name)]
-        : test;
-    })),
-);
+const es2016plus = require("compat-table/data-es2016plus");
+es2016plus.browsers = pickBy(envs, byTestSuite("es2016plus"));
+
+const interpolateAllResults = (rawBrowsers, tests) => {
+  const interpolateResults = res => {
+    let browser;
+    let prevBrowser;
+    let result;
+    let prevResult;
+    let prevBid;
+
+    for (const bid in rawBrowsers) {
+      // For browsers that are essentially equal to other browsers,
+      // copy over the results.
+      browser = rawBrowsers[bid];
+      if (browser.equals && res[bid] === undefined) {
+        result = res[browser.equals];
+        res[bid] = browser.ignore_flagged && result === "flagged"
+          ? false
+          : result;
+        // For each browser, check if the previous browser has the same
+        // browser full name (e.g. Firefox) or family name (e.g. Chakra) as this one.
+      } else if (
+        prevBrowser &&
+        (prevBrowser.full.replace(/,.+$/, "") ===
+          browser.full.replace(/,.+$/, "") ||
+          (browser.family !== undefined &&
+            prevBrowser.family === browser.family))
+      ) {
+        // For each test, check if the previous browser has a result
+        // that this browser lacks.
+        result = res[bid];
+        prevResult = res[prevBid];
+        if (prevResult !== undefined && result === undefined) {
+          res[bid] = prevResult;
+        }
+      }
+      prevBrowser = browser;
+      prevBid = bid;
+    }
+  };
+
+  // Now print the results.
+  tests.forEach(function(t) {
+    // Calculate the result totals for tests which consist solely of subtests.
+    if ("subtests" in t) {
+      t.subtests.forEach(function(e) {
+        interpolateResults(e.res);
+      });
+    } else {
+      interpolateResults(t.res);
+    }
+  });
+};
+
+interpolateAllResults(es6.browsers, es6.tests);
+interpolateAllResults(es2016plus.browsers, es2016plus.tests);
+
+// End of compat-table code adaptation
 
 const environments = [
   "chrome",
@@ -61,6 +109,7 @@ const environments = [
 const envMap = {
   safari51: "safari5",
   safari71_8: "safari8",
+  safari10_1: "safari10.1",
   firefox3_5: "firefox3",
   firefox3_6: "firefox3",
   node010: "node0.10",
@@ -68,6 +117,7 @@ const envMap = {
   iojs: "node3.3",
   node64: "node6",
   node65: "node6.5",
+  node76: "node7.6",
   android40: "android4.0",
   android41: "android4.1",
   android42: "android4.2",
@@ -77,6 +127,15 @@ const envMap = {
   android51: "android5.1",
   ios51: "ios5.1",
 };
+
+const compatibilityTests = flattenDeep(
+  [es6, es2016plus].map(data =>
+    data.tests.map(test => {
+      return test.subtests
+        ? [test, renameTests(test.subtests, name => test.name + " / " + name)]
+        : test;
+    }))
+);
 
 const getLowestImplementedVersion = ({ features }, env) => {
   const tests = flatten(
@@ -102,7 +161,7 @@ const getLowestImplementedVersion = ({ features }, env) => {
               res: test.res,
               isBuiltIn,
             };
-      }),
+      })
   );
 
   const envTests = tests.map(({ res: test, name, isBuiltIn }, i) => {
@@ -113,27 +172,16 @@ const getLowestImplementedVersion = ({ features }, env) => {
       return "-1";
     }
 
-    // `equals` in compat-table
-    Object.keys(test).forEach(t => {
-      const invertedEnvs = invertedEqualsEnv[envMap[t] || t];
-      if (invertedEnvs) {
-        invertedEnvs.forEach(inv => {
-          test[inv] = test[t];
-        });
-      }
-    });
-
     return (
       Object.keys(test)
         .filter(t => t.startsWith(env))
         // Babel assumes strict mode
         .filter(
-          test =>
-            tests[i].res[test] === true || tests[i].res[test] === "strict",
+          test => tests[i].res[test] === true || tests[i].res[test] === "strict"
         )
         // normalize some keys
         .map(test => envMap[test] || test)
-        .filter(test => !isNaN(parseInt(test.replace(env, ""))))
+        .filter(test => !isNaN(parseFloat(test.replace(env, ""))))
         .shift()
     );
   });
@@ -165,6 +213,7 @@ const generateData = (environments, features) => {
     }
 
     const plugin = {};
+
     environments.forEach(env => {
       const version = getLowestImplementedVersion(options, env);
       if (version !== null) {
@@ -185,12 +234,36 @@ const generateData = (environments, features) => {
   });
 };
 
+const pluginsDataPath = path.join(__dirname, "../data/plugins.json");
+const builtInsDataPath = path.join(__dirname, "../data/built-ins.json");
+
+const newPluginData = generateData(environments, pluginFeatures);
+const newBuiltInsData = generateData(environments, builtInFeatures);
+
+if (process.argv[2] === "--check") {
+  const currentPluginData = require(pluginsDataPath);
+  const currentBuiltInsData = require(builtInsDataPath);
+
+  if (
+    !isEqual(currentPluginData, newPluginData) ||
+    !isEqual(currentBuiltInsData, newBuiltInsData)
+  ) {
+    console.error(
+      "The newly generated plugin/built-in data does not match the current " +
+        "files. Re-run `npm run build-data`."
+    );
+    process.exit(1);
+  }
+
+  process.exit(0);
+}
+
 fs.writeFileSync(
-  path.join(__dirname, "../data/plugins.json"),
-  JSON.stringify(generateData(environments, pluginFeatures), null, 2) + "\n",
+  pluginsDataPath,
+  JSON.stringify(newPluginData, null, 2) + "\n"
 );
 
 fs.writeFileSync(
-  path.join(__dirname, "../data/built-ins.json"),
-  JSON.stringify(generateData(environments, builtInFeatures), null, 2) + "\n",
+  builtInsDataPath,
+  JSON.stringify(newBuiltInsData, null, 2) + "\n"
 );

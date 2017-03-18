@@ -1,12 +1,10 @@
-import intersection from "lodash/intersection";
 import invariant from "invariant";
 import browserslist from "browserslist";
+import { electronToChromium } from "electron-to-chromium";
 import builtInsList from "../data/built-ins.json";
 import defaultInclude from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import pluginFeatures from "../data/plugin-features";
-
-const hasBeenWarned = false;
 
 const validIncludesAndExcludes = [
   ...Object.keys(pluginFeatures),
@@ -26,9 +24,12 @@ export const validateIncludesAndExcludes = (opts = [], type) => {
     `Invalid Option: The '${type}' option must be an Array<String> of plugins/built-ins`,
   );
 
-  const unknownOpts = opts.filter(
-    opt => !validIncludesAndExcludes.includes(opt),
-  );
+  const unknownOpts = [];
+  opts.forEach(opt => {
+    if (validIncludesAndExcludes.indexOf(opt) === -1) {
+      unknownOpts.push(opt);
+    }
+  });
 
   invariant(
     unknownOpts.length === 0,
@@ -40,7 +41,7 @@ export const validateIncludesAndExcludes = (opts = [], type) => {
 };
 
 export const checkDuplicateIncludeExcludes = (include = [], exclude = []) => {
-  const duplicates = intersection(include, exclude);
+  const duplicates = include.filter(opt => exclude.indexOf(opt) >= 0);
 
   invariant(
     duplicates.length === 0,
@@ -80,7 +81,7 @@ export const objectToBrowserslist = (object, log) => {
 export const validateModulesOption = (modulesOpt = "commonjs") => {
   invariant(
     modulesOpt === false ||
-      Object.keys(moduleTransformations).includes(modulesOpt),
+      Object.keys(moduleTransformations).indexOf(modulesOpt) > -1,
     `Invalid Option: The 'modules' option must be either 'false' to indicate no modules, or a
     module type which can be be one of: 'commonjs' (default), 'amd', 'umd', 'systemjs'.`,
   );
@@ -88,33 +89,29 @@ export const validateModulesOption = (modulesOpt = "commonjs") => {
   return modulesOpt;
 };
 
-export default function normalizeOptions(opts) {
-  // TODO: remove whitelist in favor of include in next major
-  if (opts.whitelist && !hasBeenWarned) {
-    console.warn(
-      `Deprecation Warning: The "whitelist" option has been deprecated in favor of "include" to
-      match the newly added "exclude" option (instead of "blacklist").`,
-    );
-  }
-
-  invariant(
-    !(opts.whitelist && opts.include),
-    `Invalid Option: The "whitelist" and the "include" option are the same and one can be used at
-    a time`,
+export const getElectronChromeVersion = electronVersion => {
+  const electronChromeVersion = parseInt(
+    electronToChromium(electronVersion),
+    10,
   );
 
-  checkDuplicateIncludeExcludes(opts.whitelist || opts.include, opts.exclude);
+  invariant(
+    !!electronChromeVersion,
+    `Electron version ${electronVersion} is either too old or too new`,
+  );
+
+  return electronChromeVersion;
+};
+
+export default function normalizeOptions(opts) {
+  checkDuplicateIncludeExcludes(opts.include, opts.exclude);
 
   return {
     debug: opts.debug,
     exclude: validateIncludesAndExcludes(opts.exclude, "exclude"),
-    include: validateIncludesAndExcludes(
-      opts.whitelist || opts.include,
-      "include",
-    ),
+    include: validateIncludesAndExcludes(opts.include, "include"),
     loose: validateLooseOption(opts.loose),
     moduleType: validateModulesOption(opts.modules),
-    path: opts.path,
     targets: opts.targets,
     useBuiltIns: opts.useBuiltIns,
   };

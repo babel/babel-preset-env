@@ -1,9 +1,10 @@
 import browserslist from "browserslist";
 import builtInsList from "../data/built-ins.json";
 import defaultInclude from "./default-includes";
-import { electronToChromium } from "electron-to-chromium";
 import moduleTransformations from "./module-transformations";
-import normalizeOptions, { objectToBrowserslist } from "./normalize-options.js";
+import normalizeOptions, {
+  getElectronChromeVersion,
+} from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
 import transformPolyfillRequirePlugin
   from "./transform-polyfill-require-plugin";
@@ -51,6 +52,10 @@ export const isPluginRequired = (
   });
 
   return isRequiredForEnvironments.length > 0 ? true : false;
+};
+
+const isBrowsersQueryValid = browsers => {
+  return typeof browsers === "string" || Array.isArray(browsers);
 };
 
 const browserNameMap = {
@@ -109,33 +114,26 @@ const _extends = Object.assign ||
     return target;
   };
 
-export const getTargets = (targets = {}, fileContext = {}) => {
-  const targetOps = _extends({}, targets);
+export const getTargets = (targets = {}) => {
+  const targetOpts = _extends({}, targets);
 
-  if (targetOps.node === true || targetOps.node === "current") {
-    targetOps.node = getCurrentNodeVersion();
+  if (targetOpts.node === true || targetOpts.node === "current") {
+    targetOpts.node = getCurrentNodeVersion();
   }
 
-  // Rewrite Electron versions to their Chrome equivalents
-  if (targetOps.electron) {
-    const electronChromeVersion = parseInt(
-      electronToChromium(targetOps.electron),
-      10,
-    );
+  if (targetOpts.hasOwnProperty("uglify") && !targetOpts.uglify) {
+    delete targetOpts.uglify;
+  }
 
-    if (!electronChromeVersion) {
-      throw new Error(
-        `Electron version ${targetOps.electron} is either too old or too new`,
-      );
-    }
+  // Replace Electron target with its Chrome equivalent
+  if (targetOpts.electron) {
+    const electronChromeVersion = getElectronChromeVersion(targetOpts.electron);
 
-    if (targetOps.chrome) {
-      targetOps.chrome = Math.min(targetOps.chrome, electronChromeVersion);
-    } else {
-      targetOps.chrome = electronChromeVersion;
-    }
+    targetOpts.chrome = targetOpts.chrome
+      ? Math.min(targetOpts.chrome, electronChromeVersion)
+      : electronChromeVersion;
 
-    delete targetOps.electron;
+    delete targetOpts.electron;
   }
   browserslist.defaults = objectToBrowserslist(targetOps);
 
@@ -174,6 +172,14 @@ const filterItem = (targets, exclusions, list, fileContext, item) => {
   return isRequired && notExcluded;
 };
 
+const getBuiltInTargets = targets => {
+  const builtInTargets = _extends({}, targets);
+  if (builtInTargets.uglify != null) {
+    delete builtInTargets.uglify;
+  }
+  return builtInTargets;
+};
+
 export const transformIncludesAndExcludes = opts => ({
   all: opts,
   plugins: opts.filter(opt => !opt.match(/^(es\d+|web)\./)),
@@ -183,7 +189,8 @@ export const transformIncludesAndExcludes = opts => ({
 export default function buildPreset(context, opts = {}, fileContext) {
   const validatedOptions = normalizeOptions(opts);
   const { debug, loose, moduleType, useBuiltIns } = validatedOptions;
-  const targets = getTargets(validatedOptions.targets, fileContext);
+
+  const targets = getTargets(validatedOptions.targets);
   const include = transformIncludesAndExcludes(validatedOptions.include);
   const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
 
@@ -199,10 +206,12 @@ export default function buildPreset(context, opts = {}, fileContext) {
     .concat(include.plugins);
 
   let polyfills;
+  let polyfillTargets;
   if (useBuiltIns) {
+    polyfillTargets = getBuiltInTargets(targets);
     const filterBuiltIns = filterItem.bind(
       null,
-      targets,
+      polyfillTargets,
       exclude.builtIns,
       builtInsList,
       fileContext,
@@ -227,7 +236,7 @@ export default function buildPreset(context, opts = {}, fileContext) {
     if (useBuiltIns && polyfills.length) {
       console.log("\nUsing polyfills:");
       polyfills.forEach(polyfill => {
-        logPlugin(polyfill, targets, builtInsList);
+        logPlugin(polyfill, polyfillTargets, builtInsList);
       });
     }
   }
