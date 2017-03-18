@@ -8,7 +8,7 @@ const {
   validateIncludesAndExcludes,
   validateLooseOption,
   validateModulesOption,
-  objectToBrowserslist
+  objectToBrowserslist,
 } = normalizeOptions;
 
 describe("normalize-options", () => {
@@ -26,29 +26,35 @@ describe("normalize-options", () => {
     });
 
     it("array option is invalid", () => {
-      assert.throws(() => {
-        validateLooseOption([]);
-      }, Error);
+      assert.throws(
+        () => {
+          validateLooseOption([]);
+        },
+        Error,
+      );
     });
   });
 
   describe("checkDuplicateIncludeExcludes", function() {
     it("should throw if duplicate names in both", function() {
-      assert.throws(() => {
-        checkDuplicateIncludeExcludes(
-          ["transform-regenerator", "map"],
-          ["transform-regenerator", "map"]
-        );
-      }, Error);
+      assert.throws(
+        () => {
+          checkDuplicateIncludeExcludes(
+            ["transform-regenerator", "map"],
+            ["transform-regenerator", "map"],
+          );
+        },
+        Error,
+      );
     });
 
     it("should not throw if no duplicate names in both", function() {
-      assert.doesNotThrow(() => {
-        checkDuplicateIncludeExcludes(
-          ["transform-regenerator"],
-          ["map"]
-        );
-      }, Error);
+      assert.doesNotThrow(
+        () => {
+          checkDuplicateIncludeExcludes(["transform-regenerator"], ["map"]);
+        },
+        Error,
+      );
     });
   });
 
@@ -78,15 +84,21 @@ describe("normalize-options", () => {
     });
 
     it("`true` option is invalid", () => {
-      assert.throws(() => {
-        validateModulesOption(true);
-      }, Error);
+      assert.throws(
+        () => {
+          validateModulesOption(true);
+        },
+        Error,
+      );
     });
 
     it("array option is invalid", () => {
-      assert.throws(() => {
-        assert(validateModulesOption([]));
-      }, Error);
+      assert.throws(
+        () => {
+          assert(validateModulesOption([]));
+        },
+        Error,
+      );
     });
   });
 
@@ -96,19 +108,25 @@ describe("normalize-options", () => {
     });
 
     it("should throw if not in features", function() {
-      assert.throws(() => {
-        validateIncludesAndExcludes(["asdf"]);
-      }, Error);
+      assert.throws(
+        () => {
+          validateIncludesAndExcludes(["asdf"]);
+        },
+        Error,
+      );
     });
   });
 
   describe("objectToBrowserslist", function() {
     it("should return browserslist's query from a plain object", function() {
-      assert.deepEqual(objectToBrowserslist({
-        chrome: 55,
-        ie: 11,
-        node: 7
-      }), ["chrome 55", "ie 11"]);
+      assert.deepEqual(
+        objectToBrowserslist({
+          chrome: 55,
+          ie: 11,
+          node: 7,
+        }),
+        ["chrome 55", "ie 11"],
+      );
     });
 
     it("should return browserslist's query from an empty object", function() {

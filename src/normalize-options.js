@@ -10,28 +10,30 @@ const hasBeenWarned = false;
 
 const validIncludesAndExcludes = [
   ...Object.keys(pluginFeatures),
-  ...Object.keys(moduleTransformations).map((m) => moduleTransformations[m]),
+  ...Object.keys(moduleTransformations).map(m => moduleTransformations[m]),
   ...Object.keys(builtInsList),
-  ...defaultInclude
+  ...defaultInclude,
 ];
 
 const validBrowserslistTargets = [
   ...browserslist.major,
-  ...Object.keys(browserslist.aliases)
+  ...Object.keys(browserslist.aliases),
 ];
 
 export const validateIncludesAndExcludes = (opts = [], type) => {
   invariant(
     Array.isArray(opts),
-    `Invalid Option: The '${type}' option must be an Array<String> of plugins/built-ins`
+    `Invalid Option: The '${type}' option must be an Array<String> of plugins/built-ins`,
   );
 
-  const unknownOpts = opts.filter((opt) => !validIncludesAndExcludes.includes(opt));
+  const unknownOpts = opts.filter(
+    opt => !validIncludesAndExcludes.includes(opt),
+  );
 
   invariant(
     unknownOpts.length === 0,
     `Invalid Option: The plugins/built-ins '${unknownOpts}' passed to the '${type}' option are not
-    valid. Please check data/[plugin-features|built-in-features].js in babel-preset-env`
+    valid. Please check data/[plugin-features|built-in-features].js in babel-preset-env`,
   );
 
   return opts;
@@ -43,7 +45,7 @@ export const checkDuplicateIncludeExcludes = (include = [], exclude = []) => {
   invariant(
     duplicates.length === 0,
     `Invalid Option: The plugins/built-ins '${duplicates}' were found in both the "include" and
-    "exclude" options.`
+    "exclude" options.`,
   );
 };
 
@@ -53,30 +55,34 @@ export const checkDuplicateIncludeExcludes = (include = [], exclude = []) => {
 export const validateLooseOption = (looseOpt = false) => {
   invariant(
     typeof looseOpt === "boolean",
-    "Invalid Option: The 'loose' option must be a boolean."
+    "Invalid Option: The 'loose' option must be a boolean.",
   );
 
   return looseOpt;
 };
 
 export const objectToBrowserslist = (object, log) => {
-  return Object.keys(object).reduce((list, targetName) => {
-    if (log) {
-      console.log(validBrowserslistTargets);
-    }
-    if (validBrowserslistTargets.includes(targetName)) {
-      const targetVersion = object[targetName];
-      return list.concat(`${targetName} ${targetVersion}`);
-    }
-    return list;
-  }, []);
+  return Object.keys(object).reduce(
+    (list, targetName) => {
+      if (log) {
+        console.log(validBrowserslistTargets);
+      }
+      if (validBrowserslistTargets.includes(targetName)) {
+        const targetVersion = object[targetName];
+        return list.concat(`${targetName} ${targetVersion}`);
+      }
+      return list;
+    },
+    [],
+  );
 };
 
 export const validateModulesOption = (modulesOpt = "commonjs") => {
   invariant(
-    modulesOpt === false || Object.keys(moduleTransformations).includes(modulesOpt),
+    modulesOpt === false ||
+      Object.keys(moduleTransformations).includes(modulesOpt),
     `Invalid Option: The 'modules' option must be either 'false' to indicate no modules, or a
-    module type which can be be one of: 'commonjs' (default), 'amd', 'umd', 'systemjs'.`
+    module type which can be be one of: 'commonjs' (default), 'amd', 'umd', 'systemjs'.`,
   );
 
   return modulesOpt;
@@ -87,14 +93,14 @@ export default function normalizeOptions(opts) {
   if (opts.whitelist && !hasBeenWarned) {
     console.warn(
       `Deprecation Warning: The "whitelist" option has been deprecated in favor of "include" to
-      match the newly added "exclude" option (instead of "blacklist").`
+      match the newly added "exclude" option (instead of "blacklist").`,
     );
   }
 
   invariant(
     !(opts.whitelist && opts.include),
     `Invalid Option: The "whitelist" and the "include" option are the same and one can be used at
-    a time`
+    a time`,
   );
 
   checkDuplicateIncludeExcludes(opts.whitelist || opts.include, opts.exclude);
@@ -102,11 +108,14 @@ export default function normalizeOptions(opts) {
   return {
     debug: opts.debug,
     exclude: validateIncludesAndExcludes(opts.exclude, "exclude"),
-    include: validateIncludesAndExcludes(opts.whitelist || opts.include, "include"),
+    include: validateIncludesAndExcludes(
+      opts.whitelist || opts.include,
+      "include",
+    ),
     loose: validateLooseOption(opts.loose),
     moduleType: validateModulesOption(opts.modules),
     path: opts.path,
     targets: opts.targets,
-    useBuiltIns: opts.useBuiltIns
+    useBuiltIns: opts.useBuiltIns,
   };
 }

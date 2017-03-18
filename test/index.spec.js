@@ -7,63 +7,83 @@ const { versions: electronToChromiumData } = require("electron-to-chromium");
 describe("babel-preset-env", () => {
   describe("getTargets", () => {
     it("should return the current node version with option 'current'", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        node: true
-      }), {
-        node: parseFloat(process.versions.node)
-      });
+      assert.deepEqual(
+        babelPresetEnv.getTargets({
+          node: true,
+        }),
+        {
+          node: parseFloat(process.versions.node),
+        },
+      );
 
-      assert.deepEqual(babelPresetEnv.getTargets({
-        node: "current"
-      }), {
-        node: parseFloat(process.versions.node)
-      });
+      assert.deepEqual(
+        babelPresetEnv.getTargets({
+          node: "current",
+        }),
+        {
+          node: parseFloat(process.versions.node),
+        },
+      );
     });
   });
 
   describe("getTargets + electron", () => {
     it("should work with a string", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        electron: "1.0"
-      }), {
-        chrome: 49
-      });
+      assert.deepEqual(
+        babelPresetEnv.getTargets({
+          electron: "1.0",
+        }),
+        {
+          chrome: 49,
+        },
+      );
     });
 
     it("should work with a number", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        electron: 1.0
-      }), {
-        chrome: 49
-      });
+      assert.deepEqual(
+        babelPresetEnv.getTargets({
+          electron: 1.0,
+        }),
+        {
+          chrome: 49,
+        },
+      );
     });
 
-
     it("should preserve lower Chrome number if Electron version is more recent", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        electron: 1.4,
-        chrome: 50
-      }), {
-        chrome: 50
-      });
+      assert.deepEqual(
+        babelPresetEnv.getTargets({
+          electron: 1.4,
+          chrome: 50,
+        }),
+        {
+          chrome: 50,
+        },
+      );
     });
 
     it("should overwrite Chrome number if Electron version is older", function() {
-      assert.deepEqual(babelPresetEnv.getTargets({
-        electron: 1.0,
-        chrome: 50
-      }), {
-        chrome: 49
-      });
+      assert.deepEqual(
+        babelPresetEnv.getTargets({
+          electron: 1.0,
+          chrome: 50,
+        }),
+        {
+          chrome: 49,
+        },
+      );
     });
 
-    Object.keys(electronToChromiumData).forEach((electronVersion) => {
+    Object.keys(electronToChromiumData).forEach(electronVersion => {
       it(`"should work for Electron: ${electronVersion}`, function() {
-        assert.deepEqual(babelPresetEnv.getTargets({
-          electron: electronVersion
-        }), {
-          chrome: electronToChromiumData[electronVersion]
-        });
+        assert.deepEqual(
+          babelPresetEnv.getTargets({
+            electron: electronVersion,
+          }),
+          {
+            chrome: electronToChromiumData[electronVersion],
+          },
+        );
       });
     });
   });
@@ -83,13 +103,13 @@ describe("babel-preset-env", () => {
       };
 
       targets = {
-        "chrome": Number.MAX_SAFE_INTEGER,
-        "firefox": Number.MAX_SAFE_INTEGER
+        chrome: Number.MAX_SAFE_INTEGER,
+        firefox: Number.MAX_SAFE_INTEGER,
       };
       assert(babelPresetEnv.isPluginRequired(targets, plugin) === false);
 
       targets = {
-        "edge": 12,
+        edge: 12,
       };
       assert(babelPresetEnv.isPluginRequired(plugin, plugin) === true);
     });
@@ -99,7 +119,7 @@ describe("babel-preset-env", () => {
         chrome: 49,
       };
       const targets = {
-        "chrome": Number.MAX_SAFE_INTEGER,
+        chrome: Number.MAX_SAFE_INTEGER,
       };
       assert(babelPresetEnv.isPluginRequired(targets, plugin) === false);
     });
@@ -109,7 +129,7 @@ describe("babel-preset-env", () => {
         chrome: 49,
       };
       const targets = {
-        "chrome": 49,
+        chrome: 49,
       };
       assert(babelPresetEnv.isPluginRequired(targets, plugin) === false);
     });
@@ -119,7 +139,7 @@ describe("babel-preset-env", () => {
         chrome: 50,
       };
       const targets = {
-        "chrome": 49,
+        chrome: 49,
       };
       assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
     });
@@ -129,7 +149,7 @@ describe("babel-preset-env", () => {
         chrome: 49,
       };
       const targets = {
-        "browsers": "chrome > 50"
+        browsers: "chrome > 50",
       };
       assert(babelPresetEnv.isPluginRequired(targets, plugin) === false);
     });
@@ -139,7 +159,7 @@ describe("babel-preset-env", () => {
         chrome: 52,
       };
       const targets = {
-        "browsers": "chrome > 50"
+        browsers: "chrome > 50",
       };
       assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
     });
@@ -150,7 +170,7 @@ describe("babel-preset-env", () => {
       };
       const targets = {
         browsers: "last 2 Chrome versions",
-        chrome: 44
+        chrome: 44,
       };
 
       assert(babelPresetEnv.isPluginRequired(targets, plugin) === true);
@@ -158,42 +178,50 @@ describe("babel-preset-env", () => {
 
     it("doesn't throw when specifying a decimal for node", () => {
       const plugin = {
-        node: 6
+        node: 6,
       };
 
       const targets = {
-        "node": 6.5
+        node: 6.5,
       };
 
-      assert.doesNotThrow(() => {
-        babelPresetEnv.isPluginRequired(targets, plugin);
-      }, Error);
+      assert.doesNotThrow(
+        () => {
+          babelPresetEnv.isPluginRequired(targets, plugin);
+        },
+        Error,
+      );
     });
 
     it("will throw if target version is not a number", () => {
       const plugin = {
-        "node": 6,
+        node: 6,
       };
 
       const targets = {
-        "node": "6.5",
+        node: "6.5",
       };
 
-      assert.throws(() => {
-        babelPresetEnv.isPluginRequired(targets, plugin);
-      }, Error);
+      assert.throws(
+        () => {
+          babelPresetEnv.isPluginRequired(targets, plugin);
+        },
+        Error,
+      );
     });
   });
 
   describe("transformIncludesAndExcludes", function() {
     it("should return in transforms array", function() {
       assert.deepEqual(
-        babelPresetEnv.transformIncludesAndExcludes(["transform-es2015-arrow-functions"]),
+        babelPresetEnv.transformIncludesAndExcludes([
+          "transform-es2015-arrow-functions",
+        ]),
         {
           all: ["transform-es2015-arrow-functions"],
           plugins: ["transform-es2015-arrow-functions"],
-          builtIns: []
-        }
+          builtIns: [],
+        },
       );
     });
 
@@ -203,8 +231,8 @@ describe("babel-preset-env", () => {
         {
           all: ["es6.map"],
           plugins: [],
-          builtIns: ["es6.map"]
-        }
+          builtIns: ["es6.map"],
+        },
       );
     });
   });
