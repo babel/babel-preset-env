@@ -4,6 +4,7 @@ import defaultInclude from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions, {
   getElectronChromeVersion,
+  objectToBrowserslist,
 } from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
 import transformPolyfillRequirePlugin
@@ -114,7 +115,7 @@ const _extends = Object.assign ||
     return target;
   };
 
-export const getTargets = (targets = {}) => {
+export const getTargets = (targets = {}, fileContext = {}) => {
   const targetOpts = _extends({}, targets);
 
   if (targetOpts.node === true || targetOpts.node === "current") {
@@ -135,15 +136,15 @@ export const getTargets = (targets = {}) => {
 
     delete targetOpts.electron;
   }
-  browserslist.defaults = objectToBrowserslist(targetOps);
+  browserslist.defaults = objectToBrowserslist(targetOpts);
 
-  const browsersQuery = targetOps.browsers;
+  const browsersQuery = targetOpts.browsers;
   const browserslistOpts = { path: fileContext.dirname };
   const browsersValues = browserslist(browsersQuery, browserslistOpts);
   const queryBrowsers = getLowestVersions(browsersValues);
-  return mergeBrowsers(queryBrowsers, targetOps);
+  return mergeBrowsers(queryBrowsers, targetOpts);
 
-  return targetOps;
+  return targetOpts;
 };
 
 let hasBeenLogged = false;
