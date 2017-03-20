@@ -55,10 +55,6 @@ export const isPluginRequired = (
   return isRequiredForEnvironments.length > 0 ? true : false;
 };
 
-const isBrowsersQueryValid = browsers => {
-  return typeof browsers === "string" || Array.isArray(browsers);
-};
-
 const browserNameMap = {
   chrome: "chrome",
   edge: "edge",
