@@ -134,6 +134,15 @@ describe("babel-preset-env", () => {
     });
   });
 
+  describe("getTargets + fileContext", () => {
+    it("doesn't throw when fileContext is undefined", () => {
+      assert.doesNotThrow(
+        () => babelPresetEnv.getTargets({}, undefined),
+        Error,
+      );
+    });
+  });
+
   describe("isPluginRequired", () => {
     it("returns true if no targets are specified", () => {
       const isRequired = babelPresetEnv.isPluginRequired({}, {});
