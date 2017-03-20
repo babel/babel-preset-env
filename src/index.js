@@ -64,6 +64,10 @@ const browserNameMap = {
   safari: "safari",
 };
 
+const shouldIgnoreBrowserslist = query => {
+  return query === false || query === null;
+};
+
 const getLowestVersions = browsers => {
   return browsers.reduce(
     (all, browser) => {
@@ -135,10 +139,16 @@ export const getTargets = (targets = {}, fileContext = {}) => {
   browserslist.defaults = objectToBrowserslist(targetOpts);
 
   const browsersQuery = targetOpts.browsers;
-  const browserslistOpts = { path: fileContext.dirname };
-  const browsersValues = browserslist(browsersQuery, browserslistOpts);
-  const queryBrowsers = getLowestVersions(browsersValues);
-  return mergeBrowsers(queryBrowsers, targetOpts);
+  const ignoreBrowserslist = shouldIgnoreBrowserslist(browsersQuery);
+
+  if (ignoreBrowserslist) {
+    delete targetOpts.browsers;
+  } else {
+    const browserslistOpts = { path: fileContext.dirname };
+    const browsersValues = browserslist(browsersQuery, browserslistOpts);
+    const queryBrowsers = getLowestVersions(browsersValues);
+    return mergeBrowsers(queryBrowsers, targetOpts);
+  }
 
   return targetOpts;
 };
