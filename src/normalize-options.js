@@ -68,7 +68,7 @@ export const objectToBrowserslist = (object, log) => {
       if (log) {
         console.log(validBrowserslistTargets);
       }
-      if (validBrowserslistTargets.includes(targetName)) {
+      if (validBrowserslistTargets.indexOf(targetName) >= 0) {
         const targetVersion = object[targetName];
         return list.concat(`${targetName} ${targetVersion}`);
       }
