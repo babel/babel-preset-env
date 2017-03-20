@@ -62,12 +62,9 @@ export const validateLooseOption = (looseOpt = false) => {
   return looseOpt;
 };
 
-export const objectToBrowserslist = (object, log) => {
+export const objectToBrowserslist = object => {
   return Object.keys(object).reduce(
     (list, targetName) => {
-      if (log) {
-        console.log(validBrowserslistTargets);
-      }
       if (validBrowserslistTargets.indexOf(targetName) >= 0) {
         const targetVersion = object[targetName];
         return list.concat(`${targetName} ${targetVersion}`);
