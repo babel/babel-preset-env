@@ -122,6 +122,14 @@ A query to select browsers (ex: last 2 versions, > 5%) using [browserslist](http
 
 Note, browsers' results are overridden by explicit items from `targets`.
 
+#### Browserslist config file.
+File with browsers queries splitted by a new line. For more info see [browserslist/config-file](https://github.com/ai/browserslist#config-file).
+
+#### `browserslist` field in `package.json`
+Way to reduce configuration files and separate browserslist query from the Babel config.
+
+Browserslist config file and `browserslist` field in `package.json` will be ignored if: 1) `targets.browsers` was specified 2) or with `ignoreBrowserslistConfig: true` option.
+
 ### `targets.uglify`
 
 `number | true`
@@ -212,6 +220,12 @@ This will also work for `core-js` directly (`import "core-js";`)
 ```
 npm install core-js --save
 ```
+
+### `ignoreBrowserslistConfig`
+
+`boolean, defaults to false`
+
+Option to ignore browserslist config file searching. Also will ignore browserslist field in package.json. Useful for projects which using browserslist config for files won't be compiled with Babel.
 
 ---
 
