@@ -1,9 +1,7 @@
 {
   "presets": [
     ["../../../../lib", {
-      "targets": {
-        "browsers": false
-      },
+      "ignoreBrowserslistConfig": true,
       "modules": false,
       "debug": true
     }]
