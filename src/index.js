@@ -5,6 +5,7 @@ import moduleTransformations from "./module-transformations";
 import normalizeOptions, {
   getElectronChromeVersion,
   objectToBrowserslist,
+  isBrowserslistQuery,
 } from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
 import transformPolyfillRequirePlugin
@@ -21,10 +22,15 @@ import transformPolyfillRequirePlugin
 export const isPluginRequired = (
   supportedEnvironments,
   plugin,
+  options,
   fileContext,
 ) => {
   if (supportedEnvironments.browsers) {
-    supportedEnvironments = getTargets(supportedEnvironments, fileContext);
+    supportedEnvironments = getTargets(
+      supportedEnvironments,
+      options,
+      fileContext,
+    );
   }
 
   const targetEnvironments = Object.keys(supportedEnvironments);
@@ -62,10 +68,6 @@ const browserNameMap = {
   ie: "ie",
   ios_saf: "ios",
   safari: "safari",
-};
-
-const shouldIgnoreBrowserslist = query => {
-  return query === false || query === null;
 };
 
 const getLowestVersions = browsers => {
@@ -115,7 +117,7 @@ const _extends = Object.assign ||
     return target;
   };
 
-export const getTargets = (targets = {}, fileContext = {}) => {
+export const getTargets = (targets = {}, options = {}, fileContext = {}) => {
   const targetOpts = _extends({}, targets);
 
   if (targetOpts.node === true || targetOpts.node === "current") {
@@ -139,15 +141,20 @@ export const getTargets = (targets = {}, fileContext = {}) => {
   browserslist.defaults = objectToBrowserslist(targetOpts);
 
   const browsersQuery = targetOpts.browsers;
-  const ignoreBrowserslist = shouldIgnoreBrowserslist(browsersQuery);
+  const browsersSpecified = isBrowserslistQuery(browsersQuery);
+  const { ignoreBrowserslistConfig } = options;
 
-  if (ignoreBrowserslist) {
-    delete targetOpts.browsers;
-  } else {
-    const browserslistOpts = { path: fileContext.dirname };
+  if (!ignoreBrowserslistConfig || browsersSpecified) {
+    const browserslistOpts = ignoreBrowserslistConfig
+      ? {}
+      : { path: fileContext.dirname };
     const browsersValues = browserslist(browsersQuery, browserslistOpts);
     const queryBrowsers = getLowestVersions(browsersValues);
     return mergeBrowsers(queryBrowsers, targetOpts);
+  }
+
+  if (targetOpts.browsers) {
+    delete targetOpts.browsers;
   }
 
   return targetOpts;
@@ -170,12 +177,17 @@ const logPlugin = (plugin, targets, list) => {
   console.log(logStr);
 };
 
-const filterItem = (targets, exclusions, list, fileContext, item) => {
+const filterItem = (targets, exclusions, list, options, fileContext, item) => {
   const isDefault = defaultInclude.indexOf(item) >= 0;
   const notExcluded = exclusions.indexOf(item) === -1;
 
   if (isDefault) return notExcluded;
-  const isRequired = isPluginRequired(targets, list[item], fileContext);
+  const isRequired = isPluginRequired(
+    targets,
+    list[item],
+    options,
+    fileContext,
+  );
   return isRequired && notExcluded;
 };
 
@@ -197,7 +209,11 @@ export default function buildPreset(context, opts = {}, fileContext) {
   const validatedOptions = normalizeOptions(opts);
   const { debug, loose, moduleType, useBuiltIns } = validatedOptions;
 
-  const targets = getTargets(validatedOptions.targets, fileContext);
+  const targets = getTargets(
+    validatedOptions.targets,
+    validatedOptions,
+    fileContext,
+  );
   const include = transformIncludesAndExcludes(validatedOptions.include);
   const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
 
@@ -206,6 +222,7 @@ export default function buildPreset(context, opts = {}, fileContext) {
     targets,
     exclude.plugins,
     pluginList,
+    validatedOptions,
     fileContext,
   );
   const transformations = Object.keys(pluginList)
@@ -221,6 +238,7 @@ export default function buildPreset(context, opts = {}, fileContext) {
       polyfillTargets,
       exclude.builtIns,
       builtInsList,
+      validatedOptions,
       fileContext,
     );
 

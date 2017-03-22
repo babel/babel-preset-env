@@ -62,6 +62,15 @@ export const validateLooseOption = (looseOpt = false) => {
   return looseOpt;
 };
 
+export const validateBrowserslistOption = (browserslistOpt = false) => {
+  invariant(
+    typeof browserslistOpt === "boolean",
+    "Invalid Option: The 'browserslist' option must be a boolean.",
+  );
+
+  return browserslistOpt;
+};
+
 export const objectToBrowserslist = object => {
   return Object.keys(object).reduce(
     (list, targetName) => {
@@ -74,6 +83,9 @@ export const objectToBrowserslist = object => {
     [],
   );
 };
+
+export const isBrowserslistQuery = query =>
+  Array.isArray(query) || typeof query === "string";
 
 export const validateModulesOption = (modulesOpt = "commonjs") => {
   invariant(
@@ -110,6 +122,9 @@ export default function normalizeOptions(opts) {
     loose: validateLooseOption(opts.loose),
     moduleType: validateModulesOption(opts.modules),
     targets: opts.targets,
+    ignoreBrowserslistConfig: validateBrowserslistOption(
+      opts.ignoreBrowserslistConfig,
+    ),
     useBuiltIns: opts.useBuiltIns,
   };
 }
