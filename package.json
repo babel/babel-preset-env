@@ -21,7 +21,6 @@
     "test": "npm run build && npm run test-only",
     "test-ci": "nyc npm run test",
     "test-only": "mocha ./test --compilers js:babel-register -t 10000"
-    
   },
   "dependencies": {
     "babel-plugin-check-es2015-constants": "7.0.0-alpha.1",
@@ -120,6 +119,10 @@
     ],
     "test/*.js": [
       "prettier --trailing-comma all --write",
+      "git add"
+    ],
+    "package.json": [
+      "node ./scripts/yarn-install.js",
       "git add"
     ]
   }
