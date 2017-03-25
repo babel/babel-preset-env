@@ -62,11 +62,51 @@ If you are targeting IE 8 and Chrome 55 it will include all plugins required by 
 
 For example, if you are building on Node 4, arrow functions won't be converted, but they will if you build on Node 0.12.
 
-### Support a `browsers` option like autoprefixer
+### Support a `browsers` option like autoprefixer.
 
 Use [browserslist](https://github.com/ai/browserslist) to declare supported environments by performing queries like `> 1%, last 2 versions`.
 
 Ref: [#19](https://github.com/babel/babel-preset-env/pull/19)
+
+### Browserslist support.
+[Browserslist](https://github.com/ai/browserslist) is an library to share supported browsers list between different front-end tools like [autoprefixer](https://github.com/postcss/autoprefixer), [stylelint](https://stylelint.io/), [eslint-plugin-compat](https://github.com/amilajack/eslint-plugin-compat) and many others.
+By default, babel-preset-env will use [browserslist config sources](https://github.com/ai/browserslist#queries).
+
+For example, to enable only the polyfills and plugins needed for a project targeting *last 2 versions* and *IE10*:
+
+**.babelrc**
+```json
+{
+  "presets": [
+    ["env", {
+      "useBuiltIns": true
+    }]
+  ]
+}
+```
+
+**browserslist**
+```
+Last 2 versions
+IE 10
+```
+
+or
+
+**package.json**
+```
+"browserslist": "last 2 versions, ie 10"
+```
+
+Browserslist config will be ignored if: 1) `targets.browsers` was specified 2) or with `ignoreBrowserslistConfig: true` option ([see more](#ignoreBrowserslistConfig)):
+
+#### Targets merging.
+
+1. If [targets.browsers](#browsers) was defined - browserslist config will be ignored. Also will be merged with [targets defined explicitly](#targets). In the case of merge, targets defined explicitly will override the same targets received from `browsers` field.
+
+2. If [targets.browsers](#browsers) was not defined - the program will search browserslist file or `package.json` with `browserslist` field. The search will be started from compilation target and ended on the system root. If both will be found - an exception will be thrown.
+
+3. If [targets.browsers](#browsers) was not defined, but [targets](#targets) and browserslist config was found - the targets will be merged in the same way as `targets` with `targets.browsers`.
 
 ## Install
 
@@ -121,14 +161,6 @@ If you want to compile against the current node version, you can specify `"node"
 A query to select browsers (ex: last 2 versions, > 5%) using [browserslist](https://github.com/ai/browserslist).
 
 Note, browsers' results are overridden by explicit items from `targets`.
-
-#### Browserslist config file.
-File with browsers queries splitted by a new line. For more info see [browserslist/config-file](https://github.com/ai/browserslist#config-file).
-
-#### `browserslist` field in `package.json`
-Way to reduce configuration files and separate browserslist query from the Babel config.
-
-Browserslist config file and `browserslist` field in `package.json` will be ignored if: 1) `targets.browsers` was specified 2) or with `ignoreBrowserslistConfig: true` option.
 
 ### `targets.uglify`
 
@@ -223,10 +255,9 @@ npm install core-js --save
 
 ### `ignoreBrowserslistConfig`
 
-`boolean, defaults to false`
+`boolean`, defaults to `false`
 
-Option to ignore browserslist config file searching. Also will ignore browserslist field in package.json. Useful for projects which using browserslist config for files won't be compiled with Babel.
-
+Toggles whether or not [browserslist config sources](https://github.com/ai/browserslist#queries) are used, which includes searching for any browserslist files or referencing the browserslist key inside package.json. This is useful for projects that use a browserslist config for files that won't be compiled with Babel.
 ---
 
 ## Examples
