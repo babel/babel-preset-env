@@ -25,7 +25,7 @@ const findClosestElectronVersion = (targetVersion) => {
   const chromiumVersionsLength = chromiumToElectronVersions.length;
   const maxChromium = +chromiumToElectronVersions[chromiumVersionsLength - 1];
   if (targetVersion > maxChromium) return null;
-  
+
   const closestChrome = chromiumToElectronVersions.find(
     (version) => targetVersion <= version
   );
