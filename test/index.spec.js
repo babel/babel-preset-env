@@ -2,7 +2,6 @@
 
 const babelPresetEnv = require("../lib/index.js");
 const assert = require("assert");
-const { versions: electronToChromiumData } = require("electron-to-chromium");
 
 describe("babel-preset-env", () => {
   describe("getTargets", () => {
