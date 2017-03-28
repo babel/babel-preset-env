@@ -19,7 +19,7 @@ const chromiumToElectronMap = electronToChromiumKeys.reduce(
     return all;
   }
 , {});
-const chromiumToElectronVersions = Object.keys(chromiumToElectronMap).sort();
+const chromiumToElectronVersions = Object.keys(chromiumToElectronMap);
 
 const findClosestElectronVersion = (targetVersion) => {
   const chromiumVersionsLength = chromiumToElectronVersions.length;
