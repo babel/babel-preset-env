@@ -13,7 +13,7 @@ const {
 
 describe("normalize-options", () => {
   describe("normalizeOptions", () => {
-    it("should return normalized includes and excludes", () => {
+    it("should return normalized `include` and `exclude`", () => {
       const normalized = normalizeOptions.default({
         include: [
           "babel-plugin-transform-es2015-spread",
@@ -26,7 +26,7 @@ describe("normalize-options", () => {
       ]);
     });
 
-    it("should return normalized includes and excludes", () => {
+    it("should throw if duplicate names in `include` and `exclude`", () => {
       const normalizeWithSameIncludes = () => {
         normalizeOptions.default({
           include: [
