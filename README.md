@@ -102,7 +102,7 @@ For more information on setting options for a preset, refer to the [plugin/prese
 
 Takes an object of environment versions to support.
 
-Each target environment takes a number or a string (you can also specify a minor version like `node: 6.5`).
+Each target environment takes a number or a string (we recommend using a string when specifying minor versions like `node: "6.10"`).
 
 Example environments: `chrome`, `opera`, `edge`, `firefox`, `safari`, `ie`, `ios`, `android`, `node`, `electron`.
 
