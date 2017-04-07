@@ -45,6 +45,23 @@ const getLowestVersions = browsers => {
   );
 };
 
+const outputDecimalWarning = decimalTargets => {
+  if (!decimalTargets || !decimalTargets.length) {
+    return;
+  }
+
+  console.log("Warning, the following targets are using a decimal version:");
+  console.log("");
+  decimalTargets.forEach(({ target, value }) =>
+    console.log(`  ${target}: ${value}`));
+  console.log("");
+  console.log(
+    "We recommend using a string for minor/patch versions to avoid numbers like 6.10",
+  );
+  console.log("getting parsed as 6.1, which can lead to unexpected behavior.");
+  console.log("");
+};
+
 const targetParserMap = {
   __default: (target, value) => [target, semverify(value)],
 
@@ -70,10 +87,15 @@ const getTargets = (targets = {}) => {
   }
 
   // Parse remaining targets
-  return Object.keys(targets).reduce(
+  const parsed = Object.keys(targets).reduce(
     (results, target) => {
       if (target !== "browsers") {
         const value = targets[target];
+
+        // Warn when specifying minor/patch as a decimal
+        if (typeof value === "number" && value % 1 !== 0) {
+          results.decimalWarnings.push({ target, value });
+        }
 
         // Check if we have a target parser?
         const parser = targetParserMap[target] || targetParserMap.__default;
@@ -82,22 +104,29 @@ const getTargets = (targets = {}) => {
         if (parsedValue) {
           // Merge (lowest wins)
           if (typeof parsedValue === "string") {
-            results[parsedTarget] = semverMin(
-              results[parsedTarget],
+            results.targets[parsedTarget] = semverMin(
+              results.targets[parsedTarget],
               parsedValue,
             );
           } else {
             // We can remove this block if/when we replace Uglify target
             // with top level option
-            results[parsedTarget] = parsedValue;
+            results.targets[parsedTarget] = parsedValue;
           }
         }
       }
 
       return results;
     },
-    targetOpts,
+    {
+      targets: targetOpts,
+      decimalWarnings: [],
+    },
   );
+
+  outputDecimalWarning(parsed.decimalWarnings);
+
+  return parsed.targets;
 };
 
 export default getTargets;
