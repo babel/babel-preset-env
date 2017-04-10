@@ -66,12 +66,12 @@ const outputDecimalWarning = decimalTargets => {
 const targetParserMap = {
   __default: (target, value) => [target, semverify(value)],
 
-  node: (target, value, useBuiltIns, fileContext) => {
+  node: (target, value, options = {}, fileContext = {}) => {
     let parsed;
     if (value === true || value === "current") {
       parsed = process.versions.node;
     } else if (value === "engines") {
-      parsed = getEnginesNodeVersion(fileContext, useBuiltIns);
+      parsed = getEnginesNodeVersion(fileContext.dirname, options.useBuiltIns);
     } else {
       parsed = semverify(value);
     }
@@ -107,7 +107,7 @@ const getTargets = (targets = {}, options, fileContext) => {
         const [parsedTarget, parsedValue] = parser(
           target,
           value,
-          options.useBuiltIns,
+          options,
           fileContext,
         );
 

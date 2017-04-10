@@ -1,5 +1,6 @@
 import semver from "semver";
 import path from "path";
+import fs from "fs";
 import { getEnv, semverify } from "./utils";
 import pluginList from "../data/plugins.json";
 import builtInsList from "../data/built-ins.json";
@@ -8,7 +9,37 @@ import builtInsList from "../data/built-ins.json";
    ../confg/ -> ../confg/package.json
    ./index.js -> ./package.json */
 const resolvePackagePath = (packagePath = "") => {
-  return path.join(process.cwd(), packagePath, "package.json");
+  return path.join(packagePath, "package.json");
+};
+
+// Just check wether the file exist.
+export const fileExist = file =>
+  fs.existsSync(file) && fs.statSync(file).isFile();
+
+const eachParent = (file, callback) => {
+  if (!file) return undefined;
+  let loc = path.resolve(file);
+  do {
+    const result = callback(loc);
+    if (typeof result !== "undefined") return result;
+  } while (loc !== (loc = path.dirname(loc)));
+  return undefined;
+};
+
+const parsePackage = path => JSON.parse(fs.readFileSync(path));
+
+export const findPackageRecursively = entry => {
+  return eachParent(entry, dir => {
+    const pkg = resolvePackagePath(dir, "package.json");
+
+    if (fileExist(pkg)) {
+      try {
+        return parsePackage(pkg);
+      } catch (e) {
+        console.warn("Can't parse " + pkg + ".");
+      }
+    }
+  });
 };
 
 /* Filter versions that satisfiyng to passed semver range.
@@ -18,7 +49,6 @@ const filterSatisfiedVersions = (range, versions) => {
 };
 
 const getVersionsFromList = list => {
-  // console.log(list)
   return Object.keys(list).reduce(
     (allVersions, currentItem) => {
       const currentVersions = list[currentItem];
@@ -68,10 +98,8 @@ export const getLowestFromSemverValue = (version, versionsList) => {
 /* Try to access `package.json` with passed path.
    If can't - logs (but doesn't throw) an error. */
 export const getPackageJSON = packagePath => {
-  const pkgPath = resolvePackagePath(packagePath);
-
   try {
-    return require(pkgPath);
+    return findPackageRecursively(packagePath);
   } catch (e) {
     console.warn(`Can't parse package.json in ${pkgPath}: `, e);
   }
@@ -83,6 +111,7 @@ export const getPackageJSON = packagePath => {
 export const getEnginesNodeVersion = (packagePath, useBuiltIns) => {
   const env = getEnv(process.env);
   const pkg = getPackageJSON(packagePath);
+  if (!pkg) return null;
   const engines = (env === "development" && pkg.devEngines) || pkg.engines;
 
   if (engines && engines.node) {
