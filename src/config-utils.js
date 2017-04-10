@@ -1,12 +1,6 @@
 import semver from "semver";
 import path from "path";
-import {
-  getDirnameInPath,
-  getFilenameInPath,
-  getEnv,
-  semverify,
-  desemverify,
-} from "./utils";
+import { getEnv, semverify } from "./utils";
 import pluginList from "../data/plugins.json";
 import builtInsList from "../data/built-ins.json";
 
@@ -28,7 +22,7 @@ const getVersionsFromList = list => {
   return Object.keys(list).reduce(
     (allVersions, currentItem) => {
       const currentVersions = list[currentItem];
-      for (let envName in currentVersions) {
+      for (const envName in currentVersions) {
         const currentVersion = allVersions[envName];
         const envVersion = currentVersions[envName];
 
@@ -39,7 +33,7 @@ const getVersionsFromList = list => {
         }
       }
 
-      for (let env in allVersions) {
+      for (const env in allVersions) {
         allVersions[env].sort((a, b) => a - b);
       }
 
