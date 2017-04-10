@@ -30,7 +30,7 @@ const parsePackage = path => JSON.parse(fs.readFileSync(path));
 
 export const findPackageRecursively = entry => {
   return eachParent(entry, dir => {
-    const pkg = resolvePackagePath(dir, "package.json");
+    const pkg = resolvePackagePath(dir);
 
     if (fileExist(pkg)) {
       try {
@@ -101,7 +101,7 @@ export const getPackageJSON = packagePath => {
   try {
     return findPackageRecursively(packagePath);
   } catch (e) {
-    console.warn(`Can't parse package.json in ${pkgPath}: `, e);
+    console.warn(`Can't parse package.json in ${packagePath}: `, e);
   }
 };
 
