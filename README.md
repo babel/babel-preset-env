@@ -1,4 +1,4 @@
-# babel-preset-env [![npm](https://img.shields.io/npm/v/babel-preset-env.svg)](https://www.npmjs.com/package/babel-preset-env) [![travis](https://img.shields.io/travis/babel/babel-preset-env/master.svg)](https://travis-ci.org/babel/babel-preset-env) [![npm-downloads](https://img.shields.io/npm/dm/babel-preset-env.svg)](https://www.npmjs.com/package/babel-preset-env)
+# babel-preset-env [![npm](https://img.shields.io/npm/v/babel-preset-env.svg)](https://www.npmjs.com/package/babel-preset-env) [![travis](https://img.shields.io/travis/babel/babel-preset-env/master.svg)](https://travis-ci.org/babel/babel-preset-env) [![npm-downloads](https://img.shields.io/npm/dm/babel-preset-env.svg)](https://www.npmjs.com/package/babel-preset-env) [![codecov](https://img.shields.io/codecov/c/github/babel/babel-preset-env/master.svg?maxAge=43200)](https://codecov.io/github/babel/babel-preset-env)
 
 > A Babel preset that can automatically determine the Babel plugins and polyfills you need based on your supported environments.
 
@@ -17,8 +17,6 @@ npm install babel-preset-env --save-dev
   ]
 }
 ```
-
-Check out the many options (especially `useBuiltIns` to polyfill less)!
 
 - [How it Works](#how-it-works)
 - [Install](#install)
@@ -44,7 +42,7 @@ Ref: [#7](https://github.com/babel/babel-preset-env/issues/7)
 
 > Currently located at [plugin-features.js](https://github.com/babel/babel-preset-env/blob/master/data/plugin-features.js).
 
-This should be straightforward to do in most cases. There might be cases were plugins should be split up more or certain plugins aren't standalone enough (or impossible to do).
+This should be straightforward to do in most cases. There might be cases where plugins should be split up more or certain plugins aren't standalone enough (or impossible to do).
 
 ### Support all plugins in Babel that are considered `latest`
 
@@ -70,8 +68,16 @@ Ref: [#19](https://github.com/babel/babel-preset-env/pull/19)
 
 ## Install
 
+With [npm](https://www.npmjs.com):
+
 ```sh
 npm install --save-dev babel-preset-env
+```
+
+Or [yarn](https://yarnpkg.com):
+
+```sh
+yarn add babel-preset-env --dev
 ```
 
 ## Usage
@@ -90,11 +96,11 @@ For more information on setting options for a preset, refer to the [plugin/prese
 
 ### `targets`
 
-`{ [string]: number }`, defaults to `{}`.
+`{ [string]: number | string }`, defaults to `{}`.
 
 Takes an object of environment versions to support.
 
-Each target environment takes a number (you can also specify a minor versions like `node: 6.5`)
+Each target environment takes a number or a string (we recommend using a string when specifying minor versions like `node: "6.10"`).
 
 Example environments: `chrome`, `opera`, `edge`, `firefox`, `safari`, `ie`, `ios`, `android`, `node`, `electron`.
 
@@ -110,9 +116,19 @@ If you want to compile against the current node version, you can specify `"node"
 
 `Array<string> | string`
 
-A query to select browsers (ex: last 2 versions, > 5%) using [browserslist](https://github.com/ai/browserslist).  
+A query to select browsers (ex: last 2 versions, > 5%) using [browserslist](https://github.com/ai/browserslist).
 
 Note, browsers' results are overridden by explicit items from `targets`.
+
+### `targets.uglify`
+
+`number | true`
+
+UglifyJS does not currently support any ES6 syntax, so if you are using Uglify to minify your code, targeting later browsers may cause Uglify to throw syntax errors.
+
+To prevent these errors - specify the uglify option, which will enable all plugins and, as a result, fully compile your code to ES5. However, the `useBuiltIns` option will still work as before, and only include the polyfills that your target(s) need.
+
+> NOTE: Uglify has a work-in-progress "Harmony" branch to address the lack of ES6 support, but it is not yet stable.  You can follow its progress in [UglifyJS2 issue #448](https://github.com/mishoo/UglifyJS2/issues/448).  If you require an alternative minifier which _does_ support ES6 syntax, we recommend using [Babili](https://github.com/babel/babili).
 
 ### `loose`
 
@@ -138,8 +154,6 @@ Outputs the targets/plugins used and the version specified in [plugin data versi
 
 `Array<string>`, defaults to `[]`.
 
-> NOTE: `whitelist` is deprecated and will be removed in the next major in favor of this.
-
 An array of plugins to always include.
 
 Valid options include any of the [babel plugins](https://github.com/babel/babel-preset-env/blob/master/data/plugin-features.js) or [built-ins](https://github.com/babel/babel-preset-env/blob/master/data/built-in-features.js), such as `transform-es2015-arrow-functions`, `map`, `set`, or `object.assign`.
@@ -160,20 +174,59 @@ This option is useful for "blacklisting" a transform like `transform-regenerator
 
 ### `useBuiltIns`
 
-`boolean`, defaults to `false`.
+`boolean` | `"entry"`, defaults to `true`.
 
-A way to apply `babel-preset-env` for polyfills (via "babel-polyfill").
+A way to apply `babel-preset-env` for polyfills (via `babel-polyfill`).
 
-> NOTE: This does not currently polyfill experimental/stage-x built-ins like the regular "babel-polyfill" does.
-> This will only work with npm >= 3 (which should be used with Babel 6 anyway)
-
-```
+```sh
 npm install babel-polyfill --save
 ```
 
-This option enables a new plugin that replaces the statement `import "babel-polyfill"` or `require("babel-polyfill")` with individual requires for `babel-polyfill` based on environment.
+#### `useBuiltIns: true`
+
+Adds specific imports for polyfills when they are used in each file. We take advantage of the fact that a bundler will load the same polyfill only once.
+
+**In**
+
+a.js
+
+```js
+var a = new Promise();
+```
+
+b.js
+
+```js
+var b = new Map();
+```
+
+**Out (if environment doesn't support it)**
+
+```js
+import "babel-polyfill/core-js/modules/es6.promise";
+var a = new Promise();
+```
+
+```js
+import "babel-polyfill/core-js/modules/es6.map";
+var b = new Map();
+```
+
+**Out (if environment supports it)**
+
+```js
+var a = new Promise();
+```
+
+```js
+var b = new Map();
+```
+
+#### `useBuiltIns: 'entry'`
 
 > NOTE: Only use `require("babel-polyfill");` once in your whole app. One option is to create a single entry file that only contains the require statement.
+
+This option enables a new plugin that replaces the statement `import "babel-polyfill"` or `require("babel-polyfill")` with individual requires for `babel-polyfill` based on environment.
 
 **In**
 
@@ -184,18 +237,13 @@ import "babel-polyfill";
 **Out (different based on environment)**
 
 ```js
-import "core-js/modules/es7.string.pad-start";
-import "core-js/modules/es7.string.pad-end";
-import "core-js/modules/web.timers";
-import "core-js/modules/web.immediate";
-import "core-js/modules/web.dom.iterable";
+import "babel-polyfill/core-js/modules/es7.string.pad-start";
+import "babel-polyfill/core-js/modules/es7.string.pad-end";
 ```
 
-This will also work for `core-js` directly (`import "core-js";`)
+#### `useBuiltIns: false`
 
-```
-npm install core-js --save
-```
+Don't add polyfills automatically per file, or transform `import "babel-polyfill"` to individual polyfills.
 
 ---
 
@@ -321,7 +369,7 @@ exports.A = A;
 }
 ```
 
-**stdin**
+**stdout**
 
 ```sh
 Using targets:
@@ -368,8 +416,5 @@ If you get a `SyntaxError: Unexpected token ...` error when using the [object-re
 
 ## Other Cool Projects
 
-- [auto-babel](https://github.com/jakepusateri/auto-babel)
-- [babel-preset-target](https://github.com/sdkennedy/babel-preset-target)
-- [babel-preset-modern-node](https://github.com/michaelcontento/babel-preset-modern-node)
 - [babel-preset-modern-browsers](https://github.com/christophehurpeau/babel-preset-modern-browsers)
 - ?

@@ -1,191 +1,80 @@
-import browserslist from "browserslist";
+import semver from "semver";
 import builtInsList from "../data/built-ins.json";
-import defaultInclude from "./default-includes";
-import { electronToChromium } from "electron-to-chromium";
+import { defaultWebIncludes } from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
-import transformPolyfillRequirePlugin from "./transform-polyfill-require-plugin";
+import transformPolyfillRequirePlugin
+  from "./transform-polyfill-require-plugin";
 import { getEnginesNodeVersion } from "./config-utils";
-import { _extends, desemverify} from "./utils";
+import { _extends, desemverify } from "./utils";
+import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
+import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
+import getTargets from "./targets-parser";
+import { prettifyTargets, prettifyVersion, semverify } from "./utils";
 
 /**
  * Determine if a transformation is required
+ *
+ * NOTE: This assumes `supportedEnvironments` has already been parsed by `getTargets`
+ *
  * @param  {Object}  supportedEnvironments  An Object containing environment keys and the lowest
  *                                          supported version as a value
  * @param  {Object}  plugin                 An Object containing environment keys and the lowest
  *                                          version the feature was implemented in as a value
- * @return {Boolean}  Whether or not the transformation is required
+ * @return {Boolean} Whether or not the transformation is required
  */
-export const isPluginRequired = (supportedEnvironments, plugin, options) => {
-  if (supportedEnvironments.browsers) {
-    supportedEnvironments = getTargets(supportedEnvironments, options);
-  }
-
+export const isPluginRequired = (supportedEnvironments, plugin) => {
   const targetEnvironments = Object.keys(supportedEnvironments);
 
-  if (targetEnvironments.length === 0) { return true; }
-
-  const isRequiredForEnvironments = targetEnvironments
-    .filter((environment) => {
-      // Feature is not implemented in that environment
-      if (!plugin[environment]) { return true; }
-
-      const lowestImplementedVersion = plugin[environment];
-      const lowestTargetedVersion = supportedEnvironments[environment];
-
-      if (typeof lowestTargetedVersion === "string") {
-        throw new Error(`Target version must be a number,
-          '${lowestTargetedVersion}' was given for '${environment}'`);
-      }
-
-      return lowestTargetedVersion < lowestImplementedVersion;
-    });
-
-  return isRequiredForEnvironments.length > 0 ? true : false;
-};
-
-const getVersionsFromList = (list) => {
-  return Object.keys(list).reduce((allVersions, currentItem) => {
-    const currentVersions = list[currentItem];
-    for (const envName in currentVersions) {
-      const currentVersion = allVersions[envName];
-      const envVersion = currentVersions[envName];
-
-      if (!currentVersion) {
-        allVersions[envName] = [envVersion];
-      } else if (currentVersion.indexOf(envVersion) === -1) {
-        allVersions[envName].push(envVersion);
-      }
-    }
-
-    for (const env in allVersions) {
-      allVersions[env].sort((a, b) => a - b);
-    }
-
-    return allVersions;
-  }, {});
-};
-
-const isBrowsersQueryValid = (browsers) => {
-  return typeof browsers === "string" || Array.isArray(browsers);
-};
-
-const browserNameMap = {
-  chrome: "chrome",
-  edge: "edge",
-  firefox: "firefox",
-  ie: "ie",
-  ios_saf: "ios",
-  safari: "safari"
-};
-
-const getLowestVersions = (browsers) => {
-  return browsers.reduce((all, browser) => {
-    const [browserName, browserVersion] = browser.split(" ");
-    const normalizedBrowserName = browserNameMap[browserName];
-    const parsedBrowserVersion = parseInt(browserVersion);
-    if (normalizedBrowserName && !isNaN(parsedBrowserVersion)) {
-      all[normalizedBrowserName] = Math.min(all[normalizedBrowserName] || Infinity, parsedBrowserVersion);
-    }
-    return all;
-  }, {});
-};
-
-const mergeBrowsers = (fromQuery, fromTarget) => {
-  return Object.keys(fromTarget).reduce((queryObj, targKey) => {
-    if (targKey !== "browsers") {
-      queryObj[targKey] = fromTarget[targKey];
-    }
-    return queryObj;
-  }, fromQuery);
-};
-
-export const getCurrentNodeVersion = () => {
-  return desemverify(process.versions.node);
-};
-
-export const electronVersionToChromeVersion = (semverVer) => {
-  semverVer = String(semverVer);
-
-  if (semverVer === "1") {
-    semverVer = "1.0";
+  if (targetEnvironments.length === 0) {
+    return true;
   }
 
-  const m = semverVer.match(/^(\d+\.\d+)/);
-  if (!m) {
-    throw new Error("Electron version must be a semver version");
-  }
-
-  const result = electronToChromium[m[1]];
-  if (!result) {
-    throw new Error(`Electron version ${m[1]} is either too old or too new`);
-  }
-
-  return result;
-};
-
-
-export const getTargets = (targets = {}, options = {}) => {
-  const targetOps = _extends({}, targets);
-  const {node} = targetOps;
-
-  if (node === true || node === "current") {
-    targetOps.node = getCurrentNodeVersion();
-  } else if (node === "engines") {
-    const lists = [pluginList];
-    if (options.useBuiltIns) {
-      lists.push(builtInsList);
+  const isRequiredForEnvironments = targetEnvironments.filter(environment => {
+    // Feature is not implemented in that environment
+    if (!plugin[environment]) {
+      return true;
     }
 
-    const allSupportedVersions = getVersionsFromList(_extends({}, ...lists));
-    const supportedNodeVersions = allSupportedVersions["node"];
-    const packageJSONRoot = options.root;
-    targetOps.node = getEnginesNodeVersion(packageJSONRoot, supportedNodeVersions);
-  }
+    const lowestImplementedVersion = plugin[environment];
+    const lowestTargetedVersion = supportedEnvironments[environment];
 
-  // Rewrite Electron versions to their Chrome equivalents
-  if (targetOps.electron) {
-    const electronChromeVersion = parseInt(electronToChromium(targetOps.electron), 10);
-
-    if (!electronChromeVersion) {
-      throw new Error(`Electron version ${targetOps.electron} is either too old or too new`);
+    if (!semver.valid(lowestTargetedVersion)) {
+      throw new Error(
+        // eslint-disable-next-line max-len
+        `Invalid version passed for target "${environment}": "${lowestTargetedVersion}". Versions must be in semver format (major.minor.patch)`,
+      );
     }
 
-    if (targetOps.chrome) {
-      targetOps.chrome = Math.min(targetOps.chrome, electronChromeVersion);
-    } else {
-      targetOps.chrome = electronChromeVersion;
-    }
+    return semver.gt(
+      semverify(lowestImplementedVersion),
+      lowestTargetedVersion,
+    );
+  });
 
-    delete targetOps.electron;
-  }
-
-  const browserOpts = targetOps.browsers;
-  if (isBrowsersQueryValid(browserOpts)) {
-    const queryBrowsers = getLowestVersions(browserslist(browserOpts));
-    return mergeBrowsers(queryBrowsers, targetOps);
-  }
-  return targetOps;
+  return isRequiredForEnvironments.length > 0;
 };
 
 let hasBeenLogged = false;
 
 const logPlugin = (plugin, targets, list) => {
   const envList = list[plugin] || {};
-  const filteredList = Object.keys(targets)
-  .reduce((a, b) => {
-    if (!envList[b] || targets[b] < envList[b]) {
-      a[b] = targets[b];
-    }
-    return a;
-  }, {});
+  const filteredList = Object.keys(targets).reduce(
+    (a, b) => {
+      if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
+        a[b] = prettifyVersion(targets[b]);
+      }
+      return a;
+    },
+    {},
+  );
   const logStr = `  ${plugin} ${JSON.stringify(filteredList)}`;
   console.log(logStr);
 };
 
 const filterItem = (targets, exclusions, list, item) => {
-  const isDefault = defaultInclude.indexOf(item) >= 0;
+  const isDefault = defaultWebIncludes.indexOf(item) >= 0;
   const notExcluded = exclusions.indexOf(item) === -1;
 
   if (isDefault) return notExcluded;
@@ -193,31 +82,58 @@ const filterItem = (targets, exclusions, list, item) => {
   return isRequired && notExcluded;
 };
 
-export const transformIncludesAndExcludes = (opts) => ({
+const getBuiltInTargets = targets => {
+  const builtInTargets = Object.assign({}, targets);
+  if (builtInTargets.uglify != null) {
+    delete builtInTargets.uglify;
+  }
+  return builtInTargets;
+};
+
+export const transformIncludesAndExcludes = opts => ({
   all: opts,
-  plugins: opts.filter((opt) => !opt.match(/^(es\d+|web)\./)),
-  builtIns: opts.filter((opt) => opt.match(/^(es\d+|web)\./))
+  plugins: opts.filter(opt => !opt.match(/^(es\d+|web)\./)),
+  builtIns: opts.filter(opt => opt.match(/^(es\d+|web)\./)),
 });
+
+function getPlatformSpecificDefaultFor(targets) {
+  const targetNames = Object.keys(targets);
+  const isAnyTarget = !targetNames.length;
+  const isWebTarget = targetNames.some(name => name !== "node");
+
+  return isAnyTarget || isWebTarget ? defaultWebIncludes : [];
+}
 
 export default function buildPreset(context, opts = {}) {
   const validatedOptions = normalizeOptions(opts);
-  const {debug, loose, moduleType, useBuiltIns} = validatedOptions;
+  const { debug, loose, moduleType, useBuiltIns } = validatedOptions;
 
-  const targets = getTargets(validatedOptions.targets, opts);
+  const targets = getTargets(validatedOptions.targets);
   const include = transformIncludesAndExcludes(validatedOptions.include);
   const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
 
-  const filterPlugins = filterItem.bind(null, targets, exclude.plugins, pluginList);
+  const filterPlugins = filterItem.bind(
+    null,
+    targets,
+    exclude.plugins,
+    pluginList,
+  );
   const transformations = Object.keys(pluginList)
     .filter(filterPlugins)
     .concat(include.plugins);
 
   let polyfills;
+  let polyfillTargets;
   if (useBuiltIns) {
-    const filterBuiltIns = filterItem.bind(null, targets, exclude.builtIns, builtInsList);
-
+    polyfillTargets = getBuiltInTargets(targets);
+    const filterBuiltIns = filterItem.bind(
+      null,
+      polyfillTargets,
+      exclude.builtIns,
+      builtInsList,
+    );
     polyfills = Object.keys(builtInsList)
-      .concat(defaultInclude)
+      .concat(getPlatformSpecificDefaultFor(polyfillTargets))
       .filter(filterBuiltIns)
       .concat(include.builtIns);
   }
@@ -226,35 +142,45 @@ export default function buildPreset(context, opts = {}) {
     hasBeenLogged = true;
     console.log("babel-preset-env: `DEBUG` option");
     console.log("\nUsing targets:");
-    console.log(JSON.stringify(targets, null, 2));
+    console.log(JSON.stringify(prettifyTargets(targets), null, 2));
     console.log(`\nModules transform: ${moduleType}`);
     console.log("\nUsing plugins:");
-    transformations.forEach((transform) => {
+    transformations.forEach(transform => {
       logPlugin(transform, targets, pluginList);
     });
     if (useBuiltIns && polyfills.length) {
       console.log("\nUsing polyfills:");
-      polyfills.forEach((polyfill) => {
-        logPlugin(polyfill, targets, builtInsList);
+      polyfills.forEach(polyfill => {
+        logPlugin(polyfill, polyfillTargets, builtInsList);
       });
     }
   }
 
   const regenerator = transformations.indexOf("transform-regenerator") >= 0;
-  const modulePlugin = moduleType !== false && moduleTransformations[moduleType];
+  const modulePlugin = moduleType !== false &&
+    moduleTransformations[moduleType];
   const plugins = [];
 
   modulePlugin &&
     plugins.push([require(`babel-plugin-${modulePlugin}`), { loose }]);
 
-  plugins.push(...transformations.map((pluginName) =>
-    [require(`babel-plugin-${pluginName}`), { loose }]
-  ));
+  plugins.push(
+    ...transformations.map(pluginName => [
+      require(`babel-plugin-${pluginName}`),
+      { loose },
+    ]),
+  );
 
-  useBuiltIns &&
-    plugins.push([transformPolyfillRequirePlugin, { polyfills, regenerator }]);
+  if (useBuiltIns === true) {
+    plugins.push([
+      addUsedBuiltInsPlugin,
+      { polyfills: new Set(polyfills), regenerator, debug },
+    ]);
+  } else if (useBuiltIns === "entry") {
+    plugins.push([useBuiltInsEntryPlugin, { polyfills, regenerator }]);
+  }
 
   return {
-    plugins
+    plugins,
   };
 }
