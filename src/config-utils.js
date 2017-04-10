@@ -93,12 +93,20 @@ export const getEnginesNodeVersion = (packagePath, useBuiltIns) => {
 
   if (engines && engines.node) {
     const semverVersion = engines.node;
-    const list = [...pluginList];
+
+    const list = [pluginList];
     if (useBuiltIns) {
-      list.push(...builtInsList);
+      list.push(builtInsList);
     }
-    const allVersions = getVersionsFromList(list);
-    return getLowestFromSemverValue(semverVersion, allVersions["node"]);
+
+    const allSupportedVersions = getVersionsFromList(
+      Object.assign({}, ...list),
+    );
+
+    return getLowestFromSemverValue(
+      semverVersion,
+      allSupportedVersions["node"],
+    );
   }
   return null;
 };
