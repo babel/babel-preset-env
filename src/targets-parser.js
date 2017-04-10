@@ -1,6 +1,7 @@
 import browserslist from "browserslist";
 import semver from "semver";
 import { semverify } from "./utils";
+import { getEnginesNodeVersion } from "./config-utils";
 
 const browserNameMap = {
   chrome: "chrome",
@@ -65,11 +66,15 @@ const outputDecimalWarning = decimalTargets => {
 const targetParserMap = {
   __default: (target, value) => [target, semverify(value)],
 
-  // Parse `node: true` and `node: "current"` to version
-  node: (target, value) => {
-    const parsed = value === true || value === "current"
-      ? process.versions.node
-      : semverify(value);
+  node: (target, value, options = {}, fileContext = {}) => {
+    let parsed;
+    if (value === true || value === "current") {
+      parsed = process.versions.node;
+    } else if (value === "engines") {
+      parsed = getEnginesNodeVersion(fileContext.dirname, options.useBuiltIns);
+    } else {
+      parsed = semverify(value);
+    }
 
     return [target, parsed];
   },
@@ -78,7 +83,7 @@ const targetParserMap = {
   uglify: (target, value) => [target, value === true],
 };
 
-const getTargets = (targets = {}) => {
+const getTargets = (targets = {}, options, fileContext) => {
   let targetOpts = {};
 
   // Parse browsers target via browserslist
@@ -99,7 +104,12 @@ const getTargets = (targets = {}) => {
 
         // Check if we have a target parser?
         const parser = targetParserMap[target] || targetParserMap.__default;
-        const [parsedTarget, parsedValue] = parser(target, value);
+        const [parsedTarget, parsedValue] = parser(
+          target,
+          value,
+          options,
+          fileContext,
+        );
 
         if (parsedValue) {
           // Merge (lowest wins)

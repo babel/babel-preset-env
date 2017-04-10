@@ -1,0 +1,9 @@
+{
+  "presets": [
+    ["../../../../lib", {
+      "targets": {
+        "node": "engines"
+      }
+    }]
+  ]
+}

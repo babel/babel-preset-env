@@ -1,0 +1,6 @@
+{
+  "name": "fixtures-dev-engines-test",
+  "engines" : {
+    "node" : ">= 0.10.0"
+  }
+}

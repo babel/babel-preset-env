@@ -100,11 +100,11 @@ function getPlatformSpecificDefaultFor(targets) {
   return isAnyTarget || isWebTarget ? defaultWebIncludes : [];
 }
 
-export default function buildPreset(context, opts = {}) {
+export default function buildPreset(context, opts = {}, fileContext) {
   const validatedOptions = normalizeOptions(opts);
   const { debug, loose, moduleType, useBuiltIns } = validatedOptions;
 
-  const targets = getTargets(validatedOptions.targets);
+  const targets = getTargets(validatedOptions.targets, opts, fileContext);
   const include = transformIncludesAndExcludes(validatedOptions.include);
   const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
 
