@@ -1,6 +1,7 @@
 // @flow
 import semver from "semver";
 
+const DEFAULT_ENV = "development";
 // Convert version to a semver value.
 // 2.5 -> 2.5.0; 1 -> 1.0.0;
 export const semverify = version => {
@@ -57,6 +58,10 @@ export const prettifyTargets = (targets = {}) => {
   );
 };
 
+export const getEnv = env => {
+  return env.BABEL_ENV || env.NODE_ENV || DEFAULT_ENV;
+};
+
 // const DEFAULT_ENV = "development";
 // const filePathRe = /^(\.\w+)|(\w+\.\w+)$/;
 // const patchSpecifiedRe = /^\d+\.\d+\.\d+$/;
@@ -94,9 +99,6 @@ export const prettifyTargets = (targets = {}) => {
 // };
 
 // // Get current environment.
-// export const getEnv = (env) => {
-//   return env.BABEL_ENV || env.NODE_ENV || DEFAULT_ENV;
-// };
 
 // /* Check passed argument includes filename.
 //    Ex: ./.babelerc, /my/path/package.json

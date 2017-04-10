@@ -66,12 +66,12 @@ const outputDecimalWarning = decimalTargets => {
 const targetParserMap = {
   __default: (target, value) => [target, semverify(value)],
 
-  node: (target, value, fileContext) => {
+  node: (target, value, useBuiltIns, fileContext) => {
     let parsed;
     if (value === true || value === "current") {
       parsed = process.versions.node;
     } else if (value === "engines") {
-      parsed = getEnginesNodeVersion(fileContext);
+      parsed = getEnginesNodeVersion(fileContext, useBuiltIns);
     } else {
       parsed = semverify(value);
     }
@@ -83,7 +83,7 @@ const targetParserMap = {
   uglify: (target, value) => [target, value === true],
 };
 
-const getTargets = (targets = {}, fileContext) => {
+const getTargets = (targets = {}, options, fileContext) => {
   let targetOpts = {};
 
   // Parse browsers target via browserslist
@@ -104,7 +104,12 @@ const getTargets = (targets = {}, fileContext) => {
 
         // Check if we have a target parser?
         const parser = targetParserMap[target] || targetParserMap.__default;
-        const [parsedTarget, parsedValue] = parser(target, value, fileContext);
+        const [parsedTarget, parsedValue] = parser(
+          target,
+          value,
+          options.useBuiltIns,
+          fileContext,
+        );
 
         if (parsedValue) {
           // Merge (lowest wins)

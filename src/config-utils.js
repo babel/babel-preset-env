@@ -1,7 +1,6 @@
 import semver from "semver";
 import path from "path";
 import {
-  pathIsFile,
   getDirnameInPath,
   getFilenameInPath,
   getEnv,
@@ -15,11 +14,6 @@ import builtInsList from "../data/built-ins.json";
    ../confg/ -> ../confg/package.json
    ./index.js -> ./package.json */
 const resolvePackagePath = (packagePath = "") => {
-  if (pathIsFile(packagePath)) {
-    if (getFilenameInPath(packagePath) !== "package.json") {
-      packagePath = getDirnameInPath(packagePath);
-    }
-  }
   return path.join(process.cwd(), packagePath, "package.json");
 };
 
@@ -66,12 +60,12 @@ export const getLowestFromSemverValue = (version, versionsList) => {
   }
 
   if (semver.valid(version)) {
-    return desemverify(version);
+    return version;
   } else if (semver.validRange(version)) {
     const versions = versionsList.map(semverify);
     const allSupported = filterSatisfiedVersions(version, versions);
     if (allSupported.length) {
-      return desemverify(allSupported[0]);
+      return allSupported[0];
     }
   }
   return null;
@@ -83,8 +77,7 @@ export const getPackageJSON = packagePath => {
   const pkgPath = resolvePackagePath(packagePath);
 
   try {
-    const pkg = require(pkgPath);
-    return pkg;
+    return require(pkgPath);
   } catch (e) {
     console.warn(`Can't parse package.json in ${pkgPath}: `, e);
   }
@@ -93,16 +86,18 @@ export const getPackageJSON = packagePath => {
 /* Gives `package.json` path and all versions to consider and
    returns engines/devEngines version or `null`.
    `null` means support all node.js versions. */
-export const getEnginesNodeVersion = packagePath => {
+export const getEnginesNodeVersion = (packagePath, useBuiltIns) => {
   const env = getEnv(process.env);
   const pkg = getPackageJSON(packagePath);
   const engines = (env === "development" && pkg.devEngines) || pkg.engines;
 
   if (engines && engines.node) {
     const semverVersion = engines.node;
-    const versions = versionsFromData[env].map(semverify);
-    pluginList, builtInsList;
-    const allVersions = getVersionsFromList({ ...pluginList, ...builtInsList });
+    const list = [...pluginList];
+    if (useBuiltIns) {
+      list.push(...builtInsList);
+    }
+    const allVersions = getVersionsFromList(list);
     return getLowestFromSemverValue(semverVersion, allVersions["node"]);
   }
   return null;
