@@ -17,6 +17,10 @@ export const semverify = version => {
   return split.join(".");
 };
 
+export const desemverify = version => {
+  return parseFloat(version);
+};
+
 export const prettifyVersion = version => {
   if (typeof version !== "string") {
     return version;

@@ -1,6 +1,7 @@
 import browserslist from "browserslist";
 import semver from "semver";
 import { semverify } from "./utils";
+import { getEnginesNodeVersion } from "./config-utils";
 
 const browserNameMap = {
   chrome: "chrome",
@@ -65,25 +66,15 @@ const outputDecimalWarning = decimalTargets => {
 const targetParserMap = {
   __default: (target, value) => [target, semverify(value)],
 
-  // Parse `node: true` and `node: "current"` to version
-  // if (node === true || node === "current") {
-  //   targetOps.node = getCurrentNodeVersion();
-  // } else if (node === "engines") {
-  //   const lists = [pluginList];
-  //   if (options.useBuiltIns) {
-  //     lists.push(builtInsList);
-  //   }
-
-  //   const allSupportedVersions = getVersionsFromList(_extends({}, ...lists));
-  //   const supportedNodeVersions = allSupportedVersions["node"];
-  //   const packageJSONRoot = options.root;
-  //   targetOps.node = getEnginesNodeVersion(packageJSONRoot, supportedNodeVersions);
-  // }
-
-  node: (target, value) => {
-    const parsed = value === true || value === "current"
-      ? process.versions.node
-      : semverify(value);
+  node: (target, value, fileContext) => {
+    let parsed;
+    if (value === true || value === "current") {
+      parsed = process.versions.node;
+    } else if (value === "engines") {
+      parsed = getEnginesNodeVersion(fileContext);
+    } else {
+      parsed = semverify(value);
+    }
 
     return [target, parsed];
   },
@@ -92,7 +83,7 @@ const targetParserMap = {
   uglify: (target, value) => [target, value === true],
 };
 
-const getTargets = (targets = {}) => {
+const getTargets = (targets = {}, fileContext) => {
   let targetOpts = {};
 
   // Parse browsers target via browserslist
@@ -113,7 +104,7 @@ const getTargets = (targets = {}) => {
 
         // Check if we have a target parser?
         const parser = targetParserMap[target] || targetParserMap.__default;
-        const [parsedTarget, parsedValue] = parser(target, value);
+        const [parsedTarget, parsedValue] = parser(target, value, fileContext);
 
         if (parsedValue) {
           // Merge (lowest wins)

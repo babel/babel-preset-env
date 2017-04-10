@@ -1,6 +1,15 @@
 import semver from "semver";
 import path from "path";
-import { pathIsFile, getDirnameInPath, getFilenameInPath, getEnv, semverify, desemverify } from "./utils";
+import {
+  pathIsFile,
+  getDirnameInPath,
+  getFilenameInPath,
+  getEnv,
+  semverify,
+  desemverify,
+} from "./utils";
+import pluginList from "../data/plugins.json";
+import builtInsList from "../data/built-ins.json";
 
 /* Resolving path depending on what type of path was passed (directory or file).
    ../confg/ -> ../confg/package.json
@@ -17,7 +26,33 @@ const resolvePackagePath = (packagePath = "") => {
 /* Filter versions that satisfiyng to passed semver range.
    Ex: 5.5 satisfies ^5.0, 1.0.1 satisfies >= 1.0 */
 const filterSatisfiedVersions = (range, versions) => {
-  return versions.filter((targ) => semver.satisfies(targ, range));
+  return versions.filter(targ => semver.satisfies(targ, range));
+};
+
+const getVersionsFromList = list => {
+  // console.log(list)
+  return Object.keys(list).reduce(
+    (allVersions, currentItem) => {
+      const currentVersions = list[currentItem];
+      for (let envName in currentVersions) {
+        const currentVersion = allVersions[envName];
+        const envVersion = currentVersions[envName];
+
+        if (!currentVersion) {
+          allVersions[envName] = [envVersion];
+        } else if (currentVersion.indexOf(envVersion) === -1) {
+          allVersions[envName].push(envVersion);
+        }
+      }
+
+      for (let env in allVersions) {
+        allVersions[env].sort((a, b) => a - b);
+      }
+
+      return allVersions;
+    },
+    {},
+  );
 };
 
 /* First, it checks whether passed version is a wildcat, a range or a simple string
@@ -44,7 +79,7 @@ export const getLowestFromSemverValue = (version, versionsList) => {
 
 /* Try to access `package.json` with passed path.
    If can't - logs (but doesn't throw) an error. */
-export const getPackageJSON = (packagePath) => {
+export const getPackageJSON = packagePath => {
   const pkgPath = resolvePackagePath(packagePath);
 
   try {
@@ -58,14 +93,17 @@ export const getPackageJSON = (packagePath) => {
 /* Gives `package.json` path and all versions to consider and
    returns engines/devEngines version or `null`.
    `null` means support all node.js versions. */
-export const getEnginesNodeVersion = (packagePath, supportedVersions) => {
+export const getEnginesNodeVersion = packagePath => {
   const env = getEnv(process.env);
   const pkg = getPackageJSON(packagePath);
-  const engines = env === "development" && pkg.devEngines || pkg.engines;
+  const engines = (env === "development" && pkg.devEngines) || pkg.engines;
 
   if (engines && engines.node) {
     const semverVersion = engines.node;
-    return getLowestFromSemverValue(semverVersion, supportedVersions);
+    const versions = versionsFromData[env].map(semverify);
+    pluginList, builtInsList;
+    const allVersions = getVersionsFromList({ ...pluginList, ...builtInsList });
+    return getLowestFromSemverValue(semverVersion, allVersions["node"]);
   }
   return null;
 };

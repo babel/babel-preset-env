@@ -4,10 +4,6 @@ import { defaultWebIncludes } from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
-import transformPolyfillRequirePlugin
-  from "./transform-polyfill-require-plugin";
-import { getEnginesNodeVersion } from "./config-utils";
-import { _extends, desemverify } from "./utils";
 import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
