@@ -10,7 +10,7 @@ import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
 import { prettifyTargets, prettifyVersion, semverify } from "./utils";
-import type { Targets, Options } from "./types";
+import type { Targets, Options, Plugin } from "./types";
 
 /**
  * Determine if a transformation is required
@@ -107,7 +107,10 @@ function getPlatformSpecificDefaultFor(targets: Targets): Array<string> {
   return isAnyTarget || isWebTarget ? defaultWebIncludes : [];
 }
 
-export default function buildPreset(context: Object, opts: Object = {}) {
+export default function buildPreset(
+  context: Object,
+  opts: Object = {},
+): { plugins: Array<Plugin> } {
   const validatedOptions: Options = normalizeOptions(opts);
   const { debug, loose, moduleType, useBuiltIns, useSyntax } = validatedOptions;
   const targets: Targets = getTargets(validatedOptions.targets);
@@ -169,7 +172,7 @@ export default function buildPreset(context: Object, opts: Object = {}) {
   const regenerator = transformations.indexOf("transform-regenerator") >= 0;
   const modulePlugin = moduleType !== false &&
     moduleTransformations[moduleType];
-  const plugins = [];
+  const plugins: Array<Plugin> = [];
 
   if (typeof modulePlugin === "string") {
     plugins.push([require(`babel-plugin-${modulePlugin}`), { loose }]);

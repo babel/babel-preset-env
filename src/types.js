@@ -1,5 +1,6 @@
 //@flow
 
+// Targets
 export type Target = string;
 export type Targets = {
   [target: string]: Target,

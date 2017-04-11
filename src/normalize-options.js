@@ -14,12 +14,9 @@ const validIncludesAndExcludes = [
   ...defaultWebIncludes,
 ];
 
-type include = "include";
-type exclude = "exclude";
-
 export const validateIncludesAndExcludes = (
   opts: Array<string> = [],
-  type: include | exclude,
+  type: string,
 ): Array<string> => {
   invariant(
     Array.isArray(opts),
