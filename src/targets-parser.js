@@ -3,10 +3,7 @@
 import browserslist from "browserslist";
 import semver from "semver";
 import { semverify } from "./utils";
-
-export type Targets = {
-  [target: string]: string,
-};
+import type { Targets } from "./types";
 
 const browserNameMap = {
   chrome: "chrome",
@@ -24,7 +21,7 @@ const semverMin = (first: ?string, second: string): string => {
   return first && semver.lt(first, second) ? first : second;
 };
 
-const getLowestVersions = browsers => {
+const getLowestVersions = (browsers: Array<string>): Targets => {
   return browsers.reduce(
     (all, browser) => {
       const [browserName, browserVersion] = browser.split(" ");
@@ -85,7 +82,7 @@ const targetParserMap = {
 };
 
 const getTargets = (targets: Object = {}): Targets => {
-  let targetOpts = {};
+  let targetOpts: Targets = {};
 
   // Parse browsers target via browserslist
   if (isBrowsersQueryValid(targets.browsers)) {
