@@ -1,7 +1,7 @@
 // @flow
 
 import semver from "semver";
-import type { Targets } from "./targets-parser";
+import type { Targets } from "./types";
 
 // Convert version to a semver value.
 // 2.5 -> 2.5.0; 1 -> 1.0.0;

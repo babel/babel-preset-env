@@ -23,7 +23,7 @@ const semverMin = (first: ?string, second: string): string => {
 
 const getLowestVersions = (browsers: Array<string>): Targets => {
   return browsers.reduce(
-    (all, browser) => {
+    (all: Object, browser: string): Object => {
       const [browserName, browserVersion] = browser.split(" ");
       const normalizedBrowserName = browserNameMap[browserName];
 
@@ -76,9 +76,6 @@ const targetParserMap = {
 
     return [target, parsed];
   },
-
-  // Only valid value for Uglify is `true`
-  uglify: (target, value) => [target, value === true],
 };
 
 const getTargets = (targets: Object = {}): Targets => {
@@ -90,8 +87,12 @@ const getTargets = (targets: Object = {}): Targets => {
   }
 
   // Parse remaining targets
+  type ParsedResult = {
+    targets: Targets,
+    decimalWarnings: Array<Object>,
+  };
   const parsed = Object.keys(targets).reduce(
-    (results, target) => {
+    (results: ParsedResult, target: string): ParsedResult => {
       if (target !== "browsers") {
         const value = targets[target];
 
@@ -106,16 +107,10 @@ const getTargets = (targets: Object = {}): Targets => {
 
         if (parsedValue) {
           // Merge (lowest wins)
-          if (typeof parsedValue === "string") {
-            results.targets[parsedTarget] = semverMin(
-              results.targets[parsedTarget],
-              parsedValue,
-            );
-          } else {
-            // We can remove this block if/when we replace Uglify target
-            // with top level option
-            results.targets[parsedTarget] = parsedValue;
-          }
+          results.targets[parsedTarget] = semverMin(
+            results.targets[parsedTarget],
+            parsedValue,
+          );
         }
       }
 

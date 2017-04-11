@@ -1,8 +1,11 @@
+//@flow
+
 import invariant from "invariant";
 import builtInsList from "../data/built-ins.json";
 import { defaultWebIncludes } from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import pluginFeatures from "../data/plugin-features";
+import type { Options, ModuleOption, BuiltInsOption } from "./types";
 
 const validIncludesAndExcludes = [
   ...Object.keys(pluginFeatures),
@@ -11,14 +14,20 @@ const validIncludesAndExcludes = [
   ...defaultWebIncludes,
 ];
 
-export const validateIncludesAndExcludes = (opts = [], type) => {
+type include = "include";
+type exclude = "exclude";
+
+export const validateIncludesAndExcludes = (
+  opts: Array<string> = [],
+  type: include | exclude,
+): Array<string> => {
   invariant(
     Array.isArray(opts),
     `Invalid Option: The '${type}' option must be an Array<String> of plugins/built-ins`,
   );
 
-  const unknownOpts = [];
-  opts.forEach(opt => {
+  const unknownOpts: Array<string> = [];
+  opts.forEach((opt: string): void => {
     if (validIncludesAndExcludes.indexOf(opt) === -1) {
       unknownOpts.push(opt);
     }
@@ -26,24 +35,30 @@ export const validateIncludesAndExcludes = (opts = [], type) => {
 
   invariant(
     unknownOpts.length === 0,
-    `Invalid Option: The plugins/built-ins '${unknownOpts}' passed to the '${type}' option are not
+    `Invalid Option: The plugins/built-ins '${unknownOpts.join(", ")}' passed to the '${type}' option are not
     valid. Please check data/[plugin-features|built-in-features].js in babel-preset-env`,
   );
 
   return opts;
 };
 
-export const normalizePluginName = plugin =>
+export const normalizePluginName = (plugin: string): string =>
   plugin.replace(/^babel-plugin-/, "");
 
-export const normalizePluginNames = plugins => plugins.map(normalizePluginName);
+export const normalizePluginNames = (plugins: Array<string>): Array<string> =>
+  plugins.map(normalizePluginName);
 
-export const checkDuplicateIncludeExcludes = (include = [], exclude = []) => {
-  const duplicates = include.filter(opt => exclude.indexOf(opt) >= 0);
+export const checkDuplicateIncludeExcludes = (
+  include: Array<string> = [],
+  exclude: Array<string> = [],
+): void => {
+  const duplicates: Array<string> = include.filter(
+    opt => exclude.indexOf(opt) >= 0,
+  );
 
   invariant(
     duplicates.length === 0,
-    `Invalid Option: The plugins/built-ins '${duplicates}' were found in both the "include" and
+    `Invalid Option: The plugins/built-ins '${duplicates.join(", ")}' were found in both the "include" and
     "exclude" options.`,
   );
 };
@@ -51,7 +66,7 @@ export const checkDuplicateIncludeExcludes = (include = [], exclude = []) => {
 // TODO: Allow specifying plugins as either shortened or full name
 // babel-plugin-transform-es2015-classes
 // transform-es2015-classes
-export const validateLooseOption = (looseOpt = false) => {
+export const validateLooseOption = (looseOpt: boolean = false): boolean => {
   invariant(
     typeof looseOpt === "boolean",
     "Invalid Option: The 'loose' option must be a boolean.",
@@ -60,7 +75,9 @@ export const validateLooseOption = (looseOpt = false) => {
   return looseOpt;
 };
 
-export const validateModulesOption = (modulesOpt = "commonjs") => {
+export const validateModulesOption = (
+  modulesOpt: ModuleOption = "commonjs",
+) => {
   invariant(
     modulesOpt === false ||
       Object.keys(moduleTransformations).indexOf(modulesOpt) > -1,
@@ -71,7 +88,9 @@ export const validateModulesOption = (modulesOpt = "commonjs") => {
   return modulesOpt;
 };
 
-export const validateUseBuiltInsOption = (builtInsOpt = true) => {
+export const validateUseBuiltInsOption = (
+  builtInsOpt: BuiltInsOption = true,
+): BuiltInsOption => {
   invariant(
     builtInsOpt === true || builtInsOpt === false || builtInsOpt === "entry",
     `Invalid Option: The 'useBuiltIns' option must be either
@@ -83,13 +102,24 @@ export const validateUseBuiltInsOption = (builtInsOpt = true) => {
   return builtInsOpt;
 };
 
-export default function normalizeOptions(opts) {
+export const validateUseSyntaxOption = (useSyntax: boolean = true): boolean => {
+  invariant(
+    typeof useSyntax === "boolean",
+    `Invalid Option: The 'useSyntax' option must be either
+    'false' to indicate no syntax transformation, or
+    'true' (default) to use syntax based on your targets`,
+  );
+
+  return useSyntax;
+};
+
+export default function normalizeOptions(opts: Object = {}): Options {
   if (opts.exclude) {
     opts.exclude = normalizePluginNames(opts.exclude);
   }
 
-  if (opts.whitelist || opts.include) {
-    opts.include = normalizePluginNames(opts.whitelist || opts.include);
+  if (opts.include) {
+    opts.include = normalizePluginNames(opts.include);
   }
 
   checkDuplicateIncludeExcludes(opts.include, opts.exclude);
@@ -101,6 +131,7 @@ export default function normalizeOptions(opts) {
     loose: validateLooseOption(opts.loose),
     moduleType: validateModulesOption(opts.modules),
     targets: opts.targets,
+    useSyntax: validateUseSyntaxOption(opts.useSyntax),
     useBuiltIns: validateUseBuiltInsOption(opts.useBuiltIns),
   };
 }
