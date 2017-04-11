@@ -1,3 +1,5 @@
+//@flow
+
 import semver from "semver";
 import builtInsList from "../data/built-ins.json";
 import { defaultWebIncludes } from "./default-includes";
@@ -8,6 +10,7 @@ import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
 import { prettifyTargets, prettifyVersion, semverify } from "./utils";
+import type { Targets, Options } from "./types";
 
 /**
  * Determine if a transformation is required
@@ -20,42 +23,47 @@ import { prettifyTargets, prettifyVersion, semverify } from "./utils";
  *                                          version the feature was implemented in as a value
  * @return {Boolean} Whether or not the transformation is required
  */
-export const isPluginRequired = (supportedEnvironments, plugin) => {
-  const targetEnvironments = Object.keys(supportedEnvironments);
+export const isPluginRequired = (
+  supportedEnvironments: Targets,
+  plugin: Targets,
+): boolean => {
+  const targetEnvironments: Array<string> = Object.keys(supportedEnvironments);
 
   if (targetEnvironments.length === 0) {
     return true;
   }
 
-  const isRequiredForEnvironments = targetEnvironments.filter(environment => {
-    // Feature is not implemented in that environment
-    if (!plugin[environment]) {
-      return true;
-    }
+  const isRequiredForEnvironments: Array<string> = targetEnvironments.filter(
+    environment => {
+      // Feature is not implemented in that environment
+      if (!plugin[environment]) {
+        return true;
+      }
 
-    const lowestImplementedVersion = plugin[environment];
-    const lowestTargetedVersion = supportedEnvironments[environment];
+      const lowestImplementedVersion: string = plugin[environment];
+      const lowestTargetedVersion: string = supportedEnvironments[environment];
 
-    if (!semver.valid(lowestTargetedVersion)) {
-      throw new Error(
-        // eslint-disable-next-line max-len
-        `Invalid version passed for target "${environment}": "${lowestTargetedVersion}". Versions must be in semver format (major.minor.patch)`,
+      if (!semver.valid(lowestTargetedVersion)) {
+        throw new Error(
+          // eslint-disable-next-line max-len
+          `Invalid version passed for target "${environment}": "${lowestTargetedVersion}". Versions must be in semver format (major.minor.patch)`,
+        );
+      }
+
+      return semver.gt(
+        semverify(lowestImplementedVersion),
+        lowestTargetedVersion,
       );
-    }
-
-    return semver.gt(
-      semverify(lowestImplementedVersion),
-      lowestTargetedVersion,
-    );
-  });
+    },
+  );
 
   return isRequiredForEnvironments.length > 0;
 };
 
 let hasBeenLogged = false;
 
-const logPlugin = (plugin, targets, list) => {
-  const envList = list[plugin] || {};
+const logPlugin = (plugin: string, targets: Targets, list: Object): void => {
+  const envList: Targets = list[plugin] || {};
   const filteredList = Object.keys(targets).reduce(
     (a, b) => {
       if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
@@ -72,7 +80,6 @@ const logPlugin = (plugin, targets, list) => {
 const filterItem = (targets, exclusions, list, item) => {
   const isDefault = defaultWebIncludes.indexOf(item) >= 0;
   const notExcluded = exclusions.indexOf(item) === -1;
-
   if (isDefault) return notExcluded;
   const isRequired = isPluginRequired(targets, list[item]);
   return isRequired && notExcluded;
@@ -86,13 +93,13 @@ const getBuiltInTargets = targets => {
   return builtInTargets;
 };
 
-export const transformIncludesAndExcludes = opts => ({
+export const transformIncludesAndExcludes = (opts: Array<string>): Object => ({
   all: opts,
   plugins: opts.filter(opt => !opt.match(/^(es\d+|web)\./)),
   builtIns: opts.filter(opt => opt.match(/^(es\d+|web)\./)),
 });
 
-function getPlatformSpecificDefaultFor(targets) {
+function getPlatformSpecificDefaultFor(targets: Targets): Array<string> {
   const targetNames = Object.keys(targets);
   const isAnyTarget = !targetNames.length;
   const isWebTarget = targetNames.some(name => name !== "node");
@@ -100,12 +107,16 @@ function getPlatformSpecificDefaultFor(targets) {
   return isAnyTarget || isWebTarget ? defaultWebIncludes : [];
 }
 
-export default function buildPreset(context, opts = {}) {
-  const validatedOptions = normalizeOptions(opts);
+export default function buildPreset(context: Object, opts: Object = {}) {
+  const validatedOptions: Options = normalizeOptions(opts);
   const { debug, loose, moduleType, useBuiltIns, useSyntax } = validatedOptions;
-  const targets = getTargets(validatedOptions.targets);
-  const include = transformIncludesAndExcludes(validatedOptions.include);
-  const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
+  const targets: Targets = getTargets(validatedOptions.targets);
+  const include: Object = transformIncludesAndExcludes(
+    validatedOptions.include,
+  );
+  const exclude: Object = transformIncludesAndExcludes(
+    validatedOptions.exclude,
+  );
 
   const filterPlugins = filterItem.bind(
     null,
@@ -121,7 +132,7 @@ export default function buildPreset(context, opts = {}) {
       .concat(include.plugins);
   }
 
-  let polyfills;
+  let polyfills = [];
   let polyfillTargets;
   if (useBuiltIns) {
     polyfillTargets = getBuiltInTargets(targets);
@@ -142,7 +153,7 @@ export default function buildPreset(context, opts = {}) {
     console.log("babel-preset-env: `DEBUG` option");
     console.log("\nUsing targets:");
     console.log(JSON.stringify(prettifyTargets(targets), null, 2));
-    console.log(`\nModules transform: ${moduleType}`);
+    console.log(`\nModules transform: ${moduleType.toString()}`);
     console.log("\nUsing plugins:");
     transformations.forEach(transform => {
       logPlugin(transform, targets, pluginList);
@@ -160,8 +171,9 @@ export default function buildPreset(context, opts = {}) {
     moduleTransformations[moduleType];
   const plugins = [];
 
-  modulePlugin &&
+  if (typeof modulePlugin === "string") {
     plugins.push([require(`babel-plugin-${modulePlugin}`), { loose }]);
+  }
 
   plugins.push(
     ...transformations.map(pluginName => [
