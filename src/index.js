@@ -102,8 +102,7 @@ function getPlatformSpecificDefaultFor(targets) {
 
 export default function buildPreset(context, opts = {}) {
   const validatedOptions = normalizeOptions(opts);
-  const { debug, loose, moduleType, useBuiltIns } = validatedOptions;
-
+  const { debug, loose, moduleType, useBuiltIns, useSyntax } = validatedOptions;
   const targets = getTargets(validatedOptions.targets);
   const include = transformIncludesAndExcludes(validatedOptions.include);
   const exclude = transformIncludesAndExcludes(validatedOptions.exclude);
@@ -114,9 +113,13 @@ export default function buildPreset(context, opts = {}) {
     exclude.plugins,
     pluginList,
   );
-  const transformations = Object.keys(pluginList)
-    .filter(filterPlugins)
-    .concat(include.plugins);
+
+  let transformations = Object.keys(pluginList);
+  if (useSyntax) {
+    transformations = transformations
+      .filter(filterPlugins)
+      .concat(include.plugins);
+  }
 
   let polyfills;
   let polyfillTargets;
