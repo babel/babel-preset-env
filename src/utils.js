@@ -5,7 +5,7 @@ import type { Targets } from "./types";
 
 // Convert version to a semver value.
 // 2.5 -> 2.5.0; 1 -> 1.0.0;
-export const semverify = (version: string | number) => {
+export const semverify = (version: string | number): string => {
   if (typeof version === "string" && semver.valid(version)) {
     return version;
   }
@@ -19,7 +19,7 @@ export const semverify = (version: string | number) => {
   return split.join(".");
 };
 
-export const prettifyVersion = (version: string | number) => {
+export const prettifyVersion = (version: string): string => {
   if (typeof version !== "string") {
     return version;
   }
@@ -39,7 +39,7 @@ export const prettifyVersion = (version: string | number) => {
   return parts.join(".");
 };
 
-export const prettifyTargets = (targets: Targets) => {
+export const prettifyTargets = (targets: Targets): Object => {
   return Object.keys(targets).reduce(
     (results, target) => {
       let value = targets[target];
