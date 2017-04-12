@@ -93,5 +93,18 @@ to the "transform-polyfill-require" plugin
     pre() {
       this.numPolyfillImports = 0;
     },
+    post() {
+      const { debug, onDebug, polyfills } = this.opts;
+
+      if (debug) {
+        if (!polyfills.length) {
+          console.log("Based on your targets, none were added.");
+          return;
+        }
+
+        console.log("Replaced `babel-polyfill` with the following polyfills:");
+        polyfills.forEach(polyfill => onDebug(polyfill));
+      }
+    },
   };
 }
