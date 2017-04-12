@@ -150,7 +150,6 @@ export default function buildPreset(context, opts = {}) {
         logPlugin(polyfill, polyfillTargets, builtInsList);
       });
     }
-    console.log("");
   }
 
   const regenerator = transformations.indexOf("transform-regenerator") >= 0;
