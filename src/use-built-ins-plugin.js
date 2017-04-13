@@ -78,16 +78,7 @@ Please remove the "import 'babel-polyfill'" call or use "useBuiltIns: 'entry'" i
       }
     },
     Program: {
-      enter(path, state) {
-        if (!state.opts.polyfills) {
-          throw path.buildCodeFrameError(
-            `
-There was an issue in "babel-preset-env" such that
-the "polyfills" option was not correctly passed
-to the "transform-polyfill-require" plugin
-`,
-          );
-        }
+      enter(path) {
         path.get("body").forEach(bodyPath => {
           if (isRequire(bodyPath)) {
             console.warn(
