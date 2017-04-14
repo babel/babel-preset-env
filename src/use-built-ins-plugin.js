@@ -26,7 +26,7 @@ function getObjectString(node) {
 export default function({ types: t }) {
   function addImport(path, builtIn, builtIns) {
     if (builtIn && !builtIns.has(builtIn)) {
-      builtIns.add(builtIn);
+      builtIns.set(builtIn, path.hub.file.opts.filename);
       const importDec = t.importDeclaration([], t.stringLiteral(builtIn));
       importDec._blockHoist = 3;
       const programPath = path.find(path => path.isProgram());
@@ -53,13 +53,15 @@ export default function({ types: t }) {
   }
 
   function isRequire(path) {
-    return t.isExpressionStatement(path.node) &&
+    return (
+      t.isExpressionStatement(path.node) &&
       t.isCallExpression(path.node.expression) &&
       t.isIdentifier(path.node.expression.callee) &&
       path.node.expression.callee.name === "require" &&
       path.node.expression.arguments.length === 1 &&
       t.isStringLiteral(path.node.expression.arguments[0]) &&
-      isPolyfillSource(path.node.expression.arguments[0].value);
+      isPolyfillSource(path.node.expression.arguments[0].value)
+    );
   }
 
   const addAndRemovePolyfillImports = {
@@ -274,8 +276,28 @@ Please remove the "require('babel-polyfill')" call or use "useBuiltIns: 'entry'"
   return {
     name: "use-built-ins",
     pre() {
-      this.builtIns = new Set();
+      this.builtIns = new Map();
       this.usesRegenerator = false;
+    },
+    post() {
+      const { debug, onDebug } = this.opts;
+
+      if (debug) {
+        if (!this.builtIns.size) {
+          console.log("Based on your code, none were added.");
+          return;
+        }
+
+        console.log("Added the following polyfills:");
+        this.builtIns.forEach((fileName, polyfill) =>
+          onDebug(
+            polyfill
+              .replace("babel-polyfill/lib/", "")
+              .replace("core-js/modules/", ""),
+            fileName,
+          ),
+        );
+      }
     },
     visitor: addAndRemovePolyfillImports,
   };

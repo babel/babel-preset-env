@@ -96,8 +96,12 @@ describe("debug output", () => {
       );
     }
 
+    const inFileLoc = path.join(testLoc, "in.js");
+
+    const inFile = fs.existsSync(inFileLoc) ? helper.readFile(inFileLoc) : "";
+
     opts.inFiles = {
-      "src/in.js": "",
+      "src/in.js": inFile,
       ".babelrc": helper.readFile(optionsLoc),
     };
 

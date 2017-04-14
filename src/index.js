@@ -54,18 +54,17 @@ export const isPluginRequired = (supportedEnvironments, plugin) => {
 
 let hasBeenLogged = false;
 
-const logPlugin = (plugin, targets, list) => {
+const logPlugin = (plugin, targets, list, context) => {
   const envList = list[plugin] || {};
-  const filteredList = Object.keys(targets).reduce(
-    (a, b) => {
-      if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
-        a[b] = prettifyVersion(targets[b]);
-      }
-      return a;
-    },
-    {},
-  );
-  const logStr = `  ${plugin} ${JSON.stringify(filteredList)}`;
+  const filteredList = Object.keys(targets).reduce((a, b) => {
+    if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
+      a[b] = prettifyVersion(targets[b]);
+    }
+    return a;
+  }, {});
+
+  const pre = context ? `[${context}] ` : "";
+  const logStr = `  ${pre}${plugin} ${JSON.stringify(filteredList)}`;
   console.log(logStr);
 };
 
@@ -172,7 +171,8 @@ export default function buildPreset(context, opts = {}) {
   }
 
   transformations.forEach(pluginName =>
-    plugins.push([require(`babel-plugin-${pluginName}`), { loose }]));
+    plugins.push([require(`babel-plugin-${pluginName}`), { loose }]),
+  );
 
   const regenerator = transformations.has("transform-regenerator");
 
@@ -183,24 +183,18 @@ export default function buildPreset(context, opts = {}) {
     console.log("");
   }
 
-  if (useBuiltIns === "usage") {
+  if (useBuiltIns === "usage" || useBuiltIns === "entry") {
+    const pluginOptions = {
+      debug,
+      polyfills,
+      regenerator,
+      onDebug: (polyfill, context) =>
+        logPlugin(polyfill, polyfillTargets, builtInsList, context),
+    };
+
     plugins.push([
-      addUsedBuiltInsPlugin,
-      {
-        debug,
-        polyfills,
-        regenerator,
-      },
-    ]);
-  } else if (useBuiltIns === "entry") {
-    plugins.push([
-      useBuiltInsEntryPlugin,
-      {
-        debug,
-        polyfills,
-        regenerator,
-        onDebug: polyfill => logPlugin(polyfill, polyfillTargets, builtInsList),
-      },
+      useBuiltIns === "usage" ? addUsedBuiltInsPlugin : useBuiltInsEntryPlugin,
+      pluginOptions,
     ]);
   } else if (debug) {
     console.log("None were added, since the `useBuiltIns` option was not set.");
