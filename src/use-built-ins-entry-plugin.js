@@ -64,15 +64,6 @@ export default function({ types: t }) {
       }
     },
     Program(path, state) {
-      if (!state.opts.polyfills) {
-        throw path.buildCodeFrameError(
-          `
-There was an issue in "babel-preset-env" such that
-the "polyfills" option was not correctly passed
-to the "transform-polyfill-require" plugin
-`,
-        );
-      }
       path.get("body").forEach(bodyPath => {
         if (isRequire(bodyPath)) {
           bodyPath.replaceWithMultiple(
@@ -92,6 +83,19 @@ to the "transform-polyfill-require" plugin
     visitor: isPolyfillImport,
     pre() {
       this.numPolyfillImports = 0;
+    },
+    post() {
+      const { debug, onDebug, polyfills } = this.opts;
+
+      if (debug) {
+        if (!polyfills.length) {
+          console.log("Based on your targets, none were added.");
+          return;
+        }
+
+        console.log("Replaced `babel-polyfill` with the following polyfills:");
+        polyfills.forEach(polyfill => onDebug(polyfill));
+      }
     },
   };
 }

@@ -9,7 +9,7 @@ export type Targets = {
 // Options
 // Use explicit modules to prevent typo errors.
 export type ModuleOption = false | "amd" | "commonjs" | "systemjs" | "umd";
-export type BuiltInsOption = boolean | "entry";
+export type BuiltInsOption = false | "entry" | "usage";
 export type Options = {
   targets: Targets,
   loose: boolean,
