@@ -12,17 +12,6 @@ import getTargets from "./targets-parser";
 import { prettifyTargets, prettifyVersion, semverify } from "./utils";
 import type { Targets, Options, Plugin } from "./types";
 
-/**
- * Determine if a transformation is required
- *
- * NOTE: This assumes `supportedEnvironments` has already been parsed by `getTargets`
- *
- * @param  {Object}  supportedEnvironments  An Object containing environment keys and the lowest
- *                                          supported version as a value
- * @param  {Object}  plugin                 An Object containing environment keys and the lowest
- *                                          version the feature was implemented in as a value
- * @return {Boolean} Whether or not the transformation is required
- */
 export const isPluginRequired = (
   supportedEnvironments: Targets,
   plugin: Targets,
