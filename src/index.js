@@ -56,15 +56,12 @@ let hasBeenLogged = false;
 
 const logPlugin = (plugin, targets, list) => {
   const envList = list[plugin] || {};
-  const filteredList = Object.keys(targets).reduce(
-    (a, b) => {
-      if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
-        a[b] = prettifyVersion(targets[b]);
-      }
-      return a;
-    },
-    {},
-  );
+  const filteredList = Object.keys(targets).reduce((a, b) => {
+    if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
+      a[b] = prettifyVersion(targets[b]);
+    }
+    return a;
+  }, {});
   const logStr = `  ${plugin} ${JSON.stringify(filteredList)}`;
   console.log(logStr);
 };
@@ -172,7 +169,8 @@ export default function buildPreset(context, opts = {}) {
   }
 
   transformations.forEach(pluginName =>
-    plugins.push([require(`babel-plugin-${pluginName}`), { loose }]));
+    plugins.push([require(`babel-plugin-${pluginName}`), { loose }]),
+  );
 
   const regenerator = transformations.has("transform-regenerator");
 
