@@ -1,6 +1,6 @@
 import semver from "semver";
 import builtInsList from "../data/built-ins.json";
-import { logMessage, logPlugin } from "./debug";
+import { logPlugin } from "./debug";
 import { defaultWebIncludes } from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options.js";
