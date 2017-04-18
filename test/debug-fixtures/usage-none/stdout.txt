@@ -36,5 +36,5 @@ Using plugins:
 Polyfills
 =========
 
-Based on your code, none were added.
 src/in.js -> lib/in.js
+src/in2.js -> lib/in2.js

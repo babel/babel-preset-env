@@ -1,5 +1,6 @@
 import semver from "semver";
 import builtInsList from "../data/built-ins.json";
+import { logMessage, logPlugin } from "./debug";
 import { defaultWebIncludes } from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options.js";
@@ -7,7 +8,7 @@ import pluginList from "../data/plugins.json";
 import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
-import { prettifyTargets, prettifyVersion, semverify } from "./utils";
+import { prettifyTargets, semverify } from "./utils";
 
 /**
  * Determine if a transformation is required
@@ -53,20 +54,6 @@ export const isPluginRequired = (supportedEnvironments, plugin) => {
 };
 
 let hasBeenLogged = false;
-
-const logPlugin = (plugin, targets, list, context) => {
-  const envList = list[plugin] || {};
-  const filteredList = Object.keys(targets).reduce((a, b) => {
-    if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
-      a[b] = prettifyVersion(targets[b]);
-    }
-    return a;
-  }, {});
-
-  const pre = context ? `[${context}] ` : "";
-  const logStr = `  ${pre}${plugin} ${JSON.stringify(filteredList)}`;
-  console.log(logStr);
-};
 
 const getBuiltInTargets = targets => {
   const builtInTargets = Object.assign({}, targets);
@@ -149,18 +136,6 @@ export default function buildPreset(context, opts = {}) {
     );
   }
 
-  if (debug && !hasBeenLogged) {
-    hasBeenLogged = true;
-    console.log("babel-preset-env: `DEBUG` option");
-    console.log("\nUsing targets:");
-    console.log(JSON.stringify(prettifyTargets(targets), null, 2));
-    console.log(`\nModules transform: ${moduleType}`);
-    console.log("\nUsing plugins:");
-    transformations.forEach(transform => {
-      logPlugin(transform, targets, pluginList);
-    });
-  }
-
   const plugins = [];
 
   if (moduleType !== false && moduleTransformations[moduleType]) {
@@ -176,11 +151,26 @@ export default function buildPreset(context, opts = {}) {
 
   const regenerator = transformations.has("transform-regenerator");
 
-  if (debug) {
+  if (debug && !hasBeenLogged) {
+    hasBeenLogged = true;
+    console.log("babel-preset-env: `DEBUG` option");
+    console.log("\nUsing targets:");
+    console.log(JSON.stringify(prettifyTargets(targets), null, 2));
+    console.log(`\nModules transform: ${moduleType}`);
+    console.log("\nUsing plugins:");
+    transformations.forEach(transform => {
+      logPlugin(transform, targets, pluginList);
+    });
     console.log("");
     console.log("Polyfills");
     console.log("=========");
     console.log("");
+
+    if (!useBuiltIns) {
+      console.log(
+        "None were added, since the `useBuiltIns` option was not set.",
+      );
+    }
   }
 
   if (useBuiltIns === "usage" || useBuiltIns === "entry") {
@@ -188,16 +178,17 @@ export default function buildPreset(context, opts = {}) {
       debug,
       polyfills,
       regenerator,
-      onDebug: (polyfill, context) =>
-        logPlugin(polyfill, polyfillTargets, builtInsList, context),
+      onDebug: (polyfills, context) => {
+        polyfills.forEach(polyfill =>
+          logPlugin(polyfill, polyfillTargets, builtInsList, context),
+        );
+      },
     };
 
     plugins.push([
       useBuiltIns === "usage" ? addUsedBuiltInsPlugin : useBuiltInsEntryPlugin,
       pluginOptions,
     ]);
-  } else if (debug) {
-    console.log("None were added, since the `useBuiltIns` option was not set.");
   }
 
   return {
