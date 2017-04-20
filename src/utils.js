@@ -40,17 +40,14 @@ export const prettifyVersion = (version: string | number) => {
 };
 
 export const prettifyTargets = (targets: Targets) => {
-  return Object.keys(targets).reduce(
-    (results, target) => {
-      let value = targets[target];
+  return Object.keys(targets).reduce((results, target) => {
+    let value = targets[target];
 
-      if (typeof value === "string") {
-        value = prettifyVersion(value);
-      }
+    if (typeof value === "string") {
+      value = prettifyVersion(value);
+    }
 
-      results[target] = value;
-      return results;
-    },
-    {},
-  );
+    results[target] = value;
+    return results;
+  }, {});
 };
