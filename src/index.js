@@ -2,6 +2,7 @@
 
 import semver from "semver";
 import builtInsList from "../data/built-ins.json";
+import { logPlugin } from "./debug";
 import { defaultWebIncludes } from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options.js";
@@ -9,8 +10,8 @@ import pluginList from "../data/plugins.json";
 import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
+
 import { prettifyTargets, prettifyVersion, semverify } from "./utils";
-import type { Targets, Options, Plugin } from "./types";
 
 export const isPluginRequired = (
   supportedEnvironments: Targets,
@@ -51,29 +52,6 @@ export const isPluginRequired = (
 
 let hasBeenLogged = false;
 
-const logPlugin = (plugin: string, targets: Targets, list: Object): void => {
-  const envList: Targets = list[plugin] || {};
-  const filteredList = Object.keys(targets).reduce(
-    (a, b) => {
-      if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
-        a[b] = prettifyVersion(targets[b]);
-      }
-      return a;
-    },
-    {},
-  );
-  const logStr = `  ${plugin} ${JSON.stringify(filteredList)}`;
-  console.log(logStr);
-};
-
-const filterItem = (targets, exclusions, list, item) => {
-  const isDefault = defaultWebIncludes.indexOf(item) >= 0;
-  const notExcluded = exclusions.indexOf(item) === -1;
-  if (isDefault) return notExcluded;
-  const isRequired = isPluginRequired(targets, list[item]);
-  return isRequired && notExcluded;
-};
-
 const getBuiltInTargets = targets => {
   const builtInTargets = Object.assign({}, targets);
   if (builtInTargets.uglify != null) {
@@ -82,19 +60,49 @@ const getBuiltInTargets = targets => {
   return builtInTargets;
 };
 
-export const transformIncludesAndExcludes = (opts: Array<string>): Object => ({
-  all: opts,
-  plugins: opts.filter(opt => !opt.match(/^(es\d+|web)\./)),
-  builtIns: opts.filter(opt => opt.match(/^(es\d+|web)\./)),
-});
 
-function getPlatformSpecificDefaultFor(targets: Targets): Array<string> {
+export const transformIncludesAndExcludes = (opts: Array<string>): Object => ({
+  return opts.reduce(
+    (result, opt) => {
+      const target = opt.match(/^(es\d+|web)\./) ? "builtIns" : "plugins";
+      result[target].add(opt);
+      return result;
+    },
+    {
+      all: opts,
+      plugins: new Set(),
+      builtIns: new Set(),
+    },
+  );
+};
+
+const getPlatformSpecificDefaultFor(targets: Targets): Array<string> {
   const targetNames = Object.keys(targets);
   const isAnyTarget = !targetNames.length;
   const isWebTarget = targetNames.some(name => name !== "node");
 
-  return isAnyTarget || isWebTarget ? defaultWebIncludes : [];
-}
+  return isAnyTarget || isWebTarget ? defaultWebIncludes : null;
+};
+
+const filterItems = (list, includes, excludes, targets, defaultItems) => {
+  const result = new Set();
+
+  for (const item in list) {
+    const excluded = excludes.has(item);
+
+    if (!excluded && isPluginRequired(targets, list[item])) {
+      result.add(item);
+    }
+  }
+
+  if (defaultItems) {
+    defaultItems.forEach(item => !excludes.has(item) && result.add(item));
+  }
+
+  includes.forEach(item => result.add(item));
+
+  return result;
+};
 
 export default function buildPreset(
   context: Object,
@@ -110,11 +118,11 @@ export default function buildPreset(
     validatedOptions.exclude,
   );
 
-  const filterPlugins = filterItem.bind(
-    null,
-    targets,
-    exclude.plugins,
+  const transformations = filterItems(
     pluginList,
+    include.plugins,
+    exclude.plugins,
+    targets,
   );
 
   let transformations = Object.keys(pluginList);
@@ -126,19 +134,33 @@ export default function buildPreset(
 
   let polyfills = [];
   let polyfillTargets;
+
   if (useBuiltIns) {
     polyfillTargets = getBuiltInTargets(targets);
-    const filterBuiltIns = filterItem.bind(
-      null,
-      polyfillTargets,
-      exclude.builtIns,
+
+    polyfills = filterItems(
       builtInsList,
+      include.builtIns,
+      exclude.builtIns,
+      polyfillTargets,
+      getPlatformSpecificDefaultFor(polyfillTargets),
     );
-    polyfills = Object.keys(builtInsList)
-      .concat(getPlatformSpecificDefaultFor(polyfillTargets))
-      .filter(filterBuiltIns)
-      .concat(include.builtIns);
   }
+
+  const plugins = [];
+
+  if (moduleType !== false && moduleTransformations[moduleType]) {
+    plugins.push([
+      require(`babel-plugin-${moduleTransformations[moduleType]}`),
+      { loose },
+    ]);
+  }
+
+  transformations.forEach(pluginName =>
+    plugins.push([require(`babel-plugin-${pluginName}`), { loose }]),
+  );
+
+  const regenerator = transformations.has("transform-regenerator");
 
   if (debug && !hasBeenLogged) {
     hasBeenLogged = true;
@@ -150,48 +172,34 @@ export default function buildPreset(
     transformations.forEach(transform => {
       logPlugin(transform, targets, pluginList);
     });
-  }
-
-  const regenerator = transformations.indexOf("transform-regenerator") >= 0;
-  const modulePlugin = moduleType !== false &&
-    moduleTransformations[moduleType];
-  const plugins: Array<Plugin> = [];
-
-  if (typeof modulePlugin === "string") {
-    plugins.push([require(`babel-plugin-${modulePlugin}`), { loose }]);
-  }
-
-  plugins.push(
-    ...transformations.map(pluginName => [
-      require(`babel-plugin-${pluginName}`),
-      { loose },
-    ]),
-  );
-
-  if (debug) {
     console.log("");
     console.log("Polyfills");
     console.log("=========");
     console.log("");
+
+    if (!useBuiltIns) {
+      console.log(
+        "None were added, since the `useBuiltIns` option was not set.",
+      );
+    }
   }
 
-  if (useBuiltIns === "usage") {
-    plugins.push([
-      addUsedBuiltInsPlugin,
-      { polyfills: new Set(polyfills), regenerator, debug },
-    ]);
-  } else if (useBuiltIns === "entry") {
-    plugins.push([
-      useBuiltInsEntryPlugin,
-      {
-        debug,
-        polyfills,
-        regenerator,
-        onDebug: polyfill => logPlugin(polyfill, polyfillTargets, builtInsList),
+  if (useBuiltIns === "usage" || useBuiltIns === "entry") {
+    const pluginOptions = {
+      debug,
+      polyfills,
+      regenerator,
+      onDebug: (polyfills, context) => {
+        polyfills.forEach(polyfill =>
+          logPlugin(polyfill, polyfillTargets, builtInsList, context),
+        );
       },
+    };
+
+    plugins.push([
+      useBuiltIns === "usage" ? addUsedBuiltInsPlugin : useBuiltInsEntryPlugin,
+      pluginOptions,
     ]);
-  } else if (debug) {
-    console.log("None were added, since the `useBuiltIns` option was not set.");
   }
 
   return {

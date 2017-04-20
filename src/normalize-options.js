@@ -7,12 +7,12 @@ import moduleTransformations from "./module-transformations";
 import pluginFeatures from "../data/plugin-features";
 import type { Options, ModuleOption, BuiltInsOption } from "./types";
 
-const validIncludesAndExcludes = [
+const validIncludesAndExcludes = new Set([
   ...Object.keys(pluginFeatures),
   ...Object.keys(moduleTransformations).map(m => moduleTransformations[m]),
   ...Object.keys(builtInsList),
   ...defaultWebIncludes,
-];
+]);
 
 export const validateIncludesAndExcludes = (
   opts: Array<string> = [],
@@ -23,12 +23,8 @@ export const validateIncludesAndExcludes = (
     `Invalid Option: The '${type}' option must be an Array<String> of plugins/built-ins`,
   );
 
-  const unknownOpts: Array<string> = [];
-  opts.forEach((opt: string): void => {
-    if (validIncludesAndExcludes.indexOf(opt) === -1) {
-      unknownOpts.push(opt);
-    }
-  });
+
+  const unknownOpts = opts.filter(opt => !validIncludesAndExcludes.has(opt));
 
   invariant(
     unknownOpts.length === 0,

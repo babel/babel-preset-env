@@ -26,14 +26,17 @@ export default function({ types: t }: { types: Object }): Plugin {
     );
   }
 
+
   function isRequire(path: Object): boolean {
-    return t.isExpressionStatement(path.node) &&
+    return (
+      t.isExpressionStatement(path.node) &&
       t.isCallExpression(path.node.expression) &&
       t.isIdentifier(path.node.expression.callee) &&
       path.node.expression.callee.name === "require" &&
       path.node.expression.arguments.length === 1 &&
       t.isStringLiteral(path.node.expression.arguments[0]) &&
-      isPolyfillSource(path.node.expression.arguments[0].value);
+      isPolyfillSource(path.node.expression.arguments[0].value)
+    );
   }
 
   function createImport(
@@ -51,14 +54,16 @@ export default function({ types: t }: { types: Object }): Plugin {
     return createRequireStatement(polyfill);
   }
 
+
   function createImports(
-    polyfills: Array<string>,
-    requireType: RequireType,
-    regenerator: boolean,
+      polyfills: Array<string>,
+      requireType: RequireType,
+      regenerator: boolean,
   ): Array<Object> {
-    const imports = polyfills
-      .filter((el, i, arr) => arr.indexOf(el) === i)
-      .map(polyfill => createImport(polyfill, requireType, true));
+    const items = Array.isArray(polyfills) ? new Set(polyfills) : polyfills;
+    const imports = [];
+
+    items.forEach(p => imports.push(createImport(p, requireType, true)));
 
     if (regenerator) {
       imports.push(
@@ -68,6 +73,7 @@ export default function({ types: t }: { types: Object }): Plugin {
         ),
       );
     }
+
     return imports;
   }
 
@@ -107,13 +113,13 @@ export default function({ types: t }: { types: Object }): Plugin {
       const { debug, onDebug, polyfills } = this.opts;
 
       if (debug) {
-        if (!polyfills.length) {
+        if (!polyfills.size) {
           console.log("Based on your targets, none were added.");
           return;
         }
 
         console.log("Replaced `babel-polyfill` with the following polyfills:");
-        polyfills.forEach(polyfill => onDebug(polyfill));
+        onDebug(polyfills);
       }
     },
   };
