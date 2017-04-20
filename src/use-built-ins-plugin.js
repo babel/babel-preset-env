@@ -275,7 +275,11 @@ Please remove the \`require('babel-polyfill')\` call or use \`useBuiltIns: 'entr
       const { debug, onDebug } = this.opts;
 
       if (debug) {
-        onDebug(this.builtIns, this.file.opts.filename);
+        console.log(
+          `
+[${this.file.opts.filename}] Added following polyfills:`,
+        );
+        onDebug(this.builtIns);
       }
     },
     visitor: addAndRemovePolyfillImports,

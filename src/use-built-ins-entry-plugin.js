@@ -92,11 +92,15 @@ export default function({ types: t }) {
 
       if (debug) {
         if (!polyfills.size) {
-          console.log("Based on your targets, none were added.");
+          console.log("\nBased on your targets, none were added.");
           return;
         }
+        const wordEnding = polyfills.size > 1 ? "s" : "";
 
-        console.log("Replaced `babel-polyfill` with the following polyfills:");
+        console.log(
+          `
+[${this.file.opts.filename}] Replaced \`babel-polyfill\` with the following polyfill${wordEnding}:`,
+        );
         onDebug(polyfills);
       }
     },
