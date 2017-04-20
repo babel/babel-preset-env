@@ -99,7 +99,7 @@ export default function({ types: t }) {
         }
 
         console.log("Replaced `babel-polyfill` with the following polyfills:");
-        polyfills.forEach(polyfill => onDebug(polyfill));
+        onDebug(polyfills);
       }
     },
   };
