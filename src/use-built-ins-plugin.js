@@ -1,4 +1,5 @@
 import { definitions } from "./built-in-definitions";
+import { logUsagePolyfills } from "./debug";
 
 function isPolyfillSource(value) {
   return value === "babel-polyfill";
@@ -276,20 +277,7 @@ export default function({ types: t }) {
       const { debug, onDebug } = this.opts;
 
       if (debug) {
-        if (!this.builtIns.size) {
-          console.log(
-            `
-  [${this.file.opts.filename}] Based on your code and targets, none were added.
-          `,
-          );
-          return;
-        }
-        const wordEnding = this.builtIns > 1 ? "s" : "";
-        console.log(
-          `
-  [${this.file.opts.filename}] Added following polyfill${wordEnding}:`,
-        );
-        onDebug(this.builtIns);
+        logUsagePolyfills(this.builtIns, this.file.opts.filename, onDebug);
       }
     },
     visitor: addAndRemovePolyfillImports,

@@ -1,3 +1,5 @@
+import { logEntryPolyfills } from "./debug";
+
 function isPolyfillSource(value) {
   return value === "babel-polyfill";
 }
@@ -95,27 +97,12 @@ export default function({ types: t }) {
       const { debug, onDebug, polyfills } = this.opts;
 
       if (debug) {
-        if (!this.importPolyfillIncluded) {
-          console.log(
-            `
-  [${this.file.opts.filename}] \`import 'babel-polyfill'\` was not found.`,
-          );
-          return;
-        }
-        if (!polyfills.size) {
-          console.log(
-            `
-  [${this.file.opts.filename}] Based on your targets, none were added.`,
-          );
-          return;
-        }
-        const wordEnding = polyfills.size > 1 ? "s" : "";
-
-        console.log(
-          `
-  [${this.file.opts.filename}] Replaced \`babel-polyfill\` with the following polyfill${wordEnding}:`,
+        logEntryPolyfills(
+          this.importPolyfillIncluded,
+          polyfills,
+          this.file.opts.filename,
+          onDebug,
         );
-        onDebug(polyfills);
       }
     },
   };
