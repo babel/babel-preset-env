@@ -37,21 +37,21 @@ export const logEntryPolyfills = (
   if (!importPolyfillIncluded) {
     console.log(
       `
-  [${filename}] \`import 'babel-polyfill'\` was not found.`,
+[${filename}] \`import 'babel-polyfill'\` was not found.`,
     );
     return;
   }
   if (!polyfills.size) {
     console.log(
       `
-  [${filename}] Based on your targets, none were added.`,
+[${filename}] Based on your targets, none were added.`,
     );
     return;
   }
 
   console.log(
     `
-  [${filename}] Replaced \`babel-polyfill\` with the following polyfill${wordEnds(polyfills.size)}:`,
+[${filename}] Replaced \`babel-polyfill\` with the following polyfill${wordEnds(polyfills.size)}:`,
   );
   onDebug(polyfills);
 };

@@ -148,7 +148,8 @@ export default function buildPreset(context, opts = {}) {
   // NOTE: not giving spec here yet to avoid compatibility issues when
   // babel-plugin-transform-es2015-modules-commonjs gets its spec mode
   transformations.forEach(pluginName =>
-    plugins.push([require(`babel-plugin-${pluginName}`), { spec, loose }]));
+    plugins.push([require(`babel-plugin-${pluginName}`), { spec, loose }]),
+  );
 
   const regenerator = transformations.has("transform-regenerator");
 
@@ -165,10 +166,13 @@ export default function buildPreset(context, opts = {}) {
 
     if (!useBuiltIns) {
       console.log(
-        "None were added, since the `useBuiltIns` option was not set.",
+        "\nUsing polyfills: None polyfills were added, since the `useBuiltIns` option was not set.",
       );
     } else {
-      console.log(`\nUsing polyfills with \`${useBuiltIns}\` option:`);
+      console.log(
+        `
+Using polyfills with \`${useBuiltIns}\` option:`,
+      );
     }
   }
 
@@ -179,7 +183,8 @@ export default function buildPreset(context, opts = {}) {
       regenerator,
       onDebug: (polyfills, context) => {
         polyfills.forEach(polyfill =>
-          logPlugin(polyfill, polyfillTargets, builtInsList, context));
+          logPlugin(polyfill, polyfillTargets, builtInsList, context),
+        );
       },
     };
 
