@@ -63,6 +63,7 @@ export default function({ types: t }) {
         path.node.specifiers.length === 0 &&
         isPolyfillSource(path.node.source.value)
       ) {
+        this.importPolyfillIncluded = true;
         path.replaceWithMultiple(
           createImports(state.opts.polyfills, "import", state.opts.regenerator),
         );
@@ -88,11 +89,19 @@ export default function({ types: t }) {
     visitor: isPolyfillImport,
     pre() {
       this.numPolyfillImports = 0;
+      this.importPolyfillIncluded = false;
     },
     post() {
       const { debug, onDebug, polyfills } = this.opts;
 
       if (debug) {
+        if (!this.importPolyfillIncluded) {
+          console.log(
+            `
+  [${this.file.opts.filename}] \`import 'babel-polyfill'\` was not found.`,
+          );
+          return;
+        }
         if (!polyfills.size) {
           console.log(
             `

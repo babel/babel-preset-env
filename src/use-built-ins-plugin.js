@@ -284,9 +284,10 @@ export default function({ types: t }) {
           );
           return;
         }
+        const wordEnding = this.builtIns > 1 ? "s" : "";
         console.log(
           `
-  [${this.file.opts.filename}] Added following polyfills:`,
+  [${this.file.opts.filename}] Added following polyfill${wordEnding}:`,
         );
         onDebug(this.builtIns);
       }
