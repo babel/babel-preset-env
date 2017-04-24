@@ -28,8 +28,9 @@ const modulePathMap = {
 };
 
 const getModulePath = module => {
-  return modulePathMap[module] ||
-    `babel-polyfill/lib/core-js/modules/${module}`;
+  return (
+    modulePathMap[module] || `babel-polyfill/lib/core-js/modules/${module}`
+  );
 };
 
 export default function({ types: t }) {
@@ -63,13 +64,15 @@ export default function({ types: t }) {
   }
 
   function isRequire(path) {
-    return t.isExpressionStatement(path.node) &&
+    return (
+      t.isExpressionStatement(path.node) &&
       t.isCallExpression(path.node.expression) &&
       t.isIdentifier(path.node.expression.callee) &&
       path.node.expression.callee.name === "require" &&
       path.node.expression.arguments.length === 1 &&
       t.isStringLiteral(path.node.expression.arguments[0]) &&
-      isPolyfillSource(path.node.expression.arguments[0].value);
+      isPolyfillSource(path.node.expression.arguments[0].value)
+    );
   }
 
   const addAndRemovePolyfillImports = {
@@ -80,9 +83,8 @@ export default function({ types: t }) {
       ) {
         console.warn(
           `
-When setting \`useBuiltIns: 'usage'\`, polyfills are automatically imported when needed.
-Please remove the \`import 'babel-polyfill'\` call or use \`useBuiltIns: 'entry'\` instead.
-`,
+  When setting \`useBuiltIns: 'usage'\`, polyfills are automatically imported when needed.
+  Please remove the \`import 'babel-polyfill'\` call or use \`useBuiltIns: 'entry'\` instead.`,
         );
         path.remove();
       }
@@ -93,9 +95,8 @@ Please remove the \`import 'babel-polyfill'\` call or use \`useBuiltIns: 'entry'
           if (isRequire(bodyPath)) {
             console.warn(
               `
-When setting \`useBuiltIns: 'usage'\`, polyfills are automatically imported when needed.
-Please remove the \`require('babel-polyfill')\` call or use \`useBuiltIns: 'entry'\` instead.
-`,
+  When setting \`useBuiltIns: 'usage'\`, polyfills are automatically imported when needed.
+  Please remove the \`require('babel-polyfill')\` call or use \`useBuiltIns: 'entry'\` instead.`,
             );
             bodyPath.remove();
           }
@@ -275,9 +276,17 @@ Please remove the \`require('babel-polyfill')\` call or use \`useBuiltIns: 'entr
       const { debug, onDebug } = this.opts;
 
       if (debug) {
+        if (!this.builtIns.size) {
+          console.log(
+            `
+  [${this.file.opts.filename}] Based on your code and targets, none were added.
+          `,
+          );
+          return;
+        }
         console.log(
           `
-[${this.file.opts.filename}] Added following polyfills:`,
+  [${this.file.opts.filename}] Added following polyfills:`,
         );
         onDebug(this.builtIns);
       }
