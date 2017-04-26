@@ -1,6 +1,3 @@
-The uglify target has been deprecated. Set the top level
-option `forceAllTransforms: true` instead.
-
 babel-preset-env: `DEBUG` option
 
 Using targets:
@@ -8,7 +5,7 @@ Using targets:
   "chrome": "55"
 }
 
-Using modules transform: false
+Modules transform: false
 
 Using plugins:
   check-es2015-constants {}
@@ -35,12 +32,13 @@ Using plugins:
   transform-async-to-generator {}
   syntax-trailing-function-commas {"chrome":"55"}
 
-Using polyfills with `entry` option:
+Polyfills
+=========
 
-[src/in.js] Replaced `babel-polyfill` with the following polyfills:
-  es7.string.pad-start { "chrome":"55" }
-  es7.string.pad-end { "chrome":"55" }
-  web.timers { "chrome":"55" }
-  web.immediate { "chrome":"55" }
-  web.dom.iterable { "chrome":"55" }
+Replaced `babel-polyfill` with the following polyfills:
+  es7.string.pad-start {"chrome":"55"}
+  es7.string.pad-end {"chrome":"55"}
+  web.timers {"chrome":"55"}
+  web.immediate {"chrome":"55"}
+  web.dom.iterable {"chrome":"55"}
 src/in.js -> lib/in.js
