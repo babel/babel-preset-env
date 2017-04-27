@@ -1,3 +1,4 @@
+/*eslint quotes: ["error", "double", { "avoidEscape": true }]*/
 import semver from "semver";
 import { prettifyVersion, semverify } from "./utils";
 

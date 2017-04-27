@@ -172,8 +172,7 @@ export default function buildPreset(context, opts = {}) {
   // NOTE: not giving spec here yet to avoid compatibility issues when
   // babel-plugin-transform-es2015-modules-commonjs gets its spec mode
   transformations.forEach(pluginName =>
-    plugins.push([require(`babel-plugin-${pluginName}`), { spec, loose }]),
-  );
+    plugins.push([require(`babel-plugin-${pluginName}`), { spec, loose }]));
 
   const regenerator = transformations.has("transform-regenerator");
 
@@ -207,8 +206,7 @@ Using polyfills with \`${useBuiltIns}\` option:`,
       regenerator,
       onDebug: (polyfills, context) => {
         polyfills.forEach(polyfill =>
-          logPlugin(polyfill, polyfillTargets, builtInsList, context),
-        );
+          logPlugin(polyfill, polyfillTargets, builtInsList, context));
       },
     };
 
