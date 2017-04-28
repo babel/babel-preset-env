@@ -189,7 +189,7 @@ export default function buildPreset(context, opts = {}) {
 
     if (!useBuiltIns) {
       console.log(
-        "\nUsing polyfills: None polyfills were added, since the `useBuiltIns` option was not set.",
+        "\nUsing polyfills: No polyfills were added, since the `useBuiltIns` option was not set.",
       );
     } else {
       console.log(
