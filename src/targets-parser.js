@@ -77,7 +77,6 @@ const targetParserMap = {
 
     return [target, parsed];
   },
-  // TODO: Remove in next version.
 };
 
 const getTargets = (targets: Object = {}): Targets => {
