@@ -10,7 +10,7 @@ import pluginList from "../data/plugins.json";
 import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
-import { prettifyTargets, prettifyVersion, semverify } from "./utils";
+import { prettifyTargets, semverify } from "./utils";
 import type { Plugin, Targets } from "./types";
 
 export const isPluginRequired = (
