@@ -6,6 +6,7 @@ import { semverify } from "./utils";
 import type { Targets } from "./types";
 
 const browserNameMap = {
+  android: "android",
   chrome: "chrome",
   edge: "edge",
   firefox: "firefox",
@@ -76,6 +77,7 @@ const targetParserMap = {
 
     return [target, parsed];
   },
+  // TODO: Remove in next version.
 };
 
 const getTargets = (targets: Object = {}): Targets => {

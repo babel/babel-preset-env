@@ -5,10 +5,12 @@ const assert = require("assert");
 
 const {
   checkDuplicateIncludeExcludes,
+  normalizePluginNames,
+  validateForceAllTransformsOption,
   validateIncludesAndExcludes,
   validateLooseOption,
   validateModulesOption,
-  normalizePluginNames,
+  validateSpecOption,
 } = normalizeOptions;
 
 describe("normalize-options", () => {
@@ -36,28 +38,32 @@ describe("normalize-options", () => {
       assert.throws(normalizeWithSameIncludes, Error);
     });
   });
-  describe("validateLooseOption", () => {
-    it("`undefined` option returns false", () => {
-      assert(validateLooseOption() === false);
-    });
 
-    it("`false` option returns false", () => {
-      assert(validateLooseOption(false) === false);
-    });
+  const testBoolOption = validator => {
+    describe(validator.name, () => {
+      it("`undefined` option returns false", () => {
+        assert(validator() === false);
+      });
 
-    it("`true` option returns true", () => {
-      assert(validateLooseOption(true) === true);
-    });
+      it("`false` option returns false", () => {
+        assert(validator(false) === false);
+      });
 
-    it("array option is invalid", () => {
-      assert.throws(
-        () => {
+      it("`true` option returns true", () => {
+        assert(validator(true) === true);
+      });
+
+      it("array option is invalid", () => {
+        assert.throws(() => {
           validateLooseOption([]);
-        },
-        Error,
-      );
+        });
+      });
     });
-  });
+  };
+
+  testBoolOption(validateLooseOption);
+  testBoolOption(validateSpecOption);
+  testBoolOption(validateForceAllTransformsOption);
 
   describe("checkDuplicateIncludeExcludes", function() {
     it("should throw if duplicate names in both", function() {

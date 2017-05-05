@@ -23,7 +23,6 @@ export const validateIncludesAndExcludes = (
     `Invalid Option: The '${type}' option must be an Array<String> of plugins/built-ins`,
   );
 
-
   const unknownOpts = opts.filter(opt => !validIncludesAndExcludes.has(opt));
 
   invariant(
@@ -56,17 +55,30 @@ export const checkDuplicateIncludeExcludes = (
   );
 };
 
-// TODO: Allow specifying plugins as either shortened or full name
-// babel-plugin-transform-es2015-classes
-// transform-es2015-classes
-export const validateLooseOption = (looseOpt: boolean = false): boolean => {
-  invariant(
-    typeof looseOpt === "boolean",
-    "Invalid Option: The 'loose' option must be a boolean.",
-  );
+export const validateBoolOption = (
+  name: string,
+  value: ?boolean,
+  defaultValue: boolean,
+) => {
+  if (typeof value === "undefined") {
+    value = defaultValue;
+  }
 
-  return looseOpt;
+  if (typeof value !== "boolean") {
+    throw new Error(`Preset env: '${name}' option must be a boolean.`);
+  }
+
+  return value;
 };
+
+export const validateLooseOption = (looseOpt: boolean) =>
+  validateBoolOption("loose", looseOpt, false);
+
+export const validateSpecOption = (specOpt: boolean) =>
+  validateBoolOption("spec", specOpt, false);
+
+export const validateForceAllTransformsOption = (forceAllTransforms: boolean) =>
+  validateBoolOption("forceAllTransforms", forceAllTransforms, false);
 
 export const validateModulesOption = (
   modulesOpt: ModuleOption = "commonjs",
@@ -95,18 +107,7 @@ export const validateUseBuiltInsOption = (
   return builtInsOpt;
 };
 
-export const validateUseSyntaxOption = (useSyntax: boolean = true): boolean => {
-  invariant(
-    typeof useSyntax === "boolean",
-    `Invalid Option: The 'useSyntax' option must be either
-    'false' to indicate no syntax transformation, or
-    'true' (default) to use syntax based on your targets`,
-  );
-
-  return useSyntax;
-};
-
-export default function normalizeOptions(opts: Object = {}): Options {
+export default function normalizeOptions(opts: Options) {
   if (opts.exclude) {
     opts.exclude = normalizePluginNames(opts.exclude);
   }
@@ -120,11 +121,14 @@ export default function normalizeOptions(opts: Object = {}): Options {
   return {
     debug: opts.debug,
     exclude: validateIncludesAndExcludes(opts.exclude, "exclude"),
+    forceAllTransforms: validateForceAllTransformsOption(
+      opts.forceAllTransforms,
+    ),
     include: validateIncludesAndExcludes(opts.include, "include"),
     loose: validateLooseOption(opts.loose),
-    moduleType: validateModulesOption(opts.modules),
+    modules: validateModulesOption(opts.modules),
+    spec: validateSpecOption(opts.spec),
     targets: opts.targets,
-    useSyntax: validateUseSyntaxOption(opts.useSyntax),
     useBuiltIns: validateUseBuiltInsOption(opts.useBuiltIns),
   };
 }

@@ -1,4 +1,5 @@
 //@flow
+import { logEntryPolyfills } from "./debug";
 
 type Plugin = {
   visitor: Object,
@@ -26,17 +27,14 @@ export default function({ types: t }: { types: Object }): Plugin {
     );
   }
 
-
   function isRequire(path: Object): boolean {
-    return (
-      t.isExpressionStatement(path.node) &&
+    return t.isExpressionStatement(path.node) &&
       t.isCallExpression(path.node.expression) &&
       t.isIdentifier(path.node.expression.callee) &&
       path.node.expression.callee.name === "require" &&
       path.node.expression.arguments.length === 1 &&
       t.isStringLiteral(path.node.expression.arguments[0]) &&
-      isPolyfillSource(path.node.expression.arguments[0].value)
-    );
+      isPolyfillSource(path.node.expression.arguments[0].value);
   }
 
   function createImport(
@@ -54,11 +52,10 @@ export default function({ types: t }: { types: Object }): Plugin {
     return createRequireStatement(polyfill);
   }
 
-
   function createImports(
-      polyfills: Array<string>,
-      requireType: RequireType,
-      regenerator: boolean,
+    polyfills: Array<string>,
+    requireType: RequireType,
+    regenerator: boolean,
   ): Array<Object> {
     const items = Array.isArray(polyfills) ? new Set(polyfills) : polyfills;
     const imports = [];
@@ -83,6 +80,7 @@ export default function({ types: t }: { types: Object }): Plugin {
         path.node.specifiers.length === 0 &&
         isPolyfillSource(path.node.source.value)
       ) {
+        this.importPolyfillIncluded = true;
         path.replaceWithMultiple(
           createImports(state.opts.polyfills, "import", state.opts.regenerator),
         );
@@ -108,18 +106,18 @@ export default function({ types: t }: { types: Object }): Plugin {
     visitor: isPolyfillImport,
     pre() {
       this.numPolyfillImports = 0;
+      this.importPolyfillIncluded = false;
     },
     post() {
       const { debug, onDebug, polyfills } = this.opts;
 
       if (debug) {
-        if (!polyfills.size) {
-          console.log("Based on your targets, none were added.");
-          return;
-        }
-
-        console.log("Replaced `babel-polyfill` with the following polyfills:");
-        onDebug(polyfills);
+        logEntryPolyfills(
+          this.importPolyfillIncluded,
+          polyfills,
+          this.file.opts.filename,
+          onDebug,
+        );
       }
     },
   };

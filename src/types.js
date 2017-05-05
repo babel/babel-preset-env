@@ -10,14 +10,16 @@ export type Targets = {
 // Use explicit modules to prevent typo errors.
 export type ModuleOption = false | "amd" | "commonjs" | "systemjs" | "umd";
 export type BuiltInsOption = false | "entry" | "usage";
+
 export type Options = {
-  targets: Targets,
-  loose: boolean,
-  include: Array<string>,
-  exclude: Array<string>,
-  moduleType: ModuleOption,
   debug: boolean,
-  useSyntax: boolean,
+  exclude: Array<string>,
+  forceAllTransforms: boolean,
+  include: Array<string>,
+  loose: boolean,
+  modules: ModuleOption,
+  spec: boolean,
+  targets: Targets,
   useBuiltIns: BuiltInsOption,
 };
 

@@ -1,6 +1,7 @@
 //@flow
 
 import { definitions } from "./built-in-definitions";
+import { logUsagePolyfills } from "./debug";
 
 type Plugin = {
   visitor: Object,
@@ -37,11 +38,9 @@ const modulePathMap = {
 };
 
 const getModulePath = module => {
-  return (
-    modulePathMap[module] || `babel-polyfill/lib/core-js/modules/${module}`
-  );
+  return modulePathMap[module] ||
+    `babel-polyfill/lib/core-js/modules/${module}`;
 };
-
 
 export default function({ types: t }: { types: Object }): Plugin {
   function addImport(
@@ -49,7 +48,6 @@ export default function({ types: t }: { types: Object }): Plugin {
     builtIn: string,
     builtIns: Set<string>,
   ): void {
-
     if (builtIn && !builtIns.has(builtIn)) {
       builtIns.add(builtIn);
 
@@ -83,17 +81,14 @@ export default function({ types: t }: { types: Object }): Plugin {
     }
   }
 
-
   function isRequire(path: Object): boolean {
-    return (
-      t.isExpressionStatement(path.node) &&
+    return t.isExpressionStatement(path.node) &&
       t.isCallExpression(path.node.expression) &&
       t.isIdentifier(path.node.expression.callee) &&
       path.node.expression.callee.name === "require" &&
       path.node.expression.arguments.length === 1 &&
       t.isStringLiteral(path.node.expression.arguments[0]) &&
-      isPolyfillSource(path.node.expression.arguments[0].value)
-    );
+      isPolyfillSource(path.node.expression.arguments[0].value);
   }
 
   const addAndRemovePolyfillImports = {
@@ -104,9 +99,8 @@ export default function({ types: t }: { types: Object }): Plugin {
       ) {
         console.warn(
           `
-When setting "useBuiltIns: true", polyfills are automatically imported when needed.
-Please remove the "import 'babel-polyfill'" call or use "useBuiltIns: 'entry'" instead.
-`,
+  When setting \`useBuiltIns: 'usage'\`, polyfills are automatically imported when needed.
+  Please remove the \`import 'babel-polyfill'\` call or use \`useBuiltIns: 'entry'\` instead.`,
         );
         path.remove();
       }
@@ -117,9 +111,8 @@ Please remove the "import 'babel-polyfill'" call or use "useBuiltIns: 'entry'" i
           if (isRequire(bodyPath)) {
             console.warn(
               `
-When setting "useBuiltIns: true", polyfills are automatically imported when needed.
-Please remove the "require('babel-polyfill')" call or use "useBuiltIns: 'entry'" instead.
-`,
+  When setting \`useBuiltIns: 'usage'\`, polyfills are automatically imported when needed.
+  Please remove the \`require('babel-polyfill')\` call or use \`useBuiltIns: 'entry'\` instead.`,
             );
             bodyPath.remove();
           }
@@ -299,7 +292,7 @@ Please remove the "require('babel-polyfill')" call or use "useBuiltIns: 'entry'"
       const { debug, onDebug } = this.opts;
 
       if (debug) {
-        onDebug(this.builtIns, this.file.opts.filename);
+        logUsagePolyfills(this.builtIns, this.file.opts.filename, onDebug);
       }
     },
     visitor: addAndRemovePolyfillImports,
