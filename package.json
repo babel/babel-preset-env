@@ -58,7 +58,6 @@
     "babel-helper-fixtures": "^6.22.0",
     "babel-helper-plugin-test-runner": "^6.22.0",
     "babel-plugin-istanbul": "^3.1.2",
-    "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-preset-env": "^1.4.0",
     "babel-register": "^6.23.0",
     "chai": "^3.5.0",
@@ -77,9 +76,6 @@
   "babel": {
     "presets": [
       ["env"]
-    ],
-    "plugins": [
-      "transform-flow-strip-types"
     ],
     "env": {
       "test": {
