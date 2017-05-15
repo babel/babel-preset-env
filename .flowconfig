@@ -2,6 +2,7 @@
 .*/lib/.*
 .*/test/.*
 .*/build/.*
+.*/scripts/.*
 .*/node_modules/jest-validate/.*
 
 [options]
