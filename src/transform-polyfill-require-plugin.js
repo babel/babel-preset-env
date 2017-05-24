@@ -32,7 +32,7 @@ export default function ({ types: t }) {
 
   function createImport(polyfill, requireType, core) {
     if (core) {
-      polyfill = `core-js/modules/${polyfill}`;
+      polyfill = `core-js/library/modules/${polyfill}`;
     }
 
     if (requireType === "import") {
