@@ -68,9 +68,14 @@ const targetParserMap = {
 
   // Parse `node: true` and `node: "current"` to version
   node: (target, value) => {
-    const parsed = value === true || value === "current"
-      ? process.versions.node
-      : semverify(value);
+    const parsed = (() => {
+      switch (value) {
+        case true:
+        case "current": return process.versions.node;
+        case "maintained": return semverify("4");
+        default: return semverify(value);
+      }
+    })();
 
     return [target, parsed];
   },

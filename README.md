@@ -110,9 +110,10 @@ The [data](https://github.com/babel/babel-preset-env/blob/master/data/plugins.js
 
 ### `targets.node`
 
-`number | string | "current" | true`
+`number | string | "current" | "maintained" | true`
 
 If you want to compile against the current node version, you can specify `"node": true` or `"node": "current"`, which would be the same as `"node": parseFloat(process.versions.node)`.
+If you want to compile against the latest [maintained](https://github.com/nodejs/LTS) node version, you can specify: "node": "maintained".
 
 ### `targets.browsers`
 
