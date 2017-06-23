@@ -105,11 +105,7 @@ const getTargets = (targets: Object = {}): Targets => {
         const [parsedTarget, parsedValue] = parser(target, value);
 
         if (parsedValue) {
-          // Merge (lowest wins)
-          results.targets[parsedTarget] = semverMin(
-            results.targets[parsedTarget],
-            parsedValue,
-          );
+          results.targets[parsedTarget] = parsedValue;
         }
       }
 
