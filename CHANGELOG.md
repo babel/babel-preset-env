@@ -1,5 +1,129 @@
 # Changelog
 
+## v1.5.1 (2017-05-22)
+
+### :bug: Bug Fix
+
+- Compile with loose mode ([#322](https://github.com/babel/babel-preset-env/pull/332)) (@existentialism)
+
+## v1.5.0 (2017-05-19)
+
+### :rocket: New Feature
+
+- Support target versions as strings ([#321](https://github.com/babel/babel-preset-env/pull/321)) (@existentialism)
+
+We were originally waiting on 2.x for a breaking change, but since node v7.10
+and other targets are causing some pain, we decided to land a backwards
+compatible version.
+
+### :house: Internal
+
+- Backport: use preset-env and remove flow-strip-types ([#324](https://github.com/babel/babel-preset-env/pull/324)) (@yavorsky)
+- Bump electron-to-chromium ([#329](https://github.com/babel/babel-preset-env/pull/329)) (@existentialism)
+- Tweak version mappings to match compat-table updates ([#323](https://github.com/babel/babel-preset-env/pull/323)) (@existentialism)
+- Bump browserslist ([#319](https://github.com/babel/babel-preset-env/pull/319)) (@existentialism)
+- Bump compat-table ([#307](https://github.com/babel/babel-preset-env/pull/307)) (@existentialism)
+- Add debug-fixtures and test/tmp to .eslintignore ([#305](https://github.com/babel/babel-preset-env/pull/305)) (@yavorsky)
+
+## v1.4.0 (2017-04-14)
+
+### :rocket: New Feature
+
+- Support `spec` option ([#98](https://github.com/babel/babel-preset-env/pull/98)) (@Kovensky)
+
+Added an option to enable more spec compliant, but potentially slower, transformations for any plugins in this preset that support them.
+
+- Bump compat-table for Edge 15 support ([#273](https://github.com/babel/babel-preset-env/pull/273)) (@existentialism)
+
+We updated our mappings so that you can get native support for async/await and other goodies when targeting Edge 15!
+
+### :bug: Bug Fix
+
+- Add Android browser to name map ([#270](https://github.com/babel/babel-preset-env/pull/270)) (@existentialism)
+
+Fixed a bug that was ignoring Android targets in browserslist queries (for example: "Android >= 4").
+
+### :memo: Documentation
+
+- Clarify note about loading polyfills only once ([#282](https://github.com/babel/babel-preset-env/pull/282)) (@darahak)
+- Add a reminder about include/exclude options ([#275](https://github.com/babel/babel-preset-env/pull/275)) (@existentialism)
+
+### :house: Internal
+
+- Chore: reduce package size. ([#281](https://github.com/babel/babel-preset-env/pull/281)) (@evilebottnawi)
+- Remove deprecated comment ([#271](https://github.com/babel/babel-preset-env/pull/271)) (@yavorsky)
+
+## v1.3.3 (2017-04-07)
+
+### :bug: Bug Fix
+
+- Support electron version in a string format ([#252](https://github.com/babel/babel-preset-env/pull/252)) (@yavorsky)
+
+Adding electron as a target was an inadvertent breaking change as it no longer
+allowed string versions. We added an exception for now, even though it is
+inconsistent with other versions. Just as a note, the upcoming version 2.x will
+allow _both_ number and string versions.
+
+- Ensure const-check plugin order ([#257](https://github.com/babel/babel-preset-env/pull/257)) (@existentialism)
+
+We now force the `const-es2015-check` plugin to run first (so that it can
+correctly report issues before they get transpiled away).
+
+### :rocket: New Feature
+
+- Allow use `babel-plugin-` prefix for include and exclude ([#242](https://github.com/babel/babel-preset-env/pull/242)) (@yavorsky)
+
+The `include` and `exclude` options now allow both prefixed (`babel-plugin-transform-es2015-spread`) 
+and prefix-less (`transform-es2015-spread`) plugin names.
+
+### :memo: Documentation 
+
+- Note babel plugin prefix handling in include/exclude ([#245](https://github.com/babel/babel-preset-env/pull/245)) (@existentialism)
+- Fix README: debug option shows info in stdout. ([#236](https://github.com/babel/babel-preset-env/pull/236)) (@Gerhut)
+
+### :house: Internal
+
+- Add simple smoke-test ([#240](https://github.com/babel/babel-preset-env/pull/240)) (@existentialism)
+- Add prepublish script (@existentialism)
+
+## v1.3.2 (2017-03-30)
+
+- Fixed an issue with a broken publish
+
+## v1.3.1 (2017-03-30)
+
+- Fixed a regression with missing files due to `.npmignore`.
+
+## v1.3.0 (2017-03-30)
+
+### :bug: Bug Fix
+
+- Add check for ArrayBuffer[Symbol.species] ([#233](https://github.com/babel/babel-preset-env/pull/233)) (@existentialism)
+
+We now properly check for `Symbol.species` support in ArrayBuffer and include the
+polyfill if necessary. This should, as a side effect, fix ArrayBuffer-related 
+errors on IE9.
+
+### :nail_care: Polish
+
+- Fill data with electron as a target. ([#229](https://github.com/babel/babel-preset-env/pull/229)) (@yavorsky)
+
+We've simplified things by adding `electron` as a target instead of doing a bunch of 
+things at runtime. Electron targets should now also be displayed in the debug output.
+
+- separate default builtins for platforms ([#226](https://github.com/babel/babel-preset-env/pull/226)) (@restrry)
+
+If you are targeting the `node` environment exclusively, the always-included web polyfills
+(like `dom.iterable`, and a few others) will now no longer be included.
+
+### :memo: Documentation 
+
+ * remove deprecated projects ([#223](https://github.com/babel/babel-preset-env/pull/223)) [skip ci] (@stevemao)
+
+### :house: Internal
+
+ * npmignore: Add related to build data and codecov. ([#216](https://github.com/babel/babel-preset-env/pull/216)) (@yavorsky)
+
 ## v1.2.2 (2017-03-14)
 
 ### :bug: Bug Fix

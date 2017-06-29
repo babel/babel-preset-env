@@ -5,35 +5,65 @@ const assert = require("assert");
 
 const {
   checkDuplicateIncludeExcludes,
+  normalizePluginNames,
+  validateForceAllTransformsOption,
   validateIncludesAndExcludes,
   validateLooseOption,
   validateModulesOption,
-  objectToBrowserslist,
+  validateSpecOption,
 } = normalizeOptions;
 
 describe("normalize-options", () => {
-  describe("validateLooseOption", () => {
-    it("`undefined` option returns false", () => {
-      assert(validateLooseOption() === false);
+  describe("normalizeOptions", () => {
+    it("should return normalized `include` and `exclude`", () => {
+      const normalized = normalizeOptions.default({
+        include: [
+          "babel-plugin-transform-es2015-spread",
+          "transform-es2015-classes",
+        ],
+      });
+      assert.deepEqual(normalized.include, [
+        "transform-es2015-spread",
+        "transform-es2015-classes",
+      ]);
     });
 
-    it("`false` option returns false", () => {
-      assert(validateLooseOption(false) === false);
-    });
-
-    it("`true` option returns true", () => {
-      assert(validateLooseOption(true) === true);
-    });
-
-    it("array option is invalid", () => {
-      assert.throws(
-        () => {
-          validateLooseOption([]);
-        },
-        Error,
-      );
+    it("should throw if duplicate names in `include` and `exclude`", () => {
+      const normalizeWithSameIncludes = () => {
+        normalizeOptions.default({
+          include: ["babel-plugin-transform-es2015-spread"],
+          exclude: ["transform-es2015-spread"],
+        });
+      };
+      assert.throws(normalizeWithSameIncludes, Error);
     });
   });
+
+  const testBoolOption = validator => {
+    describe(validator.name, () => {
+      it("`undefined` option returns false", () => {
+        assert(validator() === false);
+      });
+
+      it("`false` option returns false", () => {
+        assert(validator(false) === false);
+      });
+
+      it("`true` option returns true", () => {
+        assert(validator(true) === true);
+      });
+
+      it("array option is invalid", () => {
+        assert.throws(() => {
+          validateLooseOption([]);
+        });
+      });
+    });
+  };
+
+  testBoolOption(validateLooseOption);
+  testBoolOption(validateSpecOption);
+  testBoolOption(validateForceAllTransformsOption);
 
   describe("checkDuplicateIncludeExcludes", function() {
     it("should throw if duplicate names in both", function() {
@@ -45,6 +75,27 @@ describe("normalize-options", () => {
           );
         },
         Error,
+      );
+    });
+
+    it("should not throw if no duplicate names in both", function() {
+      assert.doesNotThrow(
+        () => {
+          checkDuplicateIncludeExcludes(["transform-regenerator"], ["map"]);
+        },
+        Error,
+      );
+    });
+  });
+
+  describe("normalizePluginNames", function() {
+    it("should drop `babel-plugin-` prefix if needed", function() {
+      assert.deepEqual(
+        normalizePluginNames([
+          "babel-plugin-transform-es2015-object-super",
+          "transform-es2015-parameters",
+        ]),
+        ["transform-es2015-object-super", "transform-es2015-parameters"],
       );
     });
 
@@ -101,12 +152,10 @@ describe("normalize-options", () => {
       );
     });
   });
-
   describe("validateIncludesAndExcludes", function() {
     it("should return empty arrays if undefined", function() {
       assert.deepEqual(validateIncludesAndExcludes(), []);
     });
-
     it("should throw if not in features", function() {
       assert.throws(
         () => {
@@ -114,23 +163,6 @@ describe("normalize-options", () => {
         },
         Error,
       );
-    });
-  });
-
-  describe("objectToBrowserslist", function() {
-    it("should return browserslist's query from a plain object", function() {
-      assert.deepEqual(
-        objectToBrowserslist({
-          chrome: 55,
-          ie: 11,
-          node: 7,
-        }),
-        ["chrome 55", "ie 11"],
-      );
-    });
-
-    it("should return browserslist's query from an empty object", function() {
-      assert.deepEqual(objectToBrowserslist({}), []);
     });
   });
 });

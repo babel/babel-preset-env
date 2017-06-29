@@ -18,8 +18,6 @@ npm install babel-preset-env --save-dev
 }
 ```
 
-Check out the many options (especially `useBuiltIns` to polyfill less)!
-
 - [How it Works](#how-it-works)
 - [Install](#install)
 - [Usage](#usage)
@@ -138,11 +136,11 @@ For more information on setting options for a preset, refer to the [plugin/prese
 
 ### `targets`
 
-`{ [string]: number }`, defaults to `{}`.
+`{ [string]: number | string }`, defaults to `{}`.
 
 Takes an object of environment versions to support.
 
-Each target environment takes a number (you can also specify a minor versions like `node: 6.5`)
+Each target environment takes a number or a string (we recommend using a string when specifying minor versions like `node: "6.10"`).
 
 Example environments: `chrome`, `opera`, `edge`, `firefox`, `safari`, `ie`, `ios`, `android`, `node`, `electron`.
 
@@ -150,7 +148,7 @@ The [data](https://github.com/babel/babel-preset-env/blob/master/data/plugins.js
 
 ### `targets.node`
 
-`number | "current" | true`
+`number | string | "current" | true`
 
 If you want to compile against the current node version, you can specify `"node": true` or `"node": "current"`, which would be the same as `"node": parseFloat(process.versions.node)`.
 
@@ -162,15 +160,11 @@ A query to select browsers (ex: last 2 versions, > 5%) using [browserslist](http
 
 Note, browsers' results are overridden by explicit items from `targets`.
 
-### `targets.uglify`
+### `spec`
 
-`number | true`
+`boolean`, defaults to `false`.
 
-UglifyJS does not currently support any ES6 syntax, so if you are using Uglify to minify your code, targeting later browsers may cause Uglify to throw syntax errors.
-
-To prevent these errors - specify the uglify option, which will enable all plugins and, as a result, fully compile your code to ES5. However, the `useBuiltIns` option will still work as before, and only include the polyfills that your target(s) need.
-
-> NOTE: Uglify has a work-in-progress "Harmony" branch to address the lack of ES6 support, but it is not yet stable.  You can follow its progress in [UglifyJS2 issue #448](https://github.com/mishoo/UglifyJS2/issues/448).  If you require an alternative minifier which _does_ support ES6 syntax, we recommend using [Babili](https://github.com/babel/babili).
+Enable more spec compliant, but potentially slower, transformations for any plugins in this preset that support them.
 
 ### `loose`
 
@@ -198,11 +192,17 @@ Outputs the targets/plugins used and the version specified in [plugin data versi
 
 An array of plugins to always include.
 
-Valid options include any of the [babel plugins](https://github.com/babel/babel-preset-env/blob/master/data/plugin-features.js) or [built-ins](https://github.com/babel/babel-preset-env/blob/master/data/built-in-features.js), such as `transform-es2015-arrow-functions`, `map`, `set`, or `object.assign`.
+Valid options include any:
+
+- [Babel plugins](https://github.com/babel/babel-preset-env/blob/master/data/plugin-features.js) - both with (`babel-plugin-transform-es2015-spread`) and without prefix (`transform-es2015-spread`) are supported.
+
+- [Built-ins](https://github.com/babel/babel-preset-env/blob/master/data/built-in-features.js), such as `map`, `set`, or `object.assign`.
 
 This option is useful if there is a bug in a native implementation, or a combination of a non-supported feature + a supported one doesn't work.
 
 For example, Node 4 supports native classes but not spread. If `super` is used with a spread argument, then the `transform-es2015-classes` transform needs to be `include`d, as it is not possible to transpile a spread with `super` otherwise.
+
+> NOTE: The `include` and `exclude` options _only_ work with the [plugins included with this preset](https://github.com/babel/babel-preset-env/blob/master/data/plugin-features.js); so, for example, including `transform-do-expressions` or excluding `transform-function-bind` will throw errors. To use a plugin _not_ included with this preset, add them to your [config](https://babeljs.io/docs/usage/babelrc/) directly.
 
 ### `exclude`
 
@@ -216,20 +216,61 @@ This option is useful for "blacklisting" a transform like `transform-regenerator
 
 ### `useBuiltIns`
 
-`boolean`, defaults to `false`.
+`"usage"` | `"entry"` | `false`, defaults to `false`.
 
-A way to apply `babel-preset-env` for polyfills (via "babel-polyfill").
+A way to apply `babel-preset-env` for polyfills (via `babel-polyfill`).
 
-> NOTE: This does not currently polyfill experimental/stage-x built-ins like the regular "babel-polyfill" does.
-> This will only work with npm >= 3 (which should be used with Babel 6 anyway)
-
-```
+```sh
 npm install babel-polyfill --save
 ```
 
-This option enables a new plugin that replaces the statement `import "babel-polyfill"` or `require("babel-polyfill")` with individual requires for `babel-polyfill` based on environment.
+#### `useBuiltIns: 'usage'`
 
-> NOTE: Only use `require("babel-polyfill");` once in your whole app. One option is to create a single entry file that only contains the require statement.
+Adds specific imports for polyfills when they are used in each file. We take advantage of the fact that a bundler will load the same polyfill only once.
+
+**In**
+
+a.js
+
+```js
+var a = new Promise();
+```
+
+b.js
+
+```js
+var b = new Map();
+```
+
+**Out (if environment doesn't support it)**
+
+```js
+import "babel-polyfill/core-js/modules/es6.promise";
+var a = new Promise();
+```
+
+```js
+import "babel-polyfill/core-js/modules/es6.map";
+var b = new Map();
+```
+
+**Out (if environment supports it)**
+
+```js
+var a = new Promise();
+```
+
+```js
+var b = new Map();
+```
+
+#### `useBuiltIns: 'entry'`
+
+> NOTE: Only use `require("babel-polyfill");` once in your whole app.
+> Multiple imports or requires of `babel-polyfill` will throw an error since it can cause global collisions and other issues that are hard to trace.
+> We recommend creating a single entry file that only contains the `require` statement.
+
+This option enables a new plugin that replaces the statement `import "babel-polyfill"` or `require("babel-polyfill")` with individual requires for `babel-polyfill` based on environment.
 
 **In**
 
@@ -240,18 +281,54 @@ import "babel-polyfill";
 **Out (different based on environment)**
 
 ```js
-import "core-js/modules/es7.string.pad-start";
-import "core-js/modules/es7.string.pad-end";
-import "core-js/modules/web.timers";
-import "core-js/modules/web.immediate";
-import "core-js/modules/web.dom.iterable";
+import "babel-polyfill/core-js/modules/es7.string.pad-start";
+import "babel-polyfill/core-js/modules/es7.string.pad-end";
 ```
 
-This will also work for `core-js` directly (`import "core-js";`)
+#### `useBuiltIns: false`
 
-```
-npm install core-js --save
-```
+Don't add polyfills automatically per file, or transform `import "babel-polyfill"` to individual polyfills.
+
+### `forceAllTransforms`
+
+`boolean`, defaults to `false`.
+
+<p><details>
+  <summary><b>Example</b></summary>
+
+  With Babel 7's .babelrc.js support, you can force all transforms to be run if env is set to `production`.
+
+  ```js
+  module.exports = {
+    presets: [
+      ["env", {
+        targets: {
+          chrome: 59,
+          edge: 13,
+          firefox: 50,
+        },
+        // for uglifyjs...
+        forceAllTransforms: process.env === "production"
+      }],
+    ],
+  };
+  ```
+</details></p>
+
+
+> NOTE: `targets.uglify` is deprecated and will be removed in the next major in
+favor of this.
+
+By default, this preset will run all the transforms needed for the targeted
+environment(s). Enable this option if you want to force running _all_
+transforms, which is useful if the output will be run through UglifyJS or an
+environment that only supports ES5.
+
+> NOTE: Uglify has a work-in-progress "Harmony" branch to address the lack of
+ES6 support, but it is not yet stable.  You can follow its progress in
+[UglifyJS2 issue #448](https://github.com/mishoo/UglifyJS2/issues/448).  If you
+require an alternative minifier which _does_ support ES6 syntax, we recommend
+using [Babili](https://github.com/babel/babili).
 
 ### `ignoreBrowserslistConfig`
 
@@ -382,7 +459,7 @@ exports.A = A;
 }
 ```
 
-**stdin**
+**stdout**
 
 ```sh
 Using targets:
@@ -423,14 +500,6 @@ Using polyfills:
 }
 ```
 
-## Caveats
+## Issues
 
 If you get a `SyntaxError: Unexpected token ...` error when using the [object-rest-spread](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-object-rest-spread) transform then make sure the plugin has been updated to, at least, `v6.19.0`.
-
-## Other Cool Projects
-
-- [auto-babel](https://github.com/jakepusateri/auto-babel)
-- [babel-preset-target](https://github.com/sdkennedy/babel-preset-target)
-- [babel-preset-modern-node](https://github.com/michaelcontento/babel-preset-modern-node)
-- [babel-preset-modern-browsers](https://github.com/christophehurpeau/babel-preset-modern-browsers)
-- ?
