@@ -23,29 +23,29 @@ export const isPluginRequired = (
     return true;
   }
 
-  const isRequiredForEnvironments: Array<string> = targetEnvironments.filter(
-    environment => {
-      // Feature is not implemented in that environment
-      if (!plugin[environment]) {
-        return true;
-      }
+  const isRequiredForEnvironments: Array<
+    string,
+  > = targetEnvironments.filter(environment => {
+    // Feature is not implemented in that environment
+    if (!plugin[environment]) {
+      return true;
+    }
 
-      const lowestImplementedVersion: string = plugin[environment];
-      const lowestTargetedVersion: string = supportedEnvironments[environment];
+    const lowestImplementedVersion: string = plugin[environment];
+    const lowestTargetedVersion: string = supportedEnvironments[environment];
 
-      if (!semver.valid(lowestTargetedVersion)) {
-        throw new Error(
-          // eslint-disable-next-line max-len
-          `Invalid version passed for target "${environment}": "${lowestTargetedVersion}". Versions must be in semver format (major.minor.patch)`,
-        );
-      }
-
-      return semver.gt(
-        semverify(lowestImplementedVersion),
-        lowestTargetedVersion,
+    if (!semver.valid(lowestTargetedVersion)) {
+      throw new Error(
+        // eslint-disable-next-line max-len
+        `Invalid version passed for target "${environment}": "${lowestTargetedVersion}". Versions must be in semver format (major.minor.patch)`,
       );
-    },
-  );
+    }
+
+    return semver.gt(
+      semverify(lowestImplementedVersion),
+      lowestTargetedVersion,
+    );
+  });
 
   return isRequiredForEnvironments.length > 0;
 };
@@ -117,6 +117,8 @@ export default function buildPreset(
     spec,
     targets: optionsTargets,
     useBuiltIns,
+    ignoreBrowsersConfig,
+    dirname,
   } = normalizeOptions(opts);
 
   // TODO: remove this in next major
@@ -132,7 +134,7 @@ export default function buildPreset(
     console.log("");
   }
 
-  const targets = getTargets(optionsTargets);
+  const targets = getTargets(optionsTargets, { ignoreBrowsersConfig, dirname });
   const include = transformIncludesAndExcludes(optionsInclude);
   const exclude = transformIncludesAndExcludes(optionsExclude);
 
@@ -172,7 +174,8 @@ export default function buildPreset(
   // NOTE: not giving spec here yet to avoid compatibility issues when
   // babel-plugin-transform-es2015-modules-commonjs gets its spec mode
   transformations.forEach(pluginName =>
-    plugins.push([require(`babel-plugin-${pluginName}`), { spec, loose }]));
+    plugins.push([require(`babel-plugin-${pluginName}`), { spec, loose }]),
+  );
 
   const regenerator = transformations.has("transform-regenerator");
 
@@ -206,7 +209,8 @@ Using polyfills with \`${useBuiltIns}\` option:`,
       regenerator,
       onDebug: (polyfills, context) => {
         polyfills.forEach(polyfill =>
-          logPlugin(polyfill, polyfillTargets, builtInsList, context));
+          logPlugin(polyfill, polyfillTargets, builtInsList, context),
+        );
       },
     };
 
