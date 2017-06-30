@@ -117,10 +117,9 @@ export default function buildPreset(
     spec,
     targets: optionsTargets,
     useBuiltIns,
-    ignoreBrowsersConfig,
+    ignoreBrowserslistConfig,
     dirname,
   } = normalizeOptions(opts);
-
   // TODO: remove this in next major
   let hasUglifyTarget = false;
 
@@ -134,7 +133,10 @@ export default function buildPreset(
     console.log("");
   }
 
-  const targets = getTargets(optionsTargets, { ignoreBrowsersConfig, dirname });
+  const targets = getTargets(optionsTargets, {
+    ignoreBrowserslistConfig,
+    dirname,
+  });
   const include = transformIncludesAndExcludes(optionsInclude);
   const exclude = transformIncludesAndExcludes(optionsExclude);
 

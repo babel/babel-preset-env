@@ -18,8 +18,10 @@ export type Options = {
   include: Array<string>,
   loose: boolean,
   modules: ModuleOption,
+  ignoreBrowserslistConfig: boolean,
   spec: boolean,
   targets: Targets,
+  dirname: string,
   useBuiltIns: BuiltInsOption,
 };
 

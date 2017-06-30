@@ -1,9 +1,10 @@
 {
   "presets": [
     ["../../../../lib", {
-      "ignoreBrowserslistConfig": true,
+      "dirname": "../fixtures/preset-options/browserslist-config-ignore-with-false",
       "modules": false,
-      "debug": true
+      "debug": true,
+      "ignoreBrowserslistConfig": true
     }]
   ]
 }

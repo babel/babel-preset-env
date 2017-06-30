@@ -1,11 +1,12 @@
 //@flow
 
 import invariant from "invariant";
+import browserslist from "browserslist";
 import builtInsList from "../data/built-ins.json";
 import { defaultWebIncludes } from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import pluginFeatures from "../data/plugin-features";
-import type { Options, ModuleOption, BuiltInsOption } from "./types";
+import type { Targets, Options, ModuleOption, BuiltInsOption } from "./types";
 
 const validIncludesAndExcludes = new Set([
   ...Object.keys(pluginFeatures),
@@ -34,6 +35,11 @@ export const validateIncludesAndExcludes = (
   return opts;
 };
 
+const validBrowserslistTargets = [
+  ...Object.keys(browserslist.data),
+  ...Object.keys(browserslist.aliases),
+];
+
 export const normalizePluginName = (plugin: string): string =>
   plugin.replace(/^babel-plugin-/, "");
 
@@ -53,6 +59,14 @@ export const checkDuplicateIncludeExcludes = (
     `Invalid Option: The plugins/built-ins '${duplicates.join(", ")}' were found in both the "include" and
     "exclude" options.`,
   );
+};
+
+export const validateDirnameOption = (dirname: string = process.cwd()) => {
+  invariant(
+    typeof dirname === "string",
+    `Invalid Option: The dirname option '${dirname}' has incorrect format. Only strings are allowed.`,
+  );
+  return dirname;
 };
 
 export const validateBoolOption = (
@@ -80,6 +94,15 @@ export const validateSpecOption = (specOpt: boolean) =>
 export const validateForceAllTransformsOption = (forceAllTransforms: boolean) =>
   validateBoolOption("forceAllTransforms", forceAllTransforms, false);
 
+export const validateIgnoreBrowserslistConfig = (
+  ignoreBrowserslistConfig: boolean,
+) =>
+  validateBoolOption(
+    "ignoreBrowserslistConfig",
+    ignoreBrowserslistConfig,
+    false,
+  );
+
 export const validateModulesOption = (
   modulesOpt: ModuleOption = "commonjs",
 ) => {
@@ -91,6 +114,16 @@ export const validateModulesOption = (
   );
 
   return modulesOpt;
+};
+
+export const objectToBrowserslist = (object: Targets) => {
+  return Object.keys(object).reduce((list, targetName) => {
+    if (validBrowserslistTargets.indexOf(targetName) >= 0) {
+      const targetVersion = object[targetName];
+      return list.concat(`${targetName} ${targetVersion}`);
+    }
+    return list;
+  }, []);
 };
 
 export const validateUseBuiltInsOption = (
@@ -124,9 +157,13 @@ export default function normalizeOptions(opts: Options) {
     forceAllTransforms: validateForceAllTransformsOption(
       opts.forceAllTransforms,
     ),
+    dirname: validateDirnameOption(opts.dirname),
     include: validateIncludesAndExcludes(opts.include, "include"),
     loose: validateLooseOption(opts.loose),
     modules: validateModulesOption(opts.modules),
+    ignoreBrowserslistConfig: validateIgnoreBrowserslistConfig(
+      opts.ignoreBrowserslistConfig,
+    ),
     spec: validateSpecOption(opts.spec),
     targets: opts.targets,
     useBuiltIns: validateUseBuiltInsOption(opts.useBuiltIns),
