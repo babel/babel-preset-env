@@ -79,9 +79,10 @@ const targetParserMap = {
 
   // Parse `node: true` and `node: "current"` to version
   node: (target, value) => {
-    const parsed = value === true || value === "current"
-      ? process.versions.node
-      : semverify(value);
+    const parsed =
+      value === true || value === "current"
+        ? process.versions.node
+        : semverify(value);
 
     return [target, parsed];
   },
@@ -122,10 +123,7 @@ const getTargets = (targets: Object = {}, options: Object = {}): Targets => {
 
       if (parsedValue) {
         // Merge (lowest wins)
-        results.targets[parsedTarget] = semverMin(
-          results.targets[parsedTarget],
-          parsedValue,
-        );
+        results.targets[parsedTarget] = parsedValue;
       }
     }
 
