@@ -67,7 +67,7 @@
     "eslint": "^3.17.1",
     "eslint-config-babel": "^6.0.0",
     "eslint-plugin-flowtype": "^2.29.1",
-    "fs-extra": "^2.0.0",
+    "fs-extra": "~2.0.0",
     "lodash": "^4.17.4",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2",
