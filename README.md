@@ -130,7 +130,11 @@ UglifyJS does not currently support any ES6 syntax, so if you are using Uglify t
 
 To prevent these errors - specify the uglify option, which will enable all plugins and, as a result, fully compile your code to ES5. However, the `useBuiltIns` option will still work as before, and only include the polyfills that your target(s) need.
 
-> NOTE: Uglify has a work-in-progress "Harmony" branch to address the lack of ES6 support, but it is not yet stable.  You can follow its progress in [UglifyJS2 issue #448](https://github.com/mishoo/UglifyJS2/issues/448).  If you require an alternative minifier which _does_ support ES6 syntax, we recommend using [Babili](https://github.com/babel/babili).
+> NOTE: Uglify has a complete and stable alternative (https://npmjs.org/package/uglify-es). However it does not support all ES2015+ syntax. If you require an alternative minifier which _does_ support all babel syntax, we recommend using [Babili](https://github.com/babel/babili).
+
+### `targets.uglifyes`
+
+`number | true`
 
 ### `spec`
 
