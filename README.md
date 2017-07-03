@@ -126,9 +126,9 @@ Note, browsers' results are overridden by explicit items from `targets`.
 
 `true`
 
-If you are using `uglify-js` to minify your code, targeting later browsers may cause syntax errors since it does not support any ES6 syntax.
+When using `uglify-js` to minify your code, you may run into syntax errors when targeting later browsers since `uglify-js` does not support any ES2015+ syntax.
 
-To prevent these errors - set the `uglify` option to `true`, which enables all plugins and as a result, all your code is fully compiled to ES5. However, the `useBuiltIns` option will still work as before, and only include the polyfills that your target(s) need.
+To prevent these errors - set the `uglify` option to `true`, which enables all transformation plugins and as a result, your code is fully compiled to ES5. However, the `useBuiltIns` option will still work as before and only include the polyfills that your target(s) need.
 
 > Uglify has support for ES2015 syntax via [uglify-es](https://github.com/mishoo/UglifyJS2/tree/harmony). If you are using syntax unsupported by `uglify-es`, we recommend using [Babili](https://github.com/babel/babili).
 
