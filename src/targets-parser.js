@@ -1,3 +1,4 @@
+import sortedIndexBy from "lodash.sortedindexby";
 import browserslist from "browserslist";
 import semver from "semver";
 import { semverify } from "./utils";
@@ -64,14 +65,32 @@ const outputDecimalWarning = (decimalTargets) => {
   console.log("");
 };
 
+const supportedNodeVersions = [
+  [new Date(2018, 4, 0), semverify("4")],
+  [new Date(2019, 4, 0), semverify("6")],
+  [new Date(2019, 12, 0), semverify("8")],
+  [new Date(2021, 4, 0), semverify("10")],
+  [Infinity, semverify("12")],
+];
+
+function getSupportedNode(date) {
+  const index = sortedIndexBy(supportedNodeVersions, [date], (v) => v[0]);
+  return supportedNodeVersions[index];
+}
+
 const targetParserMap = {
   __default: (target, value) => [target, semverify(value)],
 
   // Parse `node: true` and `node: "current"` to version
   node: (target, value) => {
-    const parsed = value === true || value === "current"
-      ? process.versions.node
-      : semverify(value);
+    const parsed = (() => {
+      switch (value) {
+        case true:
+        case "current": return process.versions.node;
+        case "maintained": return getSupportedNode(new Date());
+        default: return semverify(value);
+      }
+    })();
 
     return [target, parsed];
   },
