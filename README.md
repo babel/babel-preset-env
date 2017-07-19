@@ -341,6 +341,7 @@ Starting point, from where browserslist config search must be started and ascend
 `boolean`, defaults to `false`
 
 Toggles whether or not [browserslist config sources](https://github.com/ai/browserslist#queries) are used, which includes searching for any browserslist files or referencing the browserslist key inside package.json. This is useful for projects that use a browserslist config for files that won't be compiled with Babel.
+
 ---
 
 ## Examples
