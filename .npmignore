@@ -4,6 +4,7 @@ test
 node_modules
 scripts
 .eslintignore
+.flowconfig
 .travis.yml
 codecov.yml
 yarn.lock
@@ -12,3 +13,6 @@ yarn.lock
 .eslintrc
 babel-preset-env-*.tgz
 flow-typed
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
