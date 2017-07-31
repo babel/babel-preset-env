@@ -334,9 +334,9 @@ using [Babili](https://github.com/babel/babili).
 
 ### `dirname`
 
-`string`
+`string`, defaults to `process.cwd()`
 
-Starting point, from where browserslist config search must be started and ascend to the system root unless it will be found.
+The starting point where the browserslist config search will start, and ascend to the system root until found.
 
 ### `ignoreBrowserslistConfig`
 
