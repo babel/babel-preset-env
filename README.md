@@ -67,7 +67,9 @@ Use [browserslist](https://github.com/ai/browserslist) to declare supported envi
 Ref: [#19](https://github.com/babel/babel-preset-env/pull/19)
 
 ### Browserslist support.
-[Browserslist](https://github.com/ai/browserslist) is an library to share supported browsers list between different front-end tools like [autoprefixer](https://github.com/postcss/autoprefixer), [stylelint](https://stylelint.io/), [eslint-plugin-compat](https://github.com/amilajack/eslint-plugin-compat) and many others.
+
+[Browserslist](https://github.com/ai/browserslist) is a library used to share a supported list of browsers between different front-end tools like [autoprefixer](https://github.com/postcss/autoprefixer), [stylelint](https://stylelint.io/), [eslint-plugin-compat](https://github.com/amilajack/eslint-plugin-compat) and many others.
+
 By default, babel-preset-env will use [browserslist config sources](https://github.com/ai/browserslist#queries).
 
 For example, to enable only the polyfills and plugins needed for a project targeting *last 2 versions* and *IE10*:
