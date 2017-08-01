@@ -100,7 +100,7 @@ const getTargets = (targets: Object = {}, options: Object = {}): Targets => {
   if (queryIsValid || !options.ignoreBrowserslistConfig) {
     browserslist.defaults = objectToBrowserslist(targets);
 
-    const browsers = browserslist(browsersquery, { path: options.dirname });
+    const browsers = browserslist(browsersquery, { path: options.configPath });
     const queryBrowsers = getLowestVersions(browsers);
     targets = mergeBrowsers(queryBrowsers, targets);
   }
