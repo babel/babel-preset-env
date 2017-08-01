@@ -108,17 +108,17 @@ export default function buildPreset(
   opts: Object = {},
 ): { plugins: Array<Plugin> } {
   const {
+    configPath,
     debug,
     exclude: optionsExclude,
     forceAllTransforms,
+    ignoreBrowserslistConfig,
     include: optionsInclude,
     loose,
     modules,
     spec,
     targets: optionsTargets,
     useBuiltIns,
-    ignoreBrowserslistConfig,
-    dirname,
   } = normalizeOptions(opts);
   // TODO: remove this in next major
   let hasUglifyTarget = false;
@@ -135,7 +135,7 @@ export default function buildPreset(
 
   const targets = getTargets(optionsTargets, {
     ignoreBrowserslistConfig,
-    dirname,
+    configPath,
   });
   const include = transformIncludesAndExcludes(optionsInclude);
   const exclude = transformIncludesAndExcludes(optionsExclude);

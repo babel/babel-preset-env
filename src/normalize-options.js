@@ -28,7 +28,9 @@ export const validateIncludesAndExcludes = (
 
   invariant(
     unknownOpts.length === 0,
-    `Invalid Option: The plugins/built-ins '${unknownOpts.join(", ")}' passed to the '${type}' option are not
+    `Invalid Option: The plugins/built-ins '${unknownOpts.join(
+      ", ",
+    )}' passed to the '${type}' option are not
     valid. Please check data/[plugin-features|built-in-features].js in babel-preset-env`,
   );
 
@@ -56,17 +58,21 @@ export const checkDuplicateIncludeExcludes = (
 
   invariant(
     duplicates.length === 0,
-    `Invalid Option: The plugins/built-ins '${duplicates.join(", ")}' were found in both the "include" and
+    `Invalid Option: The plugins/built-ins '${duplicates.join(
+      ", ",
+    )}' were found in both the "include" and
     "exclude" options.`,
   );
 };
 
-export const validateDirnameOption = (dirname: string = process.cwd()) => {
+export const validateConfigPathOption = (
+  configPath: string = process.cwd(),
+) => {
   invariant(
-    typeof dirname === "string",
-    `Invalid Option: The dirname option '${dirname}' has incorrect format. Only strings are allowed.`,
+    typeof configPath === "string",
+    `Invalid Option: The configPath option '${configPath}' is invalid, only strings are allowed.`,
   );
-  return dirname;
+  return configPath;
 };
 
 export const validateBoolOption = (
@@ -152,18 +158,18 @@ export default function normalizeOptions(opts: Options) {
   checkDuplicateIncludeExcludes(opts.include, opts.exclude);
 
   return {
+    configPath: validateConfigPathOption(opts.configPath),
     debug: opts.debug,
     exclude: validateIncludesAndExcludes(opts.exclude, "exclude"),
     forceAllTransforms: validateForceAllTransformsOption(
       opts.forceAllTransforms,
     ),
-    dirname: validateDirnameOption(opts.dirname),
-    include: validateIncludesAndExcludes(opts.include, "include"),
-    loose: validateLooseOption(opts.loose),
-    modules: validateModulesOption(opts.modules),
     ignoreBrowserslistConfig: validateIgnoreBrowserslistConfig(
       opts.ignoreBrowserslistConfig,
     ),
+    include: validateIncludesAndExcludes(opts.include, "include"),
+    loose: validateLooseOption(opts.loose),
+    modules: validateModulesOption(opts.modules),
     spec: validateSpecOption(opts.spec),
     targets: opts.targets,
     useBuiltIns: validateUseBuiltInsOption(opts.useBuiltIns),

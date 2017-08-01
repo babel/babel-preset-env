@@ -1,7 +1,7 @@
 {
   "presets": [
     ["../../../../lib", {
-      "dirname": "../fixtures/preset-options/browserslist-config",
+      "configPath": "../fixtures/preset-options/browserslist-config",
       "modules": false,
       "debug": true
     }]

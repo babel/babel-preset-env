@@ -1,7 +1,7 @@
 {
   "presets": [
     ["../../../../lib", {
-      "dirname": "../fixtures/preset-options/browserslist-package",
+      "configPath": "../fixtures/preset-options/browserslist-package",
       "targets": {
         "chrome": 55
       },
