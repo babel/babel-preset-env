@@ -55,6 +55,7 @@ const byTestSuite = suite => browser => {
 };
 
 const es6 = require("compat-table/data-es6");
+
 es6.browsers = pickBy(envs, byTestSuite("es6"));
 
 const es2016plus = require("compat-table/data-es2016plus");
@@ -129,6 +130,10 @@ const environments = [
   "phantom",
 ];
 
+const unreleasedLabels = {
+  safari: "tp",
+};
+
 const compatibilityTests = flattenDeep(
   [es6, es2016plus].map(data =>
     data.tests.map(test => {
@@ -169,6 +174,7 @@ const getLowestImplementedVersion = ({ features }, env) => {
       })
   );
 
+  const unreleasedLabel = unreleasedLabels[env];
   const envTests = tests.map(({ res: test, name, isBuiltIn }, i) => {
     // Babel itself doesn't implement the feature correctly,
     // don't count against it
@@ -176,17 +182,51 @@ const getLowestImplementedVersion = ({ features }, env) => {
     if (!test.babel && isBuiltIn) {
       return "-1";
     }
+    const sortedKeys = Object.keys(test);
+    // Replace unreleased version after latest released version.
+    const unreleasedFullLabel = unreleasedLabel ? env + unreleasedLabel : null;
+    if (unreleasedFullLabel && sortedKeys.indexOf(unreleasedFullLabel) >= 0) {
+      // Find latest released version
+      const latestVersion = sortedKeys.reduce((current, next) => {
+        let nextVer = next.replace(env, "");
+        if (!next.startsWith(env) || nextVer === unreleasedLabel)
+          return current;
+        nextVer = parseFloat(nextVer);
+        const currentVer = current
+          ? parseFloat(current.replace(env, ""))
+          : null;
+        const isLarger = !currentVer || nextVer > currentVer;
+        if (isLarger) {
+          return next;
+        }
+        return current;
+      }, null);
+      // Put unreleased version after released.
+      if (latestVersion) {
+        sortedKeys.splice(sortedKeys.indexOf(unreleasedFullLabel), 1);
+        sortedKeys.splice(
+          sortedKeys.indexOf(latestVersion) + 1,
+          0,
+          unreleasedFullLabel
+        );
+      }
+    }
 
     return (
-      Object.keys(test)
+      sortedKeys
         .filter(t => t.startsWith(env))
         // Babel assumes strict mode
         .filter(
           test => tests[i].res[test] === true || tests[i].res[test] === "strict"
         )
-        // normalize some keys
-        .map(test => test.replace("_", "."))
-        .filter(test => !isNaN(parseFloat(test.replace(env, ""))))
+        // normalize some keys and get version from full string.
+        .map(test => {
+          return test.replace("_", ".").replace(env, "");
+        })
+        // version must be label from the unreleasedLabels (like tp) or number.
+        .filter(
+          version => unreleasedLabel === version || !isNaN(parseFloat(version))
+        )
         .shift()
     );
   });
@@ -204,9 +244,14 @@ const getLowestImplementedVersion = ({ features }, env) => {
     return null;
   }
 
-  return envTests.map(str => Number(str.replace(env, ""))).reduce((a, b) => {
-    return a < b ? b : a;
-  });
+  return envTests
+    .map(str => {
+      const version = str.replace(env, "");
+      return version === unreleasedLabel ? version : parseFloat(version);
+    })
+    .reduce((a, b) => {
+      return b === unreleasedLabel || a < b ? b : a;
+    });
 };
 
 const generateData = (environments, features) => {
