@@ -11,6 +11,7 @@ const pickBy = require("lodash/pickBy");
 const electronToChromiumVersions = require("electron-to-chromium").versions;
 const pluginFeatures = require("../data/plugin-features");
 const builtInFeatures = require("../data/built-in-features");
+const unreleasedLabels = require("../data/unreleased-labels");
 
 const electronToChromiumKeys = Object.keys(
   electronToChromiumVersions
@@ -129,10 +130,6 @@ const environments = [
   "ios",
   "phantom",
 ];
-
-const unreleasedLabels = {
-  safari: "tp",
-};
 
 const compatibilityTests = flattenDeep(
   [es6, es2016plus].map(data =>

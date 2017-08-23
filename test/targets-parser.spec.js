@@ -39,6 +39,17 @@ describe("getTargets", () => {
       );
     });
 
+    it("works with TP versions", () => {
+      assert.deepEqual(
+        getTargets({
+          browsers: "safari tp",
+        }),
+        {
+          safari: "tp",
+        },
+      );
+    });
+
     it("ignores invalid", () => {
       assert.deepEqual(
         getTargets({

@@ -5,6 +5,7 @@ import semver from "semver";
 import { semverify } from "./utils";
 import { objectToBrowserslist } from "./normalize-options";
 import type { Targets } from "./types";
+import unreleasedLabels from "../data/unreleased-labels";
 
 const browserNameMap = {
   android: "android",
