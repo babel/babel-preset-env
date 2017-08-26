@@ -37,7 +37,10 @@ export const isPluginRequired = (
     const lowestTargetedVersion: string = supportedEnvironments[environment];
     const unreleasedLabel = unreleasedLabels[environment];
 
-    if (unreleasedLabel && unreleasedLabel === lowestTargetedVersion) {
+    if (
+      unreleasedLabel &&
+      unreleasedLabel === lowestTargetedVersion.toLowerCase()
+    ) {
       return false;
     }
 

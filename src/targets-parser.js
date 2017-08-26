@@ -45,7 +45,13 @@ const getLowestVersions = (browsers: Array<string>): Targets => {
 
     try {
       // Browser version can return as "10.0-10.2"
-      const splitVersion = browserVersion.split("-")[0];
+      const splitVersion = browserVersion.split("-")[0].toLowerCase();
+      const unreleasedLabel = unreleasedLabels[browserName];
+      const isUnreleased = unreleasedLabel && unreleasedLabel === splitVersion;
+      if (isUnreleased) {
+        all[normalizedBrowserName] = all[normalizedBrowserName] || splitVersion;
+      }
+
       const parsedBrowserVersion = semverify(splitVersion);
 
       all[normalizedBrowserName] = semverMin(
