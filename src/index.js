@@ -12,6 +12,7 @@ import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
 import availablePlugins from "./available-plugins";
 import { prettifyTargets, semverify } from "./utils";
+import unreleasedLabels from "../data/unreleased-labels";
 import type { Plugin, Targets } from "./types";
 
 export const isPluginRequired = (
@@ -34,6 +35,11 @@ export const isPluginRequired = (
 
     const lowestImplementedVersion: string = plugin[environment];
     const lowestTargetedVersion: string = supportedEnvironments[environment];
+    const unreleasedLabel = unreleasedLabels[environment];
+
+    if (unreleasedLabel && unreleasedLabel === lowestTargetedVersion) {
+      return false;
+    }
 
     if (!semver.valid(lowestTargetedVersion)) {
       throw new Error(

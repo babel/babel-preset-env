@@ -4,8 +4,8 @@ import browserslist from "browserslist";
 import semver from "semver";
 import { semverify } from "./utils";
 import { objectToBrowserslist } from "./normalize-options";
-import type { Targets } from "./types";
 import unreleasedLabels from "../data/unreleased-labels";
+import type { Targets } from "./types";
 
 const browserNameMap = {
   android: "android",
@@ -77,7 +77,14 @@ const outputDecimalWarning = (decimalTargets: Array<Object>): void => {
 };
 
 const targetParserMap = {
-  __default: (target, value) => [target, semverify(value)],
+  __default: (target, value) => {
+    const unreleasedLabel = unreleasedLabels[target];
+    const version =
+      unreleasedLabel && unreleasedLabel === value
+        ? unreleasedLabel
+        : semverify(value);
+    return [target, version];
+  },
 
   // Parse `node: true` and `node: "current"` to version
   node: (target, value) => {
@@ -106,6 +113,7 @@ const getTargets = (targets: Object = {}, options: Object = {}): Targets => {
     const queryBrowsers = getLowestVersions(browsers);
     targets = mergeBrowsers(queryBrowsers, targets);
   }
+
   // Parse remaining targets
   const parsed = Object.keys(targets).sort().reduce((
     results: ParsedResult,

@@ -1,5 +1,6 @@
 /*eslint quotes: ["error", "double", { "avoidEscape": true }]*/
 import semver from "semver";
+import unreleasedLabels from "../data/unreleased-labels";
 import { prettifyVersion, semverify } from "./utils";
 
 const wordEnds = size => {
@@ -15,9 +16,21 @@ export const logMessage = (message, context) => {
 export const logPlugin = (plugin, targets, list, context) => {
   const envList = list[plugin] || {};
   const filteredList = Object.keys(targets).reduce((a, b) => {
-    if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
-      a[b] = prettifyVersion(targets[b]);
+    const unreleasedLabel = unreleasedLabels[b];
+
+    const isUnreleased =
+      unreleasedLabel &&
+      unreleasedLabel === targets[b] &&
+      unreleasedLabel !== envList[b];
+
+    if (
+      !envList[b] ||
+      isUnreleased ||
+      semver.lt(targets[b], semverify(envList[b]))
+    ) {
+      a[b] = isUnreleased ? unreleasedLabel : prettifyVersion(targets[b]);
     }
+
     return a;
   }, {});
 

@@ -1,6 +1,7 @@
 // @flow
 
 import semver from "semver";
+import unreleasedLabels from "../data/unreleased-labels";
 import type { Targets } from "./types";
 
 // Convert version to a semver value.
@@ -43,7 +44,9 @@ export const prettifyTargets = (targets: Targets): Object => {
   return Object.keys(targets).reduce((results, target) => {
     let value = targets[target];
 
-    if (typeof value === "string") {
+    const unreleasedLabel = unreleasedLabels[target];
+
+    if (typeof value === "string" && unreleasedLabel !== value) {
       value = prettifyVersion(value);
     }
 
