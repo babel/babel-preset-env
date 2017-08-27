@@ -7,6 +7,9 @@ const wordEnds = size => {
   return size > 1 ? "s" : "";
 };
 
+const envIsNotSupported = (fromEnvs, fromTargets) =>
+  !fromEnvs || semver.lt(fromTargets, semverify(fromEnvs));
+
 export const logMessage = (message, context) => {
   const pre = context ? `[${context}] ` : "";
   const logStr = `  ${pre}${message}`;
@@ -23,12 +26,8 @@ export const logPlugin = (plugin, targets, list, context) => {
       unreleasedLabel === targets[b] &&
       unreleasedLabel !== envList[b];
 
-    if (
-      !envList[b] ||
-      isUnreleased ||
-      semver.lt(targets[b], semverify(envList[b]))
-    ) {
-      a[b] = isUnreleased ? unreleasedLabel : prettifyVersion(targets[b]);
+    if (!isUnreleased && envIsNotSupported(envList[b], targets[b])) {
+      a[b] = prettifyVersion(targets[b]);
     }
 
     return a;
