@@ -11,8 +11,7 @@ import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
 import availablePlugins from "./available-plugins";
-import { prettifyTargets, semverify } from "./utils";
-import unreleasedLabels from "../data/unreleased-labels";
+import { prettifyTargets, semverify, isUnreleasedVersion } from "./utils";
 import type { Plugin, Targets } from "./types";
 
 export const isPluginRequired = (
@@ -35,12 +34,8 @@ export const isPluginRequired = (
 
     const lowestImplementedVersion: string = plugin[environment];
     const lowestTargetedVersion: string = supportedEnvironments[environment];
-    const unreleasedLabel = unreleasedLabels[environment];
 
-    if (
-      unreleasedLabel &&
-      unreleasedLabel === lowestTargetedVersion.toLowerCase()
-    ) {
+    if (isUnreleasedVersion(lowestTargetedVersion, environment)) {
       return false;
     }
 

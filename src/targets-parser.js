@@ -2,9 +2,8 @@
 
 import browserslist from "browserslist";
 import semver from "semver";
-import { semverify } from "./utils";
+import { semverify, isUnreleasedVersion, getLowestUnreleased } from "./utils";
 import { objectToBrowserslist } from "./normalize-options";
-import unreleasedLabels from "../data/unreleased-labels";
 import type { Targets } from "./types";
 
 const browserNameMap = {
@@ -21,7 +20,7 @@ const browserNameMap = {
 const isBrowsersQueryValid = (browsers: string | Array<string>): boolean =>
   typeof browsers === "string" || Array.isArray(browsers);
 
-const semverMin = (first: ?string, second: string): string => {
+export const semverMin = (first: ?string, second: string): string => {
   return first && semver.lt(first, second) ? first : second;
 };
 
@@ -46,10 +45,13 @@ const getLowestVersions = (browsers: Array<string>): Targets => {
     try {
       // Browser version can return as "10.0-10.2"
       const splitVersion = browserVersion.split("-")[0].toLowerCase();
-      const unreleasedLabel = unreleasedLabels[browserName];
-      const isUnreleased = unreleasedLabel && unreleasedLabel === splitVersion;
-      if (isUnreleased) {
-        all[normalizedBrowserName] = all[normalizedBrowserName] || splitVersion;
+
+      if (isUnreleasedVersion(splitVersion, browserName)) {
+        all[normalizedBrowserName] = getLowestUnreleased(
+          all[normalizedBrowserName],
+          splitVersion,
+          browserName,
+        );
       }
 
       const parsedBrowserVersion = semverify(splitVersion);
@@ -84,11 +86,9 @@ const outputDecimalWarning = (decimalTargets: Array<Object>): void => {
 
 const targetParserMap = {
   __default: (target, value) => {
-    const unreleasedLabel = unreleasedLabels[target];
-    const version =
-      unreleasedLabel && unreleasedLabel === value
-        ? unreleasedLabel
-        : semverify(value);
+    const version = isUnreleasedVersion(value, target)
+      ? value
+      : semverify(value);
     return [target, version];
   },
 
