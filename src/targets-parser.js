@@ -87,7 +87,7 @@ const outputDecimalWarning = (decimalTargets: Array<Object>): void => {
 const targetParserMap = {
   __default: (target, value) => {
     const version = isUnreleasedVersion(value, target)
-      ? value
+      ? value.toLowerCase()
       : semverify(value);
     return [target, version];
   },

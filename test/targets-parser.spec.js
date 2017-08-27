@@ -50,6 +50,17 @@ describe("getTargets", () => {
       );
     });
 
+    it("returns TP version in lower case", () => {
+      assert.deepEqual(
+        getTargets({
+          safari: "TP",
+        }),
+        {
+          safari: "tp",
+        },
+      );
+    });
+
     it("ignores invalid", () => {
       assert.deepEqual(
         getTargets({
