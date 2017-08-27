@@ -1,7 +1,6 @@
 /*eslint quotes: ["error", "double", { "avoidEscape": true }]*/
 import semver from "semver";
-import unreleasedLabels from "../data/unreleased-labels";
-import { prettifyVersion, semverify } from "./utils";
+import { prettifyVersion, semverify, isUnreleasedVersion } from "./utils";
 
 const wordEnds = size => {
   return size > 1 ? "s" : "";
@@ -19,12 +18,7 @@ export const logMessage = (message, context) => {
 export const logPlugin = (plugin, targets, list, context) => {
   const envList = list[plugin] || {};
   const filteredList = Object.keys(targets).reduce((a, b) => {
-    const unreleasedLabel = unreleasedLabels[b];
-
-    const isUnreleased =
-      unreleasedLabel &&
-      unreleasedLabel === targets[b] &&
-      unreleasedLabel !== envList[b];
+    const isUnreleased = isUnreleasedVersion(targets[b], b);
 
     if (!isUnreleased && envIsNotSupported(envList[b], targets[b])) {
       a[b] = prettifyVersion(targets[b]);
