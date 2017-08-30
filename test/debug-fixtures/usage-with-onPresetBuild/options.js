@@ -5,7 +5,8 @@ module.exports = {
       targets: {
         ie: 11
       },
-      onPresetBuild: ({ usedPolyfillsInFiles }) => {
+      onPresetBuild: function(args) {
+        const usedPolyfillsInFiles = args.usedPolyfillsInFiles;
         console.log(
           "`onPresetBuild` received following `usedPolyfillsInFiles`:\n ",
           JSON.stringify(Array.from(usedPolyfillsInFiles), 2)
