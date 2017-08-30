@@ -1,7 +1,6 @@
 //@flow
 
 import { definitions } from "./built-in-definitions";
-import { logUsagePolyfills } from "./debug";
 
 type Plugin = {
   visitor: Object,

@@ -1,5 +1,4 @@
 //@flow
-import { logEntryPolyfills } from "./debug";
 
 type Plugin = {
   visitor: Object,

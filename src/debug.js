@@ -1,10 +1,5 @@
 /*eslint quotes: ["error", "double", { "avoidEscape": true }]*/
-import semver from "semver";
-import {
-  prettifyVersion,
-  semverify,
-  filterRequiredForPluginTargets,
-} from "./utils";
+import { filterRequiredForPluginTargets } from "./utils";
 
 const wordEnds = size => {
   return size > 1 ? "s" : "";
