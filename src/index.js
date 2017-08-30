@@ -279,9 +279,10 @@ Using polyfills with \`${useBuiltIns}\` option:`,
 
     if (useBuiltIns && polyfills) {
       polyfills.forEach(polyfill => {
-        const filteredTargets = defaultWebIncludes.includes(polyfill)
-          ? prettifyTargets(targets)
-          : filterRequiredForPluginTargets(targets, builtInsList[polyfill]);
+        const filteredTargets =
+          defaultWebIncludes.indexOf(polyfill) > -1
+            ? prettifyTargets(targets)
+            : filterRequiredForPluginTargets(targets, builtInsList[polyfill]);
         polyfillsWithTargets.add({
           name: polyfill,
           targets: filteredTargets,
