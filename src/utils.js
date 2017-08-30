@@ -51,3 +51,15 @@ export const prettifyTargets = (targets: Targets): Object => {
     return results;
   }, {});
 };
+
+export const filterRequiredForPluginTargets = (
+  allTargets: Targets,
+  envTargets: Object,
+): Object => {
+  return Object.keys(allTargets).reduce((a, b) => {
+    if (!envTargets[b] || semver.lt(allTargets[b], semverify(envTargets[b]))) {
+      a[b] = prettifyVersion(allTargets[b]);
+    }
+    return a;
+  }, {});
+};

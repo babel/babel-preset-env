@@ -2,7 +2,7 @@
 
 import semver from "semver";
 import builtInsList from "../data/built-ins.json";
-import { logPlugin } from "./debug";
+import { logPlugin, logUsagePolyfills, logEntryPolyfills } from "./debug";
 import { defaultWebIncludes } from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options.js";
@@ -11,7 +11,11 @@ import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
 import availablePlugins from "./available-plugins";
-import { prettifyTargets, semverify } from "./utils";
+import {
+  prettifyTargets,
+  semverify,
+  filterRequiredForPluginTargets,
+} from "./utils";
 import type { Plugin, Targets } from "./types";
 
 export const isPluginRequired = (
@@ -115,6 +119,7 @@ export default function buildPreset(
     forceAllTransforms,
     ignoreBrowserslistConfig,
     include: optionsInclude,
+    onPresetBuild,
     loose,
     modules,
     spec,
@@ -142,6 +147,24 @@ export default function buildPreset(
   const exclude = transformIncludesAndExcludes(optionsExclude);
 
   const transformTargets = forceAllTransforms || hasUglifyTarget ? {} : targets;
+  const withOnBuildHandler = typeof onPresetBuild === "function";
+  const usedPolyfillsInFiles = new Set();
+  const [transformationsWithTargets, polyfillsWithTargets] = [
+    new Set(),
+    new Set(),
+  ];
+  const handlePresetBuild = function() {
+    withOnBuildHandler &&
+      onPresetBuild({
+        targets: prettifyTargets(targets),
+        transformations,
+        transformationsWithTargets,
+        polyfills,
+        polyfillsWithTargets,
+        usedPolyfillsInFiles,
+        modules,
+      });
+  };
 
   const transformations = filterItems(
     pluginList,
@@ -207,10 +230,36 @@ Using polyfills with \`${useBuiltIns}\` option:`,
       debug,
       polyfills,
       regenerator,
-      onDebug: (polyfills, context) => {
-        polyfills.forEach(polyfill =>
-          logPlugin(polyfill, polyfillTargets, builtInsList, context),
-        );
+      onCompile: (polyfills, filename, opts) => {
+        if (debug) {
+          const logUsedPlugins = polyfills => {
+            polyfills.forEach(polyfill =>
+              logPlugin(polyfill, polyfillTargets, builtInsList),
+            );
+          };
+
+          const logPolyfills =
+            useBuiltIns === "usage" ? logUsagePolyfills : logEntryPolyfills;
+          logPolyfills(polyfills, filename, logUsedPlugins, opts);
+        }
+        if (withOnBuildHandler) {
+          const usedPolyfillsWithTargets = [];
+
+          polyfills.forEach(polyfill => {
+            usedPolyfillsWithTargets.push({
+              name: polyfill,
+              targets: filterRequiredForPluginTargets(
+                polyfillTargets,
+                builtInsList[polyfill],
+              ),
+            });
+          });
+          usedPolyfillsInFiles.add({
+            polyfills: usedPolyfillsWithTargets,
+            path: filename,
+          });
+          handlePresetBuild();
+        }
       },
     };
 
@@ -218,6 +267,31 @@ Using polyfills with \`${useBuiltIns}\` option:`,
       useBuiltIns === "usage" ? addUsedBuiltInsPlugin : useBuiltInsEntryPlugin,
       pluginOptions,
     ]);
+  }
+
+  if (withOnBuildHandler) {
+    transformations.forEach(transform => {
+      transformationsWithTargets.add({
+        name: transform,
+        targets: filterRequiredForPluginTargets(targets, pluginList[transform]),
+      });
+    });
+
+    if (useBuiltIns && polyfills) {
+      polyfills.forEach(polyfill => {
+        const filteredTargets = defaultWebIncludes.includes(polyfill)
+          ? prettifyTargets(targets)
+          : filterRequiredForPluginTargets(targets, builtInsList[polyfill]);
+        polyfillsWithTargets.add({
+          name: polyfill,
+          targets: filteredTargets,
+        });
+      });
+    }
+
+    if (!useBuiltIns) {
+      handlePresetBuild();
+    }
   }
 
   return {

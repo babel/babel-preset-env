@@ -18,6 +18,7 @@ export type Options = {
   forceAllTransforms: boolean,
   ignoreBrowserslistConfig: boolean,
   include: Array<string>,
+  onPresetBuild: Function,
   loose: boolean,
   modules: ModuleOption,
   spec: boolean,

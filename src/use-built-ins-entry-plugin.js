@@ -111,15 +111,11 @@ export default function({ types: t }: { types: Object }): Plugin {
       this.importPolyfillIncluded = false;
     },
     post() {
-      const { debug, onDebug, polyfills } = this.opts;
-
-      if (debug) {
-        logEntryPolyfills(
-          this.importPolyfillIncluded,
-          polyfills,
-          this.file.opts.filename,
-          onDebug,
-        );
+      const { onCompile, polyfills } = this.opts;
+      if (onCompile) {
+        onCompile(polyfills, this.file.opts.filename, {
+          importPolyfillIncluded: this.importPolyfillIncluded,
+        });
       }
     },
   };

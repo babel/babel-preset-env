@@ -292,10 +292,12 @@ export default function({ types: t }: { types: Object }): Plugin {
       this.usesRegenerator = false;
     },
     post() {
-      const { debug, onDebug } = this.opts;
+      const { onCompile } = this.opts;
 
-      if (debug) {
-        logUsagePolyfills(this.builtIns, this.file.opts.filename, onDebug);
+      if (onCompile) {
+        onCompile(this.builtIns, this.file.opts.filename, {
+          usesRegenerator: this.usesRegenerator,
+        });
       }
     },
     visitor: addAndRemovePolyfillImports,
