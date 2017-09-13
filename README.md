@@ -6,7 +6,7 @@
 npm install babel-preset-env --save-dev
 ```
 
-Without any configuration options, babel-preset-env behaves the same as babel-preset-latest (or babel-preset-es2015, babel-preset-es2016, and babel-preset-es2017 together).
+Without any configuration options, babel-preset-env behaves exactly the same as babel-preset-latest (or babel-preset-es2015, babel-preset-es2016, and babel-preset-es2017 together).
 
 ```json
 {
@@ -14,9 +14,9 @@ Without any configuration options, babel-preset-env behaves the same as babel-pr
 }
 ```
 
-But you can also configure it to only include the polyfills and transforms needed for the browsers you target. If you only support certain browsers, compiling only what's needed can make your bundles smaller and your life easier.
+You can also configure it to only include the polyfills and transforms needed for the browsers you support. Compiling only what's needed can make your bundles smaller and your life easier.
 
-This example only includes the polyfills and code transforms needed for the last two versions of each browser, and versions of safari greater than or equal to 7. We use [browserslist](https://github.com/ai/browserslist) to parse this information, so you can use [any valid query format supported by browserslist](https://github.com/ai/browserslist#queries).
+This example only includes the polyfills and code transforms needed for the last two versions of each browser, and versions of Safari greater than or equal to 7. We use [browserslist](https://github.com/ai/browserslist) to parse this information, so you can use [any valid query format supported by browserslist](https://github.com/ai/browserslist#queries).
 
 ```json
 {
@@ -30,7 +30,7 @@ This example only includes the polyfills and code transforms needed for the last
 }
 ```
 
-If you're targeting node instead of the browser, you can configure babel-preset-env to only include the polyfills and transforms necessary for a particular node version:
+Similarly, if you're targeting Node.js instead of the browser, you can configure babel-preset-env to only include the polyfills and transforms necessary for a particular version:
 
 ```json
 {
@@ -44,7 +44,8 @@ If you're targeting node instead of the browser, you can configure babel-preset-
 }
 ```
 
-Or, you can use `"node": "current"` to only include the necessary polyfills and transforms for the node version that you use to run babel:
+For convenience, you can use `"node": "current"` to only include the necessary polyfills and transforms for the Node.js version that you use to run Babel:
+
 ```json
 {
   "presets": [
