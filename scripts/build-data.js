@@ -186,8 +186,9 @@ const getLowestImplementedVersion = ({ features }, env) => {
       // Find latest released version
       const latestVersion = sortedKeys.reduce((current, next) => {
         let nextVer = next.replace(env, "");
-        if (!next.startsWith(env) || nextVer === unreleasedLabel)
+        if (!next.startsWith(env) || nextVer === unreleasedLabel) {
           return current;
+        }
         nextVer = parseFloat(nextVer);
         const currentVer = current
           ? parseFloat(current.replace(env, ""))
