@@ -97,18 +97,23 @@ describe("debug output", () => {
       opts.stderr = helper.readFile(stderrLoc);
     }
 
-    const optionsLoc = path.join(testLoc, "options.json");
+    let optionsLoc = path.join(testLoc, "options.json");
+    let babelrcIsJs = false;
 
     if (!fs.existsSync(optionsLoc)) {
-      throw new Error(
-        `Debug test '${testName}' is missing an options.json file`,
-      );
+      optionsLoc = path.join(testLoc, "options.js");
+      babelrcIsJs = true;
+      if (!fs.existsSync(optionsLoc)) {
+        throw new Error(
+          `Debug test '${testName}' is missing options.js[on] file`,
+        );
+      }
     }
 
     const inFilesFolderLoc = path.join(testLoc, "in");
 
     opts.inFiles = {
-      ".babelrc": helper.readFile(optionsLoc),
+      [`.babelrc${babelrcIsJs ? ".js" : ""}`]: helper.readFile(optionsLoc),
     };
 
     if (!fs.existsSync(inFilesFolderLoc)) {

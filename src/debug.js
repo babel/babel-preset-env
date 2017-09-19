@@ -1,6 +1,5 @@
 /*eslint quotes: ["error", "double", { "avoidEscape": true }]*/
-import semver from "semver";
-import { prettifyVersion, semverify } from "./utils";
+import { filterRequiredForPluginTargets } from "./utils";
 
 const wordEnds = size => {
   return size > 1 ? "s" : "";
@@ -14,12 +13,7 @@ export const logMessage = (message, context) => {
 
 export const logPlugin = (plugin, targets, list, context) => {
   const envList = list[plugin] || {};
-  const filteredList = Object.keys(targets).reduce((a, b) => {
-    if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
-      a[b] = prettifyVersion(targets[b]);
-    }
-    return a;
-  }, {});
+  const filteredList = filterRequiredForPluginTargets(targets, envList);
 
   const formattedTargets = JSON.stringify(filteredList)
     .replace(/\,/g, ", ")
@@ -29,13 +23,8 @@ export const logPlugin = (plugin, targets, list, context) => {
   logMessage(`${plugin} ${formattedTargets}`, context);
 };
 
-export const logEntryPolyfills = (
-  importPolyfillIncluded,
-  polyfills,
-  filename,
-  onDebug,
-) => {
-  if (!importPolyfillIncluded) {
+export const logEntryPolyfills = (polyfills, filename, onDebug, opts = {}) => {
+  if (!opts.importPolyfillIncluded) {
     console.log(
       `
 [${filename}] \`import 'babel-polyfill'\` was not found.`,

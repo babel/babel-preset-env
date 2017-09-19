@@ -1,7 +1,6 @@
 "use strict";
-
-const babelPresetEnv = require("../lib/index.js");
 const assert = require("assert");
+const babelPresetEnv = require("../lib/index.js");
 
 describe("babel-preset-env", () => {
   describe("isPluginRequired", () => {
@@ -136,6 +135,74 @@ describe("babel-preset-env", () => {
           all: ["es6.map"],
           plugins: new Set(),
           builtIns: new Set(["es6.map"]),
+        },
+      );
+    });
+  });
+
+  describe("onPresetBuild", () => {
+    it("should call onCompile callback", () => {
+      let calls = 0;
+      const onPresetBuild = () => calls++;
+      babelPresetEnv.default({}, { onPresetBuild });
+      assert(calls === 1);
+    });
+
+    it("should call onCompile callback with correct targets", () => {
+      const targets = { chrome: "60" };
+      babelPresetEnv.default(
+        {},
+        {
+          targets,
+          onPresetBuild: ({ targets: compiledTargets }) => {
+            assert.deepEqual(targets, compiledTargets);
+          },
+        },
+      );
+    });
+
+    it("should call onCompile callback with correct transformationsWithTargets", () => {
+      const targets = { chrome: "55" };
+      const transformationsWithTargetsArray = [
+        {
+          name: "syntax-trailing-function-commas",
+          targets: { chrome: "55" },
+        },
+      ];
+      babelPresetEnv.default(
+        {},
+        {
+          targets,
+          onPresetBuild: ({ transformationsWithTargets }) => {
+            assert.deepEqual(
+              transformationsWithTargetsArray,
+              Array.from(transformationsWithTargets),
+            );
+          },
+        },
+      );
+    });
+
+    it("should call onCompile callback with correct polyfillsWithTargets (`entry` option)", () => {
+      const targets = { chrome: "55" };
+      const polyfillsWithTargetsArray = [
+        { name: "es7.string.pad-start", targets: { chrome: "55" } },
+        { name: "es7.string.pad-end", targets: { chrome: "55" } },
+        { name: "web.timers", targets: { chrome: "55" } },
+        { name: "web.immediate", targets: { chrome: "55" } },
+        { name: "web.dom.iterable", targets: { chrome: "55" } },
+      ];
+      babelPresetEnv.default(
+        {},
+        {
+          targets,
+          useBuiltIns: "entry",
+          onPresetBuild: ({ polyfillsWithTargets }) => {
+            assert.deepEqual(
+              polyfillsWithTargetsArray,
+              Array.from(polyfillsWithTargets),
+            );
+          },
         },
       );
     });

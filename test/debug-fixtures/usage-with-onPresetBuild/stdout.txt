@@ -1,0 +1,45 @@
+babel-preset-env: `DEBUG` option
+
+Using targets:
+{
+  "ie": "11"
+}
+
+Using modules transform: commonjs
+
+Using plugins:
+  check-es2015-constants { "ie":"11" }
+  transform-es2015-arrow-functions { "ie":"11" }
+  transform-es2015-block-scoping { "ie":"11" }
+  transform-es2015-classes { "ie":"11" }
+  transform-es2015-computed-properties { "ie":"11" }
+  transform-es2015-destructuring { "ie":"11" }
+  transform-es2015-duplicate-keys { "ie":"11" }
+  transform-es2015-for-of { "ie":"11" }
+  transform-es2015-function-name { "ie":"11" }
+  transform-es2015-literals { "ie":"11" }
+  transform-es2015-object-super { "ie":"11" }
+  transform-es2015-parameters { "ie":"11" }
+  transform-es2015-shorthand-properties { "ie":"11" }
+  transform-es2015-spread { "ie":"11" }
+  transform-es2015-sticky-regex { "ie":"11" }
+  transform-es2015-template-literals { "ie":"11" }
+  transform-es2015-typeof-symbol { "ie":"11" }
+  transform-es2015-unicode-regex { "ie":"11" }
+  transform-regenerator { "ie":"11" }
+  transform-exponentiation-operator { "ie":"11" }
+  transform-async-to-generator { "ie":"11" }
+  syntax-trailing-function-commas { "ie":"11" }
+
+Using polyfills with `usage` option:
+
+[src/in.js] Added following polyfill:
+  es6.promise { "ie":"11" }
+`onPresetBuild` received following `usedPolyfillsInFiles`:
+  [{"polyfills":[{"name":"es6.promise","targets":{"ie":"11"}}],"path":"src/in.js"}]
+src/in.js -> lib/in.js
+
+[src/in2.js] Based on your code and targets, none were added.
+`onPresetBuild` received following `usedPolyfillsInFiles`:
+  [{"polyfills":[],"path":"src/in2.js"}]
+src/in2.js -> lib/in2.js

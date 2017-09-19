@@ -169,6 +169,7 @@ export default function normalizeOptions(opts: Options) {
     ),
     include: validateIncludesAndExcludes(opts.include, "include"),
     loose: validateLooseOption(opts.loose),
+    onPresetBuild: opts.onPresetBuild,
     modules: validateModulesOption(opts.modules),
     spec: validateSpecOption(opts.spec),
     targets: opts.targets,
