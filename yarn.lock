@@ -1957,9 +1957,9 @@ commoner@^0.10.1:
     q "^1.1.2"
     recast "^0.11.17"
 
-compat-table@kangax/compat-table#d88c80ea6dcbc7064112eb46bb020718107892f7:
+compat-table@kangax/compat-table#b8477cc0f6d65c000c46213e654d19f350de9fa8:
   version "0.0.0"
-  resolved "https://codeload.github.com/kangax/compat-table/tar.gz/d88c80ea6dcbc7064112eb46bb020718107892f7"
+  resolved "https://codeload.github.com/kangax/compat-table/tar.gz/b8477cc0f6d65c000c46213e654d19f350de9fa8"
   dependencies:
     babel-core latest
     babel-polyfill latest
