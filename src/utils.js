@@ -71,3 +71,13 @@ export const getLowestUnreleased = (
   }
   return semverMin(a, b);
 };
+
+export const filterStageFromList = (list: any, stageList: any) => {
+  return Object.keys(list).reduce((result, item) => {
+    if (!stageList[item]) {
+      result[item] = list[item];
+    }
+
+    return result;
+  }, {});
+};

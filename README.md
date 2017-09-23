@@ -1,10 +1,22 @@
 # babel-preset-env [![npm](https://img.shields.io/npm/v/babel-preset-env.svg)](https://www.npmjs.com/package/babel-preset-env) [![travis](https://img.shields.io/travis/babel/babel-preset-env/master.svg)](https://travis-ci.org/babel/babel-preset-env) [![npm-downloads](https://img.shields.io/npm/dm/babel-preset-env.svg)](https://www.npmjs.com/package/babel-preset-env) [![codecov](https://img.shields.io/codecov/c/github/babel/babel-preset-env/master.svg?maxAge=43200)](https://codecov.io/github/babel/babel-preset-env)
 
-> A Babel preset that can automatically determine the Babel plugins and polyfills you need based on your supported environments.
+> A Babel preset that compiles [ES2015+](https://github.com/tc39/proposals/blob/master/finished-proposals.md) down to ES5 by automatically determining the Babel plugins and polyfills you need based on your targeted browser or runtime environments.
 
 ```sh
 npm install babel-preset-env --save-dev
 ```
+
+Without any configuration options, babel-preset-env behaves exactly the same as babel-preset-latest (or babel-preset-es2015, babel-preset-es2016, and babel-preset-es2017 together).
+
+```json
+{
+  "presets": ["env"]
+}
+```
+
+You can also configure it to only include the polyfills and transforms needed for the browsers you support. Compiling only what's needed can make your bundles smaller and your life easier.
+
+This example only includes the polyfills and code transforms needed for the last two versions of each browser, and versions of Safari greater than or equal to 7. We use [browserslist](https://github.com/ai/browserslist) to parse this information, so you can use [any valid query format supported by browserslist](https://github.com/ai/browserslist#queries).
 
 ```json
 {
@@ -18,13 +30,40 @@ npm install babel-preset-env --save-dev
 }
 ```
 
+Similarly, if you're targeting Node.js instead of the browser, you can configure babel-preset-env to only include the polyfills and transforms necessary for a particular version:
+
+```json
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "6.10"
+      }
+    }]
+  ]
+}
+```
+
+For convenience, you can use `"node": "current"` to only include the necessary polyfills and transforms for the Node.js version that you use to run Babel:
+
+```json
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ]
+}
+```
+
 - [How it Works](#how-it-works)
 - [Install](#install)
 - [Usage](#usage)
 - [Options](#options)
 - [Examples](#examples)
-- [Caveats](#caveats)
-- [Other Cool Projects](#other-cool-projects)
+- [Issues](#issues)
 
 ## How it Works
 
@@ -58,7 +97,7 @@ If you are targeting IE 8 and Chrome 55 it will include all plugins required by 
 
 ### Support a target option `"node": "current"` to compile for the currently running node version.
 
-For example, if you are building on Node 4, arrow functions won't be converted, but they will if you build on Node 0.12.
+For example, if you are building on Node 6, arrow functions won't be converted, but they will if you build on Node 0.12.
 
 ### Support a `browsers` option like autoprefixer.
 
@@ -343,6 +382,25 @@ The starting point where the config search for browserslist will start, and asce
 `boolean`, defaults to `false`
 
 Toggles whether or not [browserslist config sources](https://github.com/ai/browserslist#queries) are used, which includes searching for any browserslist files or referencing the browserslist key inside package.json. This is useful for projects that use a browserslist config for files that won't be compiled with Babel.
+
+### `shippedProposals`
+
+`boolean`, defaults to `false`
+
+Toggles enabling support for builtin/feature proposals that have shipped in browsers. If your target environments have native support for a feature proposal, its matching parser syntax plugin is enabled instead of performing any transform. Note that this _does not_ enable the same transformations as [`babel-preset-stage3`](https://babeljs.io/docs/plugins/preset-stage-3/), since proposals can continue to change before landing in browsers.
+
+The following are currently supported:
+
+**Builtins**
+
+- [Promise.prototype.finally](https://github.com/tc39/proposal-promise-finally)
+
+**Features**
+
+- [Asynchronous Iterators](https://github.com/tc39/proposal-async-iteration)
+- [Object rest/spread properties](https://github.com/tc39/proposal-object-rest-spread)
+- [Optional catch binding](https://github.com/tc39/proposal-optional-catch-binding)
+- [Unicode property escapes in regular expressions](https://github.com/tc39/proposal-regexp-unicode-property-escapes)
 
 ---
 

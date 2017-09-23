@@ -7,12 +7,44 @@ import { defaultWebIncludes } from "./default-includes";
 import moduleTransformations from "./module-transformations";
 import normalizeOptions from "./normalize-options.js";
 import pluginList from "../data/plugins.json";
+import {
+  builtIns as proposalBuiltIns,
+  features as proposalPlugins,
+  pluginSyntaxMap,
+} from "../data/shipped-proposals.js";
 import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
 import availablePlugins from "./available-plugins";
-import { prettifyTargets, semverify, isUnreleasedVersion } from "./utils";
+import {
+  filterStageFromList,
+  prettifyTargets,
+  isUnreleasedVersion,
+  semverify,
+} from "./utils";
 import type { Plugin, Targets } from "./types";
+
+const getPlugin = (pluginName: string) => {
+  const plugin = availablePlugins[pluginName];
+
+  if (!plugin) {
+    throw new Error(
+      `Could not find plugin "${pluginName}". Ensure there is an entry in ./available-plugins.js for it.`,
+    );
+  }
+
+  return plugin;
+};
+
+const builtInsListWithoutProposals = filterStageFromList(
+  builtInsList,
+  proposalBuiltIns,
+);
+
+const pluginListWithoutProposals = filterStageFromList(
+  pluginList,
+  proposalPlugins,
+);
 
 export const isPluginRequired = (
   supportedEnvironments: Targets,
@@ -88,14 +120,28 @@ const getPlatformSpecificDefaultFor = (targets: Targets): ?Array<string> => {
   return isAnyTarget || isWebTarget ? defaultWebIncludes : null;
 };
 
-const filterItems = (list, includes, excludes, targets, defaultItems) => {
+const filterItems = (
+  list,
+  includes,
+  excludes,
+  targets,
+  defaultItems,
+): Set<string> => {
   const result = new Set();
 
   for (const item in list) {
     const excluded = excludes.has(item);
 
-    if (!excluded && isPluginRequired(targets, list[item])) {
-      result.add(item);
+    if (!excluded) {
+      if (isPluginRequired(targets, list[item])) {
+        result.add(item);
+      } else {
+        const shippedProposalsSyntax = pluginSyntaxMap.get(item);
+
+        if (shippedProposalsSyntax) {
+          result.add(shippedProposalsSyntax);
+        }
+      }
     }
   }
 
@@ -121,6 +167,7 @@ export default function buildPreset(
     include: optionsInclude,
     loose,
     modules,
+    shippedProposals,
     spec,
     targets: optionsTargets,
     useBuiltIns,
@@ -148,7 +195,7 @@ export default function buildPreset(
   const transformTargets = forceAllTransforms || hasUglifyTarget ? {} : targets;
 
   const transformations = filterItems(
-    pluginList,
+    shippedProposals ? pluginList : pluginListWithoutProposals,
     include.plugins,
     exclude.plugins,
     transformTargets,
@@ -161,7 +208,7 @@ export default function buildPreset(
     polyfillTargets = getBuiltInTargets(targets);
 
     polyfills = filterItems(
-      builtInsList,
+      shippedProposals ? builtInsList : builtInsListWithoutProposals,
       include.builtIns,
       exclude.builtIns,
       polyfillTargets,
@@ -170,15 +217,19 @@ export default function buildPreset(
   }
 
   const plugins = [];
-
-  if (modules !== false && moduleTransformations[modules]) {
-    plugins.push([availablePlugins[moduleTransformations[modules]], { loose }]);
-  }
+  const pluginUseBuiltIns = useBuiltIns !== false;
 
   // NOTE: not giving spec here yet to avoid compatibility issues when
   // babel-plugin-transform-es2015-modules-commonjs gets its spec mode
+  if (modules !== false && moduleTransformations[modules]) {
+    plugins.push([getPlugin(moduleTransformations[modules]), { loose }]);
+  }
+
   transformations.forEach(pluginName =>
-    plugins.push([availablePlugins[pluginName], { spec, loose }]),
+    plugins.push([
+      getPlugin(pluginName),
+      { spec, loose, useBuiltIns: pluginUseBuiltIns },
+    ]),
   );
 
   const regenerator = transformations.has("transform-regenerator");

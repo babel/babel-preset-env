@@ -102,6 +102,11 @@ const es2015 = {
       "RegExp \"y\" and \"u\" flags / \"u\" flag",
     ],
   },
+  "transform-new-target": {
+    features: [
+      "new.target",
+    ],
+  },
   "transform-regenerator": {
     features: [
       "generators",
@@ -130,4 +135,6 @@ const es2017 = {
   }
 };
 
-module.exports = Object.assign({}, es2015, es2016, es2017);
+const proposals = require("./shipped-proposals").features;
+
+module.exports = Object.assign({}, es2015, es2016, es2017, proposals);
