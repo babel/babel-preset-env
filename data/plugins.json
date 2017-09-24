@@ -62,7 +62,6 @@
   },
   "transform-es2015-destructuring": {
     "chrome": "51",
-    "edge": "15",
     "firefox": "53",
     "safari": "10",
     "node": "6.5",
@@ -239,12 +238,18 @@
     "opera": "45",
     "electron": "1.7"
   },
-  "transform-async-generator-functions": {},
+  "transform-async-generator-functions": {
+    "safari": "tp"
+  },
   "transform-object-rest-spread": {
     "chrome": "60",
     "firefox": "55",
+    "safari": "tp",
+    "node": "8.3",
     "opera": "47"
   },
-  "transform-optional-catch-binding": {},
+  "transform-optional-catch-binding": {
+    "safari": "tp"
+  },
   "transform-unicode-property-regex": {}
 }
