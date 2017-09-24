@@ -62,6 +62,7 @@
   },
   "transform-es2015-destructuring": {
     "chrome": "51",
+    "edge": "15",
     "firefox": "53",
     "safari": "10",
     "node": "6.5",
@@ -242,7 +243,6 @@
   "transform-object-rest-spread": {
     "chrome": "60",
     "firefox": "55",
-    "node": "8.3",
     "opera": "47"
   },
   "transform-optional-catch-binding": {},

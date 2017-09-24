@@ -7,6 +7,7 @@ const flattenDeep = require("lodash/flattenDeep");
 const isEqual = require("lodash/isEqual");
 const mapValues = require("lodash/mapValues");
 const pickBy = require("lodash/pickBy");
+const unreleasedLabels = require("../data/unreleased-labels");
 const electronToChromiumVersions = require("electron-to-chromium").versions;
 
 const electronToChromiumKeys = Object.keys(
