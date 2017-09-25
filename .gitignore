@@ -7,4 +7,5 @@ test/tmp
 .vscode
 .nyc_output
 tmp
+package-lock.json
 babel-preset-env-*.tgz

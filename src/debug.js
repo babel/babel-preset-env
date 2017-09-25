@@ -1,10 +1,13 @@
 /*eslint quotes: ["error", "double", { "avoidEscape": true }]*/
 import semver from "semver";
-import { prettifyVersion, semverify } from "./utils";
+import { prettifyVersion, semverify, isUnreleasedVersion } from "./utils";
 
 const wordEnds = size => {
   return size > 1 ? "s" : "";
 };
+
+const envIsNotSupported = (fromEnvs, fromTargets) =>
+  !fromEnvs || semver.lt(fromTargets, semverify(fromEnvs));
 
 export const logMessage = (message, context) => {
   const pre = context ? `[${context}] ` : "";
@@ -15,9 +18,12 @@ export const logMessage = (message, context) => {
 export const logPlugin = (plugin, targets, list, context) => {
   const envList = list[plugin] || {};
   const filteredList = Object.keys(targets).reduce((a, b) => {
-    if (!envList[b] || semver.lt(targets[b], semverify(envList[b]))) {
+    const isUnreleased = isUnreleasedVersion(targets[b], b);
+
+    if (!isUnreleased && envIsNotSupported(envList[b], targets[b])) {
       a[b] = prettifyVersion(targets[b]);
     }
+
     return a;
   }, {});
 

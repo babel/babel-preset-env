@@ -9,6 +9,7 @@
       ],
       "targets": {
         "firefox": 52,
+        "safari": "tp",
         "node": 7.4
       },
       "useBuiltIns": false

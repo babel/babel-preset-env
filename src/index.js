@@ -16,7 +16,12 @@ import useBuiltInsEntryPlugin from "./use-built-ins-entry-plugin";
 import addUsedBuiltInsPlugin from "./use-built-ins-plugin";
 import getTargets from "./targets-parser";
 import availablePlugins from "./available-plugins";
-import { filterStageFromList, prettifyTargets, semverify } from "./utils";
+import {
+  filterStageFromList,
+  prettifyTargets,
+  isUnreleasedVersion,
+  semverify,
+} from "./utils";
 import type { Plugin, Targets } from "./types";
 
 const getPlugin = (pluginName: string) => {
@@ -61,6 +66,10 @@ export const isPluginRequired = (
 
     const lowestImplementedVersion: string = plugin[environment];
     const lowestTargetedVersion: string = supportedEnvironments[environment];
+
+    if (isUnreleasedVersion(lowestTargetedVersion, environment)) {
+      return false;
+    }
 
     if (!semver.valid(lowestTargetedVersion)) {
       throw new Error(

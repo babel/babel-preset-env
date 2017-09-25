@@ -10,7 +10,8 @@ babel-preset-env: `DEBUG` option
 Using targets:
 {
   "firefox": "52",
-  "node": "7.4"
+  "node": "7.4",
+  "safari": "tp"
 }
 
 Using modules transform: commonjs

@@ -1,0 +1,9 @@
+{
+  "presets": [
+    ["../../../../lib", {
+      "targets": {
+        "browsers": "safari tp"
+      }
+    }]
+  ]
+}

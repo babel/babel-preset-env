@@ -826,5 +826,7 @@
     "opera": "44",
     "electron": "1.7"
   },
-  "es7.promise.finally": {}
+  "es7.promise.finally": {
+    "safari": "tp"
+  }
 }
