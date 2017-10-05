@@ -1,6 +1,6 @@
 # We moved babel-preset-env into the [main Babel repo](https://github.com/babel/babel) under a [different folder](https://github.com/babel/babel/tree/master/experimental/babel-preset-env)
 
-> This will make it easier to release/develop! I wasn't sure it was going to work out earlier so it was in a separate repo, but now it's a pain to keep it apart!
+> This will make it easier to release/develop in sync with the rest of the code! I wasn't sure it was going to work out earlier so it was in a separate repo, but now it's a pain to keep it apart!
 
 # babel-preset-env [![npm](https://img.shields.io/npm/v/babel-preset-env.svg)](https://www.npmjs.com/package/babel-preset-env) [![travis](https://img.shields.io/travis/babel/babel-preset-env/master.svg)](https://travis-ci.org/babel/babel-preset-env) [![npm-downloads](https://img.shields.io/npm/dm/babel-preset-env.svg)](https://www.npmjs.com/package/babel-preset-env) [![codecov](https://img.shields.io/codecov/c/github/babel/babel-preset-env/master.svg?maxAge=43200)](https://codecov.io/github/babel/babel-preset-env)
 
