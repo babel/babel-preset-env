@@ -6,11 +6,11 @@
 
 - Update compat table to fix two small issues ([#445](https://github.com/babel/babel-preset-env/pull/445)) (@danez)
 
-ES6 destructuring is not fully supported in Edge 15 and the polyfill required again. `es6.math.imul` is supported on Android as of version 4.4
+ES2015 destructuring is not fully supported in Edge 15 and the polyfill required again. `es6.math.imul` is supported on Android as of version 4.4
 
 - Add polyfills for ES6 static Object methods ([#441](https://github.com/babel/babel-preset-env/pull/441)) (@danez)
 
-Functions such as `Object.keys`, `Object.freeze`, ...do already exist in ES5, but their behaviour changed in ES6. `babel-preset-env` with `builtIns: true` now adds the core-js polyfills for this methods if the browser only supports the ES5 variant of the version (like IE11 for example)
+Functions such as `Object.keys`, `Object.freeze`, ... do already exist in ES5, but their behaviour changed in ES2015. `babel-preset-env` with `builtIns: true` now adds the core-js polyfills for this methods if the browser only supports the ES5 variant of the method (like IE11 for example)
 
 - Normalize module format of plugins/built-ins data ([#376](https://github.com/babel/babel-preset-env/pull/376)) (@rtsao)
 
