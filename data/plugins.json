@@ -62,7 +62,6 @@
   },
   "transform-es2015-destructuring": {
     "chrome": "51",
-    "edge": "15",
     "firefox": "53",
     "safari": "10",
     "node": "6.5",
