@@ -1,4 +1,5 @@
-# We moved babel-preset-env into the [main Babel repo](https://github.com/babel/babel) under a [different folder](https://github.com/babel/babel/tree/master/experimental/babel-preset-env)
+# babel-preset-env is still on npm
+# We only moved the package "babel-preset-env" into the [main Babel repo](https://github.com/babel/babel) under a [different folder](https://github.com/babel/babel/tree/master/experimental/babel-preset-env) instead of in this repo. We are still in the process of moving over the issues/labels/PRs/etc
 
 > This will make it easier to release/develop in sync with the rest of the code! I wasn't sure it was going to work out earlier so it was in a separate repo, but now it's a pain to keep it apart!
 
