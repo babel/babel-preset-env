@@ -1,0 +1,34 @@
+{
+  "name": "babel-es-runtime-extractor",
+  "license": "MIT",
+  "main": "src/index.js",
+  "scripts": {
+    "coverage": "BABEL_ENV=test nyc npm run test",
+    "coverage-ci": "nyc report --reporter=json && codecov -f coverage/coverage-final.json",
+    "fix": "eslint . --fix",
+    "flow": "flow",
+    "format": "prettier --trailing-comma es5 --write \"src/*.js\" \"test/*.js\" \"scripts/*.js\"",
+    "lint": "eslint .",
+    "test": "npm run flow && npm run test-only",
+    "test-ci": "nyc npm run test",
+    "test-only": "mocha ./test -t 10000"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "babel-eslint": "^7.1.1",
+    "babel-helper-plugin-test-runner": "7.0.0-alpha.8",
+    "codecov": "^2.0.1",
+    "eslint": "^3.17.1",
+    "eslint-config-babel": "^6.0.0",
+    "eslint-plugin-flowtype": "^2.29.1",
+    "flow-bin": "^0.43.0",
+    "mocha": "^3.2.0",
+    "nyc": "^10.1.2",
+    "prettier": "^0.22.0"
+  },
+  "version": "1.0.0",
+  "description": "A Babel plugin to find out which ES runtime features are being used in the code.",
+  "author": "Henry Zhu <hi@henryzoo.com>",
+  "homepage": "https://babeljs.io/",
+  "repository": "https://github.com/babel/babel-preset-env"
+}

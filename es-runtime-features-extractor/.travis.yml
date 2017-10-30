@@ -1,0 +1,24 @@
+sudo: false
+language: node_js
+cache:
+  directories:
+    - node_modules
+node_js:
+- '7'
+- '6'
+- '4'
+env:
+  global:
+    - BABEL_ENV=test
+before_install:
+  - nvm use $TRAVIS_NODE_VERSION
+  - npm set loglevel error
+  - npm set progress false
+install:
+  - npm install
+script:
+  - 'npm run lint && npm run test-ci'
+matrix:
+  fast_finish: true
+
+after_success: 'npm run coverage-ci'
