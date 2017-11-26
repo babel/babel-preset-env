@@ -1,4 +1,4 @@
-# Now that `babel-preset-env` has stabilized, it has been [moved into the main Babel mono-repo](https://github.com/babel/babel/tree/master/experimental/babel-preset-env).
+# Now that `babel-preset-env` has stabilized, it has been [moved into the main Babel mono-repo](https://github.com/babel/babel/tree/master/packages/babel-preset-env).
 
 The move makes it much easier to release and develop in sync with the rest of Babel!
 
