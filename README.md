@@ -16,6 +16,8 @@ npm install babel-preset-env --save-dev
 
 Without any configuration options, babel-preset-env behaves exactly the same as babel-preset-latest (or babel-preset-es2015, babel-preset-es2016, and babel-preset-es2017 together).
 
+> However, we don't recommend using `preset-env` this way because it doesn't take advantage of it's greater capabilities of targeting specific browsers.
+
 ```json
 {
   "presets": ["env"]
@@ -24,19 +26,22 @@ Without any configuration options, babel-preset-env behaves exactly the same as 
 
 You can also configure it to only include the polyfills and transforms needed for the browsers you support. Compiling only what's needed can make your bundles smaller and your life easier.
 
-This example only includes the polyfills and code transforms needed for the last two versions of each browser, and versions of Safari greater than or equal to 7. We use [browserslist](https://github.com/ai/browserslist) to parse this information, so you can use [any valid query format supported by browserslist](https://github.com/ai/browserslist#queries).
+This example only includes the polyfills and code transforms needed for coverage of users > 0.25%, ignoring Internet Explorer 11 and Opera Mini.. We use [browserslist](https://github.com/ai/browserslist) to parse this information, so you can use [any valid query format supported by browserslist](https://github.com/ai/browserslist#queries).
 
-```json
+```js
 {
   "presets": [
     ["env", {
       "targets": {
-        "browsers": ["last 2 versions", "safari >= 7"]
+        // The % refers to the global coverage of users from browserslist
+        "browsers": [ ">0.25%", "not ie 11", "not op_mini all"]
       }
     }]
   ]
 }
 ```
+
+> You can also target individual versions of browsers instead of using a query with `"targets": { "chrome": "52" }`.
 
 Similarly, if you're targeting Node.js instead of the browser, you can configure babel-preset-env to only include the polyfills and transforms necessary for a particular version:
 
